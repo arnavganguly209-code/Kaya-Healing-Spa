@@ -76,9 +76,9 @@ function TherapyCard({
   );
 }
 
-function StonesIcon({ className = "text-[#F47B20]" }: { className?: string; size?: number; strokeWidth?: number }) {
+function StonesIcon({ className = "text-[#F47B20]", size = 22 }: { className?: string; size?: number; strokeWidth?: number }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
       <ellipse cx="12" cy="6" rx="5" ry="2.2" stroke="currentColor" strokeWidth="1.4" />
       <ellipse cx="12" cy="12" rx="6.2" ry="2.4" stroke="currentColor" strokeWidth="1.4" />
       <ellipse cx="12" cy="18" rx="7.2" ry="2.6" stroke="currentColor" strokeWidth="1.4" />
@@ -86,9 +86,9 @@ function StonesIcon({ className = "text-[#F47B20]" }: { className?: string; size
   );
 }
 
-function CareIcon({ className = "text-[#F47B20]" }: { className?: string; size?: number; strokeWidth?: number }) {
+function CareIcon({ className = "text-[#F47B20]", size = 22 }: { className?: string; size?: number; strokeWidth?: number }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
       <path d="M8 13c0-2 1.2-3.5 2.6-3.5 1 0 1.6.6 2 1.3.4-.7 1-1.3 2-1.3C16 9.5 17.2 11 17.2 13c0 2.6-2.4 4.6-5.2 6.2C9.2 17.6 8 15.6 8 13Z" stroke="currentColor" strokeWidth="1.4" />
       <path d="M12 8.2V5.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
       <path d="M12 6.2c1.2-1 2.4-1.2 3.2-.6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
@@ -104,28 +104,37 @@ export function HomePage() {
   const gallery = orbit.gallery;
   const hero = orbit.hero;
   const therapies = orbit.therapies;
-  const pointIcons = [Flower2, Sparkles, Leaf];
+  const pointIcons = [Flower2, Leaf, CareIcon];
   const featuredServices = services.slice(0, 6);
   const preview = gallery.slice(0, 6);
 
   return (
     <>
-      <section className="relative overflow-hidden bg-white lg:h-[100svh]">
-        <div className="pointer-events-none absolute inset-0 hidden lg:block">
+      <section className="relative overflow-hidden bg-white lg:h-[max(680px,min(100svh,52vw))]">
+        <div className="pointer-events-none absolute inset-x-0 top-[108px] bottom-[56px] hidden lg:block">
           <HeroMedia
             slides={hero.slides}
             display={hero.display}
             animation={hero.animation}
             intervalMs={hero.intervalMs}
-            className="absolute inset-y-0 right-0 w-[62%]"
-            objectPosition="center center"
+            className="absolute inset-y-0 right-0 w-[64%]"
+            objectPosition="72% center"
             priority
-            sizes="62vw"
+            sizes="64vw"
           />
-          <div className="absolute inset-y-0 right-0 w-[62%] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.92)_16%,rgba(255,255,255,0.35)_36%,transparent_56%)]" />
+          <div className="absolute inset-y-0 right-0 w-[64%] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.9)_10%,rgba(255,255,255,0.35)_24%,transparent_40%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/60 to-transparent" />
         </div>
+        <Image
+          src="/hero/kaya-leaves.png"
+          alt=""
+          aria-hidden
+          width={520}
+          height={520}
+          className="pointer-events-none absolute -bottom-10 -left-16 z-[5] hidden w-[340px] mix-blend-multiply lg:block xl:w-[400px]"
+        />
 
-        <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col px-5 pt-[72px] sm:px-10 lg:pt-[108px]">
+        <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col px-5 pt-[72px] sm:px-10 lg:px-14 lg:pt-[108px]">
           <div className="flex flex-1 items-center py-8 lg:py-0">
             <div className="max-w-[520px]">
               <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.26em] text-[#8a8a8a] uppercase">
@@ -133,30 +142,30 @@ export function HomePage() {
                 <span className="h-px w-10 bg-[#F47B20]" />
               </p>
               <h1
-                className="mt-5 text-[56px] leading-[0.9] font-medium tracking-[-0.035em] text-[#171717] sm:text-[72px] lg:text-[84px]"
+                className="mt-5 text-[60px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#171717] sm:text-[80px] lg:text-[96px] xl:text-[108px]"
                 style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
               >
                 <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
               </h1>
-              <p className="mt-4 font-serif text-[28px] leading-tight text-[#171717] lg:text-[34px]">
+              <p className="mt-3 font-serif text-[28px] leading-tight font-medium text-[#171717] lg:text-[36px]">
                 {hero.subtitle}
               </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[#e06d12]">
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[#F47B20] px-7 py-4 text-[15px] font-medium text-white shadow-[0_10px_24px_rgba(244,123,32,0.28)] transition hover:-translate-y-0.5 hover:bg-[#e06d12]">
                   {hero.explore} <span aria-hidden>→</span>
                 </Link>
-                <Link href="/contact" className="inline-flex items-center gap-2 rounded-full border border-[#ece7e2] bg-white px-6 py-3 text-sm font-medium text-[#171717] transition hover:-translate-y-0.5 hover:border-[#F47B20]">
+                <Link href="/contact" className="inline-flex items-center gap-2.5 rounded-full border border-[#efe9e3] bg-white px-7 py-4 text-[15px] font-medium text-[#171717] shadow-[0_10px_24px_rgba(23,23,23,0.06)] transition hover:-translate-y-0.5 hover:border-[#F47B20]">
                   <Calendar size={16} />
                   {hero.book}
                 </Link>
               </div>
-              <ul className="mt-8 flex flex-wrap gap-x-8 gap-y-4">
+              <ul className="mt-9 flex flex-wrap gap-x-9 gap-y-4">
                 {hero.points.map((point, index) => {
                   const Icon = pointIcons[index % pointIcons.length];
                   return (
                     <li key={point.title} className="flex items-center gap-3 text-[13px] leading-tight text-[#171717]">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#efe8e2] text-[#F47B20]">
-                        <Icon size={16} strokeWidth={1.5} />
+                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#fff1e6] text-[#F47B20]">
+                        <Icon size={19} strokeWidth={1.5} />
                       </span>
                       <span>
                         {point.title}
@@ -189,11 +198,11 @@ export function HomePage() {
                 return (
                   <li
                     key={feature.title}
-                    className="flex items-center gap-3 px-6 py-5 [&:not(:first-child)]:lg:border-l [&:not(:first-child)]:lg:border-[#f0ece8]"
+                    className="flex items-center gap-4 px-7 py-6 [&:not(:first-child)]:lg:border-l [&:not(:first-child)]:lg:border-[#f0ece8]"
                   >
-                    <Icon className="shrink-0 text-[#F47B20]" size={22} strokeWidth={1.5} />
+                    <Icon className="shrink-0 text-[#F47B20]" size={32} strokeWidth={1.3} />
                     <span>
-                      <span className="block text-sm font-semibold text-[#171717]">{feature.title}</span>
+                      <span className="block text-[15px] font-semibold text-[#171717]">{feature.title}</span>
                       <span className="text-[13px] text-[#8a8a8a]">{feature.text}</span>
                     </span>
                   </li>

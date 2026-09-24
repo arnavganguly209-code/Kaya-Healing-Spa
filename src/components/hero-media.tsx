@@ -78,7 +78,7 @@ export function HeroMedia({
   if (!current) return null;
 
   return (
-    <div className={`relative overflow-hidden ${className ?? ""}`}>
+    <div className={`overflow-hidden ${className ?? "relative"}`}>
       {still ? (
         <SlideVisual slide={current} objectPosition={objectPosition} priority={priority} sizes={sizes} />
       ) : (

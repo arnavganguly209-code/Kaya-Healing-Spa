@@ -23,9 +23,11 @@ export function SiteChrome({
       <main className={pathname === "/" ? "" : "pt-[72px] lg:pt-[108px]"}>{children}</main>
       {footer}
       <BackToTop />
-      <Link href="/contact" className="btn-primary fixed bottom-4 left-4 z-40 sm:hidden">
-        Book
-      </Link>
+      <div className="fixed bottom-4 left-4 z-40 sm:hidden">
+        <Link href="/contact" className="btn-primary">
+          Book
+        </Link>
+      </div>
     </>
   );
 }

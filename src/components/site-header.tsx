@@ -52,14 +52,16 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
           })}
         </nav>
         <div className="ml-auto flex items-center gap-5">
-          <a href={`tel:${phone.replace(/\s/g, "")}`} className="hidden items-center gap-2.5 text-[#171717] lg:flex">
-            <Phone size={18} className="call-pulse text-[#F47B20]" strokeWidth={1.8} />
+          <a href={`tel:${phone.replace(/\s/g, "")}`} className="hidden items-center gap-3 text-[#171717] lg:flex">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#fff1e6]">
+              <Phone size={18} className="call-pulse text-[#F47B20]" strokeWidth={1.8} />
+            </span>
             <span className="leading-tight">
               <span className="block text-[11px] text-[#8a8a8a]">Call Us</span>
               <span className="text-sm font-semibold">{phone}</span>
             </span>
           </a>
-          <Link href="/contact" className="hidden items-center gap-2 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#e06d12] sm:inline-flex">
+          <Link href="/contact" className="hidden items-center gap-2 rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white shadow-[0_8px_20px_rgba(244,123,32,0.25)] transition hover:bg-[#e06d12] sm:inline-flex">
             <Calendar size={16} />
             Book Appointment
             <span aria-hidden>→</span>
