@@ -31,19 +31,22 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   if (pathname.startsWith("/orbit")) return null;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/50 bg-white/70 backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/60 bg-white/75 shadow-[0_8px_32px_rgba(23,23,23,0.04)] backdrop-blur-lg">
       <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-5 md:px-8 lg:h-[108px]">
         <Link href="/" className="relative z-10 shrink-0" aria-label="KAYA SPA home">
-          <Logo size={92} priority />
+          <Logo priority />
         </Link>
-        <nav className="absolute left-1/2 z-20 hidden -translate-x-1/2 items-center gap-7 xl:flex" aria-label="Primary">
+        <nav
+          className="absolute left-[calc(50%-2.75rem)] z-20 hidden -translate-x-1/2 items-center gap-6 xl:flex 2xl:left-[calc(50%-1.5rem)] 2xl:gap-7"
+          aria-label="Primary"
+        >
           {links.map((link) => {
             const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-[15px] font-bold ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
+                className={`relative text-[15px] font-bold tracking-[0.01em] ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
               >
                 {link.label}
                 {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}
@@ -51,7 +54,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
             );
           })}
         </nav>
-        <div className="ml-auto flex items-center gap-5">
+        <div className="relative z-10 ml-auto flex shrink-0 items-center gap-4 lg:gap-5">
           <a href={`tel:${phone.replace(/\s/g, "")}`} className="hidden items-center gap-3 text-[#171717] lg:flex">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#fff1e6]">
               <Phone size={18} className="call-pulse text-[#F47B20]" strokeWidth={1.8} />

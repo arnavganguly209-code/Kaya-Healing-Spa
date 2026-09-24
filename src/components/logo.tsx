@@ -1,16 +1,16 @@
 import Image from "next/image";
 
-export function Logo({ size = 56, priority = false }: { size?: number; priority?: boolean }) {
+export function Logo({ priority = false }: { size?: number; priority?: boolean }) {
   return (
-    <span className="inline-flex rounded-full bg-white p-1">
+    <span className="inline-flex shrink-0 rounded-full bg-white p-1 shadow-[0_4px_14px_rgba(23,23,23,0.06)]">
       <Image
-        src="/brand/kaya-logo-hd.png"
+        src="/brand/kaya-logo-hd.webp"
         alt="KAYA SPA — A Complete Wellness Experience"
-        width={Math.max(size * 2, 200)}
-        height={Math.max(size * 2, 200)}
+        width={184}
+        height={184}
         priority={priority}
         unoptimized
-        className="h-[68px] w-[68px] rounded-full object-cover lg:h-[92px] lg:w-[92px]"
+        className="h-[68px] w-[68px] rounded-full object-contain lg:h-[92px] lg:w-[92px]"
       />
     </span>
   );
