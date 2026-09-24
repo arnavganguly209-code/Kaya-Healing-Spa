@@ -21,6 +21,8 @@ jobs:
   deploy:
     name: Update kaya-healing-spa
     runs-on: ubuntu-latest
+    env:
+      ORBIT_PASSKEY: ${{ secrets.ORBIT_PASSKEY }}
     steps:
       - name: Pull, build, and restart this app only
         uses: appleboy/ssh-action@v1.2.2
@@ -29,6 +31,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT != '' && secrets.VPS_PORT || 22 }}
+          envs: ORBIT_PASSKEY
           script_stop: true
           script: |
             set -euo pipefail
@@ -38,5 +41,11 @@ jobs:
             git reset --hard origin/main
             npm ci --include=dev
             npm run build
+            if [ -n "${ORBIT_PASSKEY:-}" ]; then
+              touch .env
+              grep -v '^ORBIT_PASSKEY=' .env > .env.orbit.tmp || true
+              printf 'ORBIT_PASSKEY=%s\n' "$ORBIT_PASSKEY" >> .env.orbit.tmp
+              mv .env.orbit.tmp .env
+            fi
             pm2 startOrReload /var/www/kaya-healing-spa/ecosystem.config.cjs --only kaya-healing-spa --update-env
             pm2 save

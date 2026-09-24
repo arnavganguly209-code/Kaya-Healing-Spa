@@ -1,12 +1,17 @@
 import { JsonLd } from "@/components/json-ld";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { categoryLabels, formatNpr, getService, services, site } from "@/lib/content";
+import { categoryLabels, formatNpr, getService as fallbackService, services, site } from "@/lib/content";
+import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ slug: string }> };
+
+function getService(slug: string) {
+  return readOrbitContent().services.find((service) => service.slug === slug) ?? fallbackService(slug);
+}
 
 export function generateStaticParams() {
   return services.map((service) => ({ slug: service.slug }));

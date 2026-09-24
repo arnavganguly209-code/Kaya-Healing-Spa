@@ -16,7 +16,7 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -27,11 +27,13 @@ export function SiteHeader() {
     };
   }, [open]);
 
+  if (pathname.startsWith("/orbit")) return null;
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-[#f3ebe3] bg-white">
-      <div className="mx-auto flex h-[86px] max-w-[1440px] items-center gap-6 px-4 md:px-8">
+      <div className="mx-auto flex h-[96px] max-w-[1440px] items-center gap-6 px-4 md:px-8">
         <Link href="/" className="shrink-0" aria-label="KAYA SPA home">
-          <Logo size={68} priority />
+          <Logo size={78} priority />
         </Link>
         <nav className="hidden flex-1 items-center justify-center gap-7 xl:flex" aria-label="Primary">
           {links.map((link) => {
@@ -49,13 +51,13 @@ export function SiteHeader() {
           })}
         </nav>
         <div className="ml-auto flex items-center gap-4">
-          <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="hidden items-center gap-2 text-sm text-[#1c1a17] lg:flex">
+          <a href={`tel:${phone.replace(/\s/g, "")}`} className="hidden items-center gap-2 text-sm text-[#1c1a17] lg:flex">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#fff1e6] text-[#e8771a]">
               <Phone size={16} />
             </span>
             <span>
               <span className="block text-[11px] text-[#8a8175]">Call Us</span>
-              <span className="font-medium">{site.phone}</span>
+              <span className="font-medium">{phone}</span>
             </span>
           </a>
           <Link href="/contact" className="hidden items-center gap-2 rounded-full bg-[#e8771a] px-5 py-3 text-sm font-medium text-white hover:bg-[#c45e0a] sm:inline-flex">
@@ -75,7 +77,7 @@ export function SiteHeader() {
         </div>
       </div>
       {open && (
-        <div className="fixed inset-0 top-[86px] z-40 flex flex-col bg-white px-6 py-8 xl:hidden">
+        <div className="fixed inset-0 top-[96px] z-40 flex flex-col bg-white px-6 py-8 xl:hidden">
           <nav className="flex flex-col gap-5" aria-label="Mobile">
             {links.map((link) => (
               <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="font-serif text-4xl">

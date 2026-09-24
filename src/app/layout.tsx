@@ -1,11 +1,10 @@
-import { BackToTop } from "@/components/back-to-top";
 import { JsonLd } from "@/components/json-ld";
+import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 import { site } from "@/lib/content";
+import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit, Playfair_Display } from "next/font/google";
-import Link from "next/link";
 import "./globals.css";
 
 const sans = Outfit({
@@ -83,13 +82,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${sans.variable} ${serif.variable} ${display.variable} h-full antialiased`}>
       <body className="min-h-full bg-[#fffcf8] text-[#141210]">
         <JsonLd data={business} />
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
-        <BackToTop />
-        <Link href="/contact" className="btn-primary fixed bottom-4 left-4 z-40 sm:hidden">
-          Book
-        </Link>
+        <SiteChrome phone={readOrbitContent().phone || site.phone} footer={<SiteFooter />}>
+          {children}
+        </SiteChrome>
       </body>
     </html>
   );

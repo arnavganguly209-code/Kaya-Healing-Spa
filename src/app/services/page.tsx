@@ -1,7 +1,8 @@
 import { JsonLd } from "@/components/json-ld";
 import { PageHero } from "@/components/page-hero";
 import { ServiceCatalog } from "@/components/service-catalog";
-import { services, site } from "@/lib/content";
+import { services as fallbackServices, site } from "@/lib/content";
+import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,6 +22,8 @@ export default async function ServicesPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const params = await searchParams;
+  const live = readOrbitContent();
+  const services = live.services.length ? live.services : fallbackServices;
   return (
     <>
       <JsonLd
@@ -41,7 +44,7 @@ export default async function ServicesPage({
         image="https://images.unsplash.com/photo-1519824145371-296894a0daa9?auto=format&fit=crop&w=2000&q=80"
         crumbs={[{ label: "Home", href: "/" }, { label: "Services" }]}
       />
-      <ServiceCatalog initialCategory={params.category ?? "all"} />
+      <ServiceCatalog initialCategory={params.category ?? "all"} items={services} />
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { Logo } from "@/components/logo";
 import { site } from "@/lib/content";
+import { readOrbitContent } from "@/lib/orbit-store";
 import Link from "next/link";
 
 const explore = [
@@ -21,6 +22,7 @@ const treatments = [
 ];
 
 export function SiteFooter() {
+  const orbit = readOrbitContent();
   return (
     <footer className="bg-[#141210] text-[#f6f1e8]">
       <div className="h-px w-full bg-gradient-to-r from-[#e8771a] via-[#2f8f45] to-transparent" />
@@ -29,7 +31,7 @@ export function SiteFooter() {
           <Logo size={72} />
           <p className="mt-4 text-sm tracking-[0.18em] uppercase text-white/70">{site.tagline}</p>
           <p className="prose-quiet mt-4 max-w-xs text-sm text-white/60">
-            A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.
+            {orbit.footerText}
           </p>
         </div>
         <div>
@@ -60,8 +62,8 @@ export function SiteFooter() {
           <p className="text-xs tracking-[0.2em] uppercase text-[#e8771a]">Contact</p>
           <ul className="mt-4 space-y-2 text-sm text-white/75">
             <li>{site.city}</li>
-            <li>{site.phone || "Phone shared when you book"}</li>
-            <li>{site.email || "Email shared when you book"}</li>
+            <li>{orbit.phone || "Phone shared when you book"}</li>
+            <li>{orbit.email || "Email shared when you book"}</li>
             {site.hours.map((row) => (
               <li key={row.day}>
                 {row.day}: {row.hours}

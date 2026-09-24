@@ -1,5 +1,6 @@
 import { Reveal } from "@/components/reveal";
-import { formatNpr, gallery, packages, reviews, services, site } from "@/lib/content";
+import { formatNpr, reviews, site } from "@/lib/content";
+import { readOrbitContent } from "@/lib/orbit-store";
 import { Calendar, Droplets, Flower2, Leaf, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -95,72 +96,74 @@ function Feature({
 }
 
 export function HomePage() {
+  const orbit = readOrbitContent();
+  const services = orbit.services;
+  const gallery = orbit.gallery;
+  const hero = orbit.hero;
+  const therapies = orbit.therapies;
+  const pointIcons = [Flower2, Sparkles, Leaf];
   const featuredServices = services.slice(0, 6);
   const preview = gallery.slice(0, 6);
 
   return (
     <>
-      <section className="relative bg-[#fffdfb] pt-[86px]">
-        <div className="relative min-h-[560px] overflow-hidden lg:min-h-[640px]">
+      <section className="flex flex-col bg-[#fffdfb] pt-[96px] lg:h-[100svh] lg:overflow-hidden">
+        <div className="relative min-h-[520px] flex-1 overflow-hidden lg:min-h-0">
           <Image
-            src="/hero/kaya-hero-uhd.png"
-            alt="A therapist giving a guest a massage in a bright KAYA SPA treatment room"
+            src={hero.image}
+            alt={hero.alt}
             fill
             priority
             className="object-cover object-[78%_center]"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,#fffdfb_0%,#fffdfb_34%,rgba(255,253,251,0.88)_46%,rgba(255,253,251,0.2)_62%,transparent_74%)]" />
-          <div className="relative z-10 mx-auto flex min-h-[560px] max-w-[1280px] items-center px-6 py-12 lg:min-h-[640px] lg:px-8">
+          <div className="relative z-10 mx-auto flex h-full min-h-[520px] max-w-[1280px] items-center px-6 py-6 lg:min-h-0 lg:px-8">
             <div className="max-w-[520px]">
               <p className="flex items-center gap-4 text-[11px] font-medium tracking-[0.28em] text-[#9a9188]">
-                A COMPLETE WELLNESS EXPERIENCE
+                {hero.eyebrow}
                 <span className="h-px w-14 bg-[#e8771a]" />
               </p>
               <h1
-                className="mt-4 text-[64px] leading-[0.9] font-semibold tracking-[-0.03em] text-[#1a1614] sm:text-[84px] lg:text-[92px]"
+                className="mt-3 text-[56px] leading-[0.9] font-semibold tracking-[-0.03em] text-[#1a1614] sm:text-[72px] lg:text-[4.6rem]"
                 style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
               >
-                <span className="text-[#e8771a]">Kaya</span> Spa
+                <span className="text-[#e8771a]">{hero.titleOrange}</span> {hero.titleDark}
               </h1>
-              <p className="mt-5 font-serif text-[28px] leading-tight text-[#1a1614] sm:text-[32px]">
-                Heal Your Body, Calm Your Mind
+              <p className="mt-3 font-serif text-[26px] leading-tight text-[#1a1614] lg:text-[30px]">
+                {hero.subtitle}
               </p>
               <p className="mt-4 max-w-[430px] text-[15px] leading-7 text-[#5c564f]">
-                Experience the perfect blend of traditional therapies and modern wellness in a serene and peaceful environment. Rejuvenate, relax and restore your natural balance.
+                {hero.body}
               </p>
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="mt-5 flex flex-wrap gap-3">
                 <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[#e8771a] px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#d06812]">
-                  Explore Treatments <span aria-hidden>→</span>
+                  {hero.explore} <span aria-hidden>→</span>
                 </Link>
                 <Link href="/contact" className="inline-flex items-center gap-2 rounded-full border border-[#eadfd4] bg-white px-6 py-3 text-sm font-medium text-[#1a1614] hover:border-[#e8771a]">
                   <Calendar size={16} />
-                  Book Your Experience
+                  {hero.book}
                 </Link>
               </div>
-              <ul className="mt-9 flex flex-wrap gap-x-6 gap-y-4 text-[13px] leading-tight text-[#1a1614]">
-                <li className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#e4ddd4]"><Flower2 size={18} strokeWidth={1.4} /></span>
-                  Traditional<br />Therapies
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#e4ddd4]"><Sparkles size={18} strokeWidth={1.4} /></span>
-                  Relaxation<br />&amp; Healing
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#e4ddd4]"><Leaf size={18} strokeWidth={1.4} /></span>
-                  Natural<br />Wellness
-                </li>
+              <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-4 text-[13px] leading-tight text-[#1a1614]">
+                {hero.points.map((point, index) => {
+                  const Icon = pointIcons[index % pointIcons.length];
+                  return (
+                    <li key={point.title} className="flex items-center gap-3">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#e4ddd4]"><Icon size={18} strokeWidth={1.4} /></span>
+                      {point.title}<br />{point.text}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
         </div>
         <div className="border-t border-[#f3ebe3] bg-[#fffdfb]">
-          <ul className="mx-auto grid max-w-[1280px] gap-6 px-6 py-6 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
-            <Feature icon={Flower2} title="Massage Therapy" text="Release tension, restore balance" />
-            <Feature icon={Leaf} title="Body Treatments" text="Naturally rejuvenate your body" />
-            <Feature icon={Sparkles} title="Wellness Rituals" text="Ancient wisdom, modern care" />
-            <Feature icon={Flower2} title="Personalized Care" text="Tailored to your unique needs" />
+          <ul className="mx-auto grid max-w-[1280px] gap-4 px-6 py-3 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
+            {hero.features.map((feature, index) => (
+              <Feature key={feature.title} icon={[Flower2, Leaf, Sparkles, Flower2][index % 4]} title={feature.title} text={feature.text} />
+            ))}
           </ul>
         </div>
       </section>
@@ -171,24 +174,24 @@ export function HomePage() {
           <div className="grid items-center gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
             <div>
               <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.28em] text-[#8d857c]">
-                OUR SIGNATURE TREATMENTS
+                {therapies.eyebrow}
                 <span className="h-px w-16 bg-[#e8771a]" />
               </p>
               <h2
                 className="mt-3 text-4xl leading-[0.95] font-semibold tracking-[-0.03em] text-[#1a1614] sm:text-5xl lg:text-[56px]"
                 style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
               >
-                <span className="text-[#e8771a]">Natural Therapies</span>
+                <span className="text-[#e8771a]">{therapies.titleOrange}</span>
                 <br />
-                for a Healthier You
+                {therapies.titleDark}
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-6 text-[#5c564f] sm:text-[15px]">
-                Experience a carefully crafted range of traditional and modern therapies designed to relax your body, calm your mind, and restore your natural balance.
+                {therapies.intro}
               </p>
             </div>
             <div className="relative h-44 overflow-hidden rounded-2xl sm:h-56 lg:h-[220px]">
               <Image
-                src="/therapies/therapies-still.png"
+                src={therapies.image}
                 alt="Rolled towels, a candle, and flowers in the spa"
                 fill
                 className="object-cover"
@@ -197,38 +200,17 @@ export function HomePage() {
             </div>
           </div>
           <div className="relative z-10 mt-6 grid gap-4 sm:grid-cols-2 lg:-mt-8 lg:grid-cols-4 lg:gap-5">
-            <TherapyCard
-              href="/services/signature-massage"
-              image="/therapies/card-massage.png"
-              alt="Guest receiving a traditional massage"
-              icon={Flower2}
-              title="Traditional Massage"
-              text="Release tension, relieve stress and restore your natural balance with expert massage techniques."
-            />
-            <TherapyCard
-              href="/services/shirodhara"
-              image="/therapies/card-ayurveda.png"
-              alt="Warm oil poured during an Ayurvedic treatment"
-              icon={Droplets}
-              title="Ayurvedic Therapy"
-              text="Ancient healing practices to detoxify, rejuvenate and promote complete wellness."
-            />
-            <TherapyCard
-              href="/services/calm-facial"
-              image="/therapies/card-facial.png"
-              alt="Guest resting during a facial"
-              icon={Sparkles}
-              title="Facial Treatments"
-              text="Rejuvenate your skin with natural care and professional skincare therapies."
-            />
-            <TherapyCard
-              href="/services/hot-stone"
-              image="/therapies/card-stones.png"
-              alt="Warm stones prepared for hot stone therapy"
-              icon={Flower2}
-              title="Hot Stone Therapy"
-              text="Deep relaxation, improve circulation and relieve muscle tension with warm stone therapy."
-            />
+            {therapies.cards.map((card, index) => (
+              <TherapyCard
+                key={card.title}
+                href={card.href}
+                image={card.image}
+                alt={card.alt}
+                icon={[Flower2, Droplets, Sparkles, Flower2][index % 4]}
+                title={card.title}
+                text={card.text}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -338,7 +320,7 @@ export function HomePage() {
         <p className="eyebrow">Packages</p>
         <h2 className="display mt-3 text-5xl md:text-6xl">Featured sequences</h2>
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
-          {packages.slice(0, 4).map((item) => (
+          {orbit.packages.slice(0, 4).map((item) => (
             <article key={item.slug} className="grid overflow-hidden border border-[#e6dfd4] bg-white md:grid-cols-5">
               <div className="relative min-h-56 md:col-span-2">
                 <Image src={item.image} alt={item.imageAlt} fill className="object-cover" sizes="40vw" />

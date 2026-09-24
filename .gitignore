@@ -37,6 +37,8 @@ yarn-error.log*
 backend/node_modules
 backend/dist
 public/hero/reference-hero.jpg
+/data/orbit-content.json
+/public/uploads
 
 # vercel
 .vercel

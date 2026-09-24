@@ -17,18 +17,24 @@ const filters: (ServiceCategory | "all")[] = [
   "recovery",
 ];
 
-export function ServiceCatalog({ initialCategory = "all" }: { initialCategory?: string }) {
+export function ServiceCatalog({
+  initialCategory = "all",
+  items = services,
+}: {
+  initialCategory?: string;
+  items?: typeof services;
+}) {
   const [category, setCategory] = useState(initialCategory);
   const [query, setQuery] = useState("");
 
   const list = useMemo(() => {
-    return services.filter((service) => {
+    return items.filter((service) => {
       const catOk = category === "all" || service.category === category;
       const q = query.trim().toLowerCase();
       const textOk = !q || `${service.name} ${service.summary}`.toLowerCase().includes(q);
       return catOk && textOk;
     });
-  }, [category, query]);
+  }, [category, query, items]);
 
   return (
     <div className="mx-auto max-w-[1440px] px-5 py-16 md:px-8">
