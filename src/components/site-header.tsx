@@ -20,6 +20,9 @@ const links = [
 export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const isHome = pathname === "/";
+  const glass = !isHome || scrolled;
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -28,10 +31,23 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
     };
   }, [open]);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [pathname]);
+
   if (pathname.startsWith("/orbit")) return null;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/60 bg-white/75 shadow-[0_8px_32px_rgba(23,23,23,0.04)] backdrop-blur-lg">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300 ${
+        glass
+          ? "border-b border-white/60 bg-white/75 shadow-[0_8px_32px_rgba(23,23,23,0.04)] backdrop-blur-lg"
+          : "border-b border-transparent bg-transparent shadow-none backdrop-blur-none"
+      }`}
+    >
       <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-5 md:px-8 lg:h-[108px]">
         <Link href="/" className="relative z-10 shrink-0" aria-label="KAYA SPA home">
           <Logo priority />

@@ -107,14 +107,25 @@ export function TherapiesSection({
   const sectionImageUnoptimized = image.startsWith("/uploads/");
 
   return (
-    <section className="relative overflow-hidden bg-white px-4 py-12 sm:px-6 lg:min-h-[100svh] lg:px-10 lg:py-16">
+    <section className="relative overflow-hidden bg-[#fffaf6] px-4 py-12 sm:px-6 lg:min-h-[100svh] lg:px-10 lg:py-16">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#fffaf6_22%,#fff8f3_100%)]" />
+      <div className="pointer-events-none absolute -left-16 top-0 h-64 w-64 rounded-full bg-[#e8f5e6]/80 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-16 h-72 w-72 rounded-full bg-[#e8f5e6]/60 blur-3xl" />
       <Image
         src="/hero/kaya-leaves.png"
         alt=""
         aria-hidden
-        width={420}
-        height={420}
-        className="pointer-events-none absolute -left-24 top-8 hidden w-[280px] mix-blend-multiply opacity-90 lg:block"
+        width={480}
+        height={480}
+        className="pointer-events-none absolute -left-20 top-4 z-[1] hidden w-[min(42vw,360px)] opacity-95 lg:block"
+      />
+      <Image
+        src="/hero/kaya-leaves.png"
+        alt=""
+        aria-hidden
+        width={480}
+        height={480}
+        className="pointer-events-none absolute -bottom-16 -left-12 z-[1] hidden w-[min(38vw,320px)] -scale-x-100 opacity-90 lg:block"
       />
       <Image
         src="/hero/kaya-leaves.png"
@@ -122,10 +133,10 @@ export function TherapiesSection({
         aria-hidden
         width={420}
         height={420}
-        className="pointer-events-none absolute -right-28 bottom-0 hidden w-[320px] rotate-180 mix-blend-multiply opacity-85 lg:block"
+        className="pointer-events-none absolute -right-24 bottom-0 z-[1] hidden w-[280px] rotate-180 opacity-85 lg:block"
       />
 
-      <div className="relative mx-auto flex w-full max-w-[1240px] flex-col justify-center lg:min-h-[calc(100svh-8rem)]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1240px] flex-col justify-center lg:min-h-[calc(100svh-8rem)]">
         <div className="grid items-center gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
           <div>
             <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.28em] text-[#8d857c] uppercase">
