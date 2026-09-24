@@ -146,7 +146,13 @@ function merge<T>(base: T, saved: Partial<T> | undefined): T {
 }
 
 function normalizeHero(hero: OrbitHero): OrbitHero {
-  const stock = ["/hero/kaya-hero-wide.png", "/hero/kaya-hero-uhd.png", "/hero/kaya-hero-match.png", "/hero/kaya-hero-design.png"];
+  const stock = [
+    "/hero/kaya-hero-wide.png",
+    "/hero/kaya-hero-uhd.png",
+    "/hero/kaya-hero-match.png",
+    "/hero/kaya-hero-design.png",
+    "/uploads/1790263964706-po5z83.png",
+  ];
   const latest = "/hero/kaya-hero-spa.png";
   const slides = (hero.slides?.length ? hero.slides : [{ src: hero.image, alt: hero.alt, kind: "image" as const }])
     .filter((slide) => slide.src)
