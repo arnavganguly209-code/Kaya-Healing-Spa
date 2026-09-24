@@ -109,7 +109,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   const hero = content.hero;
   const heroSlides = hero.slides.length
     ? hero.slides
-    : [{ src: hero.image || "/hero/kaya-hero-match.png", alt: hero.alt, kind: "image" as const }];
+    : [{ src: hero.image || "/hero/kaya-hero-design.png", alt: hero.alt, kind: "image" as const }];
 
   return (
     <div className="flex min-h-[100svh] bg-[#f7f2ea] text-[#171717]">
@@ -192,7 +192,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   <Field label="Alt text" value={slide.alt} onChange={(value) => updateSlide(index, { alt: value })} />
                   <MediaField
                     label="Replace file"
-                    src={slide.src || hero.image || "/hero/kaya-hero-match.png"}
+                    src={slide.src || hero.image || "/hero/kaya-hero-design.png"}
                     kind={slide.kind}
                     onUpload={(file) => upload(file, (src, kind) => updateSlide(index, { src, kind }))}
                     onLibrary={() => setPicker((src, kind) => updateSlide(index, { src, kind }))}
@@ -200,7 +200,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 </div>
               ))}
               {hero.slides.length < 10 && (
-                <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => updateSlides([...heroSlides, { src: "/hero/kaya-hero-match.png", alt: "KAYA SPA hero", kind: "image" }])}>
+                <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => updateSlides([...heroSlides, { src: "/hero/kaya-hero-design.png", alt: "KAYA SPA hero", kind: "image" }])}>
                   Add image or video
                 </button>
               )}

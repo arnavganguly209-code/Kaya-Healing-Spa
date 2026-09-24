@@ -53,11 +53,11 @@ export function defaultOrbitContent(): OrbitContent {
     footerText:
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
     hero: {
-      image: "/hero/kaya-hero-match.png",
+      image: "/hero/kaya-hero-design.png",
       alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
       slides: [
         {
-          src: "/hero/kaya-hero-match.png",
+          src: "/hero/kaya-hero-design.png",
           alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
           kind: "image",
         },
@@ -146,8 +146,8 @@ function merge<T>(base: T, saved: Partial<T> | undefined): T {
 }
 
 function normalizeHero(hero: OrbitHero): OrbitHero {
-  const stock = ["/hero/kaya-hero-wide.png", "/hero/kaya-hero-uhd.png"];
-  const latest = "/hero/kaya-hero-match.png";
+  const stock = ["/hero/kaya-hero-wide.png", "/hero/kaya-hero-uhd.png", "/hero/kaya-hero-match.png"];
+  const latest = "/hero/kaya-hero-design.png";
   const slides = (hero.slides?.length ? hero.slides : [{ src: hero.image, alt: hero.alt, kind: "image" as const }])
     .filter((slide) => slide.src)
     .slice(0, 10)

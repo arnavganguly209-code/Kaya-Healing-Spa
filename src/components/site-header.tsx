@@ -31,12 +31,12 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   if (pathname.startsWith("/orbit")) return null;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-transparent">
-      <div className="mx-auto flex h-[72px] max-w-[1440px] items-center gap-6 px-5 md:px-8 lg:h-[108px] lg:gap-10">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/50 bg-white/70 backdrop-blur-md">
+      <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-5 md:px-8 lg:h-[108px]">
         <Link href="/" className="relative z-10 shrink-0" aria-label="KAYA SPA home">
           <Logo size={92} priority />
         </Link>
-        <nav className="relative z-20 hidden items-center gap-6 xl:flex" aria-label="Primary">
+        <nav className="absolute left-1/2 z-20 hidden -translate-x-1/2 items-center gap-7 xl:flex" aria-label="Primary">
           {links.map((link) => {
             const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (

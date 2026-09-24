@@ -110,22 +110,22 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-white pt-[72px] lg:h-[100svh] lg:pt-[108px]">
-        <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 hidden lg:block">
+      <section className="relative overflow-hidden bg-white lg:h-[100svh]">
+        <div className="pointer-events-none absolute inset-0 hidden lg:block">
           <HeroMedia
             slides={hero.slides}
             display={hero.display}
             animation={hero.animation}
             intervalMs={hero.intervalMs}
-            className="absolute inset-y-0 right-0 w-[58%]"
-            objectPosition="68% center"
+            className="absolute inset-y-0 right-0 w-[62%]"
+            objectPosition="center center"
             priority
-            sizes="58vw"
+            sizes="62vw"
           />
-          <div className="absolute inset-y-0 right-0 w-[58%] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.88)_18%,rgba(255,255,255,0.28)_38%,transparent_58%)]" />
+          <div className="absolute inset-y-0 right-0 w-[62%] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.92)_16%,rgba(255,255,255,0.35)_36%,transparent_56%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col px-5 sm:px-10">
+        <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col px-5 pt-[72px] sm:px-10 lg:pt-[108px]">
           <div className="flex flex-1 items-center py-8 lg:py-0">
             <div className="max-w-[520px]">
               <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.26em] text-[#8a8a8a] uppercase">
@@ -182,7 +182,7 @@ export function HomePage() {
             />
           </div>
 
-          <div className="relative z-20 mb-6 rounded-[28px] border border-[#f0ece8] bg-white shadow-[0_12px_40px_rgba(23,23,23,0.06)]">
+          <div className="relative z-20 mb-6 rounded-[28px] border border-white/80 bg-white/70 shadow-[0_16px_40px_rgba(23,23,23,0.08)] backdrop-blur-xl">
             <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];
