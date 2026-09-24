@@ -3,7 +3,12 @@
 import { packages, services } from "@/lib/content";
 import { useState } from "react";
 
-const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "";
+const useExternalApi = apiBase.startsWith("https://") && !apiBase.includes("localhost") && !apiBase.includes("127.0.0.1");
+
+function endpoint(path: "/appointments" | "/newsletter") {
+  return useExternalApi ? `${apiBase}${path}` : `/api${path}`;
+}
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -23,7 +28,7 @@ export function BookingForm({ service, packageSlug }: { service?: string; packag
     setStatus("loading");
     setMessage("");
     try {
-      const response = await fetch(`${api}/appointments`, {
+      const response = await fetch(endpoint("/appointments"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,7 +111,7 @@ export function NewsletterForm() {
     const email = String(new FormData(form).get("email") ?? "");
     setStatus("loading");
     try {
-      const response = await fetch(`${api}/newsletter`, {
+      const response = await fetch(endpoint("/newsletter"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

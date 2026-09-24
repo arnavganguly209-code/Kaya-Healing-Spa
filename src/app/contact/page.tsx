@@ -58,9 +58,20 @@ export default async function ContactPage({
             />
           </div>
           <div className="mt-6 flex flex-wrap gap-4 text-xs tracking-[0.14em] uppercase">
-            <a href={site.social.instagram}>Instagram</a>
-            <a href={site.social.facebook}>Facebook</a>
-            <a href={site.social.google}>Google</a>
+            {(
+              [
+                ["Instagram", site.social.instagram],
+                ["Facebook", site.social.facebook],
+                ["Google", site.social.google],
+                ["Tripadvisor", site.social.tripadvisor],
+              ] as const
+            )
+              .filter(([, href]) => href.startsWith("https://"))
+              .map(([label, href]) => (
+                <a key={label} href={href} target="_blank" rel="noreferrer">
+                  {label}
+                </a>
+              ))}
           </div>
           <h3 className="mt-10 font-serif text-2xl">Wellness notes</h3>
           <p className="prose-quiet mt-2 text-sm">Receive wellness updates & exclusive offers.</p>

@@ -13,13 +13,20 @@ export const site = {
     { day: "Saturday", hours: "10:00 – 21:00" },
   ],
   hoursNote: "Hours shown are a working schedule and can be confirmed when you book.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL &&
+    !process.env.NEXT_PUBLIC_SITE_URL.includes("localhost") &&
+    !process.env.NEXT_PUBLIC_SITE_URL.includes("127.0.0.1")
+      ? process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "")
+      : process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://kaya.theglobalorbit.com",
   social: {
-    instagram: "https://instagram.com",
-    facebook: "https://facebook.com",
-    tiktok: "https://tiktok.com",
-    google: "https://maps.google.com/?q=Kathmandu",
-    tripadvisor: "https://www.tripadvisor.com",
+    instagram: "",
+    facebook: "",
+    tiktok: "",
+    google: "",
+    tripadvisor: "",
   },
 };
 

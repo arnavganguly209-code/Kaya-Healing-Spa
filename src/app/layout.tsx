@@ -36,20 +36,30 @@ export const metadata: Metadata = {
   },
   description:
     "KAYA SPA is a luxury wellness spa in Kathmandu. Book massage, Ayurvedic rituals, and spa packages for a calm, complete visit.",
-  openGraph: {
-    type: "website",
-    siteName: "KAYA SPA",
-    title: "KAYA SPA | A Complete Wellness Experience",
-    description: "Luxury spa and wellness in Kathmandu. Massage, Ayurveda, and unhurried spa packages.",
-    images: ["/brand/kaya-logo.jpg"],
-  },
   twitter: {
     card: "summary_large_image",
     title: "KAYA SPA",
     description: "A complete wellness experience in Kathmandu.",
     images: ["/brand/kaya-logo.jpg"],
   },
+  keywords: [
+    "Kaya Spa",
+    "spa in Kathmandu",
+    "luxury spa in Kathmandu",
+    "massage in Kathmandu",
+    "wellness spa Kathmandu",
+    "Ayurvedic massage Kathmandu",
+  ],
+  icons: { icon: "/brand/kaya-logo.jpg", apple: "/brand/kaya-logo.jpg" },
   alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "KAYA SPA",
+    url: site.url,
+    title: "KAYA SPA | A Complete Wellness Experience",
+    description: "Luxury spa and wellness in Kathmandu. Massage, Ayurveda, and unhurried spa packages.",
+    images: ["/brand/kaya-logo.jpg"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

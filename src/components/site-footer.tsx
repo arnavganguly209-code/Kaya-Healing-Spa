@@ -69,17 +69,25 @@ export function SiteFooter() {
             ))}
           </ul>
           <p className="mt-6 text-xs tracking-[0.16em] uppercase text-white/50">Receive wellness updates & exclusive offers</p>
-          <form className="mt-3 flex gap-2" action="/contact#newsletter">
-            <Link href="/contact#newsletter" className="btn-primary !py-3">
-              Join the list
-            </Link>
-          </form>
+          <Link href="/contact#newsletter" className="btn-primary !py-3">
+            Join the list
+          </Link>
           <div className="mt-6 flex flex-wrap gap-4 text-xs tracking-[0.14em] uppercase text-white/60">
-            <a href={site.social.instagram} target="_blank" rel="noreferrer">Instagram</a>
-            <a href={site.social.facebook} target="_blank" rel="noreferrer">Facebook</a>
-            <a href={site.social.tiktok} target="_blank" rel="noreferrer">TikTok</a>
-            <a href={site.social.google} target="_blank" rel="noreferrer">Google</a>
-            <a href={site.social.tripadvisor} target="_blank" rel="noreferrer">TripAdvisor</a>
+            {(
+              [
+                ["Instagram", site.social.instagram],
+                ["Facebook", site.social.facebook],
+                ["TikTok", site.social.tiktok],
+                ["Google", site.social.google],
+                ["TripAdvisor", site.social.tripadvisor],
+              ] as const
+            )
+              .filter(([, href]) => href.startsWith("https://"))
+              .map(([label, href]) => (
+                <a key={label} href={href} target="_blank" rel="noreferrer">
+                  {label}
+                </a>
+              ))}
           </div>
         </div>
       </div>

@@ -402,6 +402,18 @@ export function HomePage() {
           <p className="mt-4 max-w-xl text-sm text-[#8a8175]">
             These cards are placeholders. They are not guest reviews and are not sourced from Google or TripAdvisor.
           </p>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm">
+            {site.social.google.startsWith("https://") ? (
+              <a className="btn-line" href={site.social.google} target="_blank" rel="noreferrer">Google reviews</a>
+            ) : (
+              <span className="text-[#8a8175]">Google reviews: listing not connected yet.</span>
+            )}
+            {site.social.tripadvisor.startsWith("https://") ? (
+              <a className="btn-line" href={site.social.tripadvisor} target="_blank" rel="noreferrer">Tripadvisor reviews</a>
+            ) : (
+              <span className="text-[#8a8175]">Tripadvisor reviews: listing not connected yet.</span>
+            )}
+          </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {reviews.map((review, index) => (
               <blockquote key={review.id} className={`bg-white p-8 ${index === 0 ? "lg:col-span-2" : ""}`}>
