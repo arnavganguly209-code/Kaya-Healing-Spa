@@ -110,55 +110,53 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative bg-white lg:h-[100svh]">
-        <div className="pointer-events-none absolute inset-0 hidden lg:block">
+      <section className="relative overflow-hidden bg-white pt-[72px] lg:h-[100svh] lg:pt-[104px]">
+        <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 hidden lg:block">
           <HeroMedia
             slides={hero.slides}
             display={hero.display}
             animation={hero.animation}
             intervalMs={hero.intervalMs}
-            className="absolute inset-y-0 right-0 w-[60%]"
+            className="absolute inset-y-0 right-0 w-[58%]"
+            objectPosition="68% center"
             priority
-            sizes="60vw"
+            sizes="58vw"
           />
-          <div className="absolute inset-y-0 right-0 w-[60%] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.9)_10%,rgba(255,255,255,0.35)_24%,transparent_40%)]" />
+          <div className="absolute inset-y-0 right-0 w-[58%] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.88)_18%,rgba(255,255,255,0.28)_38%,transparent_58%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto flex max-w-[1400px] flex-col px-5 pt-[88px] sm:px-8 lg:h-full lg:pt-[128px]">
-          <div className="py-6 lg:flex lg:flex-1 lg:items-center lg:py-0 lg:pt-2 lg:pb-2">
-            <div className="max-w-[460px]">
-              <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.22em] text-[#6B6B6B] uppercase">
+        <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col px-5 sm:px-10">
+          <div className="flex flex-1 items-center py-8 lg:py-0">
+            <div className="max-w-[520px]">
+              <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.26em] text-[#8a8a8a] uppercase">
                 {hero.eyebrow}
-                <span className="h-px w-12 bg-[#F47B20]" />
+                <span className="h-px w-10 bg-[#F47B20]" />
               </p>
               <h1
-                className="mt-4 text-[52px] leading-[0.92] font-medium tracking-[-0.03em] text-[#171717] sm:text-[68px] lg:text-[76px]"
+                className="mt-5 text-[56px] leading-[0.9] font-medium tracking-[-0.035em] text-[#171717] sm:text-[72px] lg:text-[84px]"
                 style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
               >
                 <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
               </h1>
-              <p className="mt-3 font-serif text-[26px] leading-tight text-[#171717] sm:text-[30px]">
+              <p className="mt-4 font-serif text-[28px] leading-tight text-[#171717] lg:text-[34px]">
                 {hero.subtitle}
               </p>
-              <p className="mt-4 max-w-[420px] text-[15px] leading-7 text-[#6B6B6B]">
-                {hero.body}
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-7 flex flex-wrap gap-3">
                 <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[#e06d12]">
                   {hero.explore} <span aria-hidden>→</span>
                 </Link>
-                <Link href="/contact" className="inline-flex items-center gap-2 rounded-full border border-[#e6e1dc] bg-white px-6 py-3 text-sm font-medium text-[#171717] transition hover:-translate-y-0.5 hover:border-[#F47B20]">
+                <Link href="/contact" className="inline-flex items-center gap-2 rounded-full border border-[#ece7e2] bg-white px-6 py-3 text-sm font-medium text-[#171717] transition hover:-translate-y-0.5 hover:border-[#F47B20]">
                   <Calendar size={16} />
                   {hero.book}
                 </Link>
               </div>
-              <ul className="mt-7 flex flex-wrap gap-x-7 gap-y-4">
+              <ul className="mt-8 flex flex-wrap gap-x-8 gap-y-4">
                 {hero.points.map((point, index) => {
                   const Icon = pointIcons[index % pointIcons.length];
                   return (
-                    <li key={point.title} className="flex items-center gap-2.5 text-[13px] leading-tight text-[#171717]">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#efe8e2] bg-[#fffaf7] text-[#F47B20]">
-                        <Icon size={16} strokeWidth={1.6} />
+                    <li key={point.title} className="flex items-center gap-3 text-[13px] leading-tight text-[#171717]">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#efe8e2] text-[#F47B20]">
+                        <Icon size={16} strokeWidth={1.5} />
                       </span>
                       <span>
                         {point.title}
@@ -172,7 +170,7 @@ export function HomePage() {
             </div>
           </div>
 
-          <div className="relative mb-8 h-64 overflow-hidden sm:h-80 lg:hidden">
+          <div className="relative mb-6 h-64 overflow-hidden sm:h-80 lg:hidden">
             <HeroMedia
               slides={hero.slides}
               display={hero.display}
@@ -184,19 +182,19 @@ export function HomePage() {
             />
           </div>
 
-          <div className="relative z-20 mb-5 rounded-2xl border border-[#eeeae6] bg-white shadow-[0_10px_30px_rgba(23,23,23,0.06)] lg:mb-7">
+          <div className="relative z-20 mb-6 rounded-[28px] border border-[#f0ece8] bg-white shadow-[0_12px_40px_rgba(23,23,23,0.06)]">
             <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];
                 return (
                   <li
                     key={feature.title}
-                    className="flex items-center gap-3 px-5 py-4 lg:px-6 lg:py-5 [&:not(:first-child)]:lg:border-l [&:not(:first-child)]:lg:border-[#eeeae6]"
+                    className="flex items-center gap-3 px-6 py-5 [&:not(:first-child)]:lg:border-l [&:not(:first-child)]:lg:border-[#f0ece8]"
                   >
                     <Icon className="shrink-0 text-[#F47B20]" size={22} strokeWidth={1.5} />
                     <span>
                       <span className="block text-sm font-semibold text-[#171717]">{feature.title}</span>
-                      <span className="text-[13px] text-[#6B6B6B]">{feature.text}</span>
+                      <span className="text-[13px] text-[#8a8a8a]">{feature.text}</span>
                     </span>
                   </li>
                 );
