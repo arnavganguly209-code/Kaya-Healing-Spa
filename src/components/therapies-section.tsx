@@ -30,7 +30,7 @@ function TherapySlideCard({
   const unoptimized = card.image.startsWith("/uploads/");
 
   return (
-    <article className="flex h-full w-[min(100%,280px)] shrink-0 snap-start flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_16px_48px_rgba(40,24,8,0.1)] sm:w-[300px] lg:w-[calc((100%-3rem)/4)] lg:min-w-[240px] lg:max-w-[300px]">
+    <article className="flex h-full min-h-[380px] w-[min(100%,280px)] shrink-0 snap-start flex-col overflow-hidden rounded-[22px] border border-[#f0ece8] bg-white shadow-[0_12px_40px_rgba(40,24,8,0.07)] sm:w-[300px] lg:w-[calc((100%-3rem)/4)] lg:min-w-[240px] lg:max-w-[300px]">
       <div className="relative h-[168px] sm:h-[180px]">
         <Image
           src={card.image}
@@ -63,8 +63,6 @@ export function TherapiesSection({
   titleOrange,
   titleDark,
   intro,
-  image,
-  imageAlt,
   cards,
 }: {
   eyebrow: string;
@@ -104,67 +102,25 @@ export function TherapiesSection({
     return () => window.removeEventListener("resize", onResize);
   }, [cards.length, syncArrows]);
 
-  const sectionImageUnoptimized = image.startsWith("/uploads/");
-
   return (
-    <section className="relative overflow-hidden bg-[#fffaf6] px-4 py-12 sm:px-6 lg:min-h-[100svh] lg:px-10 lg:py-16">
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#fffaf6_22%,#fff8f3_100%)]" />
-      <div className="pointer-events-none absolute -left-16 top-0 h-64 w-64 rounded-full bg-[#e8f5e6]/80 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 bottom-16 h-72 w-72 rounded-full bg-[#e8f5e6]/60 blur-3xl" />
-      <Image
-        src="/hero/kaya-leaves.png"
-        alt=""
-        aria-hidden
-        width={480}
-        height={480}
-        className="pointer-events-none absolute -left-20 top-4 z-[1] hidden w-[min(42vw,360px)] opacity-95 lg:block"
-      />
-      <Image
-        src="/hero/kaya-leaves.png"
-        alt=""
-        aria-hidden
-        width={480}
-        height={480}
-        className="pointer-events-none absolute -bottom-16 -left-12 z-[1] hidden w-[min(38vw,320px)] -scale-x-100 opacity-90 lg:block"
-      />
-      <Image
-        src="/hero/kaya-leaves.png"
-        alt=""
-        aria-hidden
-        width={420}
-        height={420}
-        className="pointer-events-none absolute -right-24 bottom-0 z-[1] hidden w-[280px] rotate-180 opacity-85 lg:block"
-      />
-
-      <div className="relative z-10 mx-auto flex w-full max-w-[1240px] flex-col justify-center lg:min-h-[calc(100svh-8rem)]">
-        <div className="grid items-center gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
-          <div>
-            <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.28em] text-[#8d857c] uppercase">
-              {eyebrow}
-              <span className="h-px w-16 bg-[#F47B20]" />
-            </p>
-            <h2
-              className="mt-4 text-[40px] leading-[0.95] font-semibold tracking-[-0.03em] sm:text-5xl lg:text-[56px]"
-              style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
-            >
-              <span className="text-[#F47B20]">{titleOrange}</span>{" "}
-              <span className="text-[#1a1614]">{titleDark}</span>
-            </h2>
-            <p className="mt-5 max-w-xl text-sm leading-7 text-[#5c564f] sm:text-[15px]">{intro}</p>
-          </div>
-          <div className="relative h-48 overflow-hidden rounded-[24px] shadow-[0_20px_50px_rgba(40,24,8,0.08)] sm:h-56 lg:h-[240px]">
-            <Image
-              src={image}
-              alt={imageAlt}
-              fill
-              unoptimized={sectionImageUnoptimized}
-              className="object-cover"
-              sizes="(min-width: 1024px) 46vw, 100vw"
-            />
-          </div>
+    <section className="relative bg-white px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
+      <div className="mx-auto flex w-full max-w-[1240px] flex-col">
+        <div className="max-w-2xl">
+          <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.28em] text-[#8d857c] uppercase">
+            {eyebrow}
+            <span className="h-px w-16 bg-[#F47B20]" />
+          </p>
+          <h2
+            className="mt-4 text-[40px] leading-[0.95] font-semibold tracking-[-0.03em] sm:text-5xl lg:text-[56px]"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+          >
+            <span className="text-[#F47B20]">{titleOrange}</span>{" "}
+            <span className="text-[#1a1614]">{titleDark}</span>
+          </h2>
+          <p className="mt-5 text-sm leading-7 text-[#5c564f] sm:text-[15px]">{intro}</p>
         </div>
 
-        <div className="relative z-10 mt-8 lg:-mt-10">
+        <div className="relative mt-10 lg:mt-12">
           <div className="flex items-center justify-end gap-2 pb-4 lg:absolute lg:-top-14 lg:right-0 lg:pb-0">
             <button
               type="button"
