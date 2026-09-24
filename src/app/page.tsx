@@ -2,6 +2,8 @@ import { HomePage } from "@/components/home-page";
 import { JsonLd } from "@/components/json-ld";
 import { site } from "@/lib/content";
 
+export const dynamic = "force-dynamic";
+
 export default function Page() {
   return (
     <>

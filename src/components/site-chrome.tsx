@@ -20,7 +20,7 @@ export function SiteChrome({
   return (
     <>
       <SiteHeader phone={phone} />
-      <main>{children}</main>
+      <main className={pathname === "/" ? "" : "pt-[72px] lg:pt-[120px]"}>{children}</main>
       {footer}
       <BackToTop />
       <Link href="/contact" className="btn-primary fixed bottom-4 left-4 z-40 sm:hidden">

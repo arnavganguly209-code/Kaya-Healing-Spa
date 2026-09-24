@@ -32,6 +32,16 @@ def rewrite(text: str, port: str) -> tuple[str, str]:
         if server_base is not None and "server_name" in line and DOMAIN in line:
             in_kaya = True
 
+        if in_kaya and "client_max_body_size" in line:
+            new_line, count = re.subn(
+                r"client_max_body_size\s+[^;]+",
+                "client_max_body_size 120m",
+                line,
+            )
+            if count and new_line != line:
+                line = new_line
+                changed = True
+
         if in_kaya and "proxy_pass" in line:
             saw_proxy = True
             named = re.search(r"proxy_pass\s+http://([A-Za-z0-9_.-]+)\s*;", line)
@@ -67,6 +77,16 @@ def rewrite(text: str, port: str) -> tuple[str, str]:
             if count and updated != text:
                 changed = True
                 saw_proxy = True
+
+    if DOMAIN in updated and "client_max_body_size 120m" not in updated:
+        updated, count = re.subn(
+            r"(server_name[^\n]*" + re.escape(DOMAIN) + r"[^\n]*\n)",
+            r"\1        client_max_body_size 120m;\n        proxy_read_timeout 300s;\n        proxy_send_timeout 300s;\n",
+            updated,
+            count=1,
+        )
+        if count:
+            changed = True
 
     if changed:
         return updated, "updated"

@@ -3,14 +3,14 @@ import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
-export type HeroSlide = { src: string; alt: string };
+export type HeroSlide = { src: string; alt: string; kind?: "image" | "video" };
 
 export type OrbitHero = {
   image: string;
   alt: string;
   slides: HeroSlide[];
   display: "still" | "slider";
-  animation: "fade" | "slide" | "none";
+  animation: "fade" | "none";
   intervalMs: number;
   eyebrow: string;
   titleOrange: string;
@@ -59,6 +59,7 @@ export function defaultOrbitContent(): OrbitContent {
         {
           src: "/hero/kaya-hero-wide.png",
           alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
+          kind: "image",
         },
       ],
       display: "still",
@@ -145,17 +146,21 @@ function merge<T>(base: T, saved: Partial<T> | undefined): T {
 }
 
 function normalizeHero(hero: OrbitHero): OrbitHero {
-  const slides = (hero.slides?.length ? hero.slides : [{ src: hero.image, alt: hero.alt }])
+  const slides = (hero.slides?.length ? hero.slides : [{ src: hero.image, alt: hero.alt, kind: "image" as const }])
     .filter((slide) => slide.src)
-    .slice(0, 8);
-  const first = slides[0] ?? { src: hero.image, alt: hero.alt };
+    .slice(0, 10)
+    .map((slide) => ({
+      ...slide,
+      kind: slide.kind === "video" || /\.(mp4|webm|mov)$/i.test(slide.src) ? "video" : "image",
+    }));
+  const first = slides[0] ?? { src: hero.image, alt: hero.alt, kind: "image" as const };
   return {
     ...hero,
     slides,
     image: first.src,
     alt: first.alt || hero.alt,
     display: hero.display === "slider" ? "slider" : "still",
-    animation: hero.animation === "slide" || hero.animation === "none" ? hero.animation : "fade",
+    animation: hero.animation === "none" ? "none" : "fade",
     intervalMs: Math.min(20000, Math.max(2500, Number(hero.intervalMs) || 6000)),
   };
 }

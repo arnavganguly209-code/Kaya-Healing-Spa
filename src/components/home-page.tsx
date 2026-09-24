@@ -110,8 +110,8 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative bg-white pt-[72px] lg:h-[100svh] lg:pt-[120px]">
-        <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 hidden lg:block">
+      <section className="relative bg-white lg:h-[100svh]">
+        <div className="pointer-events-none absolute inset-0 hidden lg:block">
           <HeroMedia
             slides={hero.slides}
             display={hero.display}
@@ -124,8 +124,8 @@ export function HomePage() {
           <div className="absolute inset-y-0 right-0 w-[60%] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.9)_10%,rgba(255,255,255,0.35)_24%,transparent_40%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto flex max-w-[1400px] flex-col px-5 sm:px-8 lg:h-full">
-          <div className="py-8 lg:flex lg:flex-1 lg:items-center lg:py-0 lg:pt-2 lg:pb-2">
+        <div className="relative z-10 mx-auto flex max-w-[1400px] flex-col px-5 pt-[88px] sm:px-8 lg:h-full lg:pt-[128px]">
+          <div className="py-6 lg:flex lg:flex-1 lg:items-center lg:py-0 lg:pt-2 lg:pb-2">
             <div className="max-w-[460px]">
               <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.22em] text-[#6B6B6B] uppercase">
                 {hero.eyebrow}

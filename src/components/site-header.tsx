@@ -31,19 +31,19 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   if (pathname.startsWith("/orbit")) return null;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-[#eeeae6] bg-white">
+    <header className="fixed inset-x-0 top-0 z-50 bg-transparent">
       <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-4 md:px-8 lg:h-[120px]">
         <Link href="/" className="relative z-10 shrink-0 bg-transparent" aria-label="KAYA SPA home">
           <Logo size={99} priority />
         </Link>
-        <nav className="absolute left-[44%] z-20 hidden -translate-x-1/2 items-center gap-6 xl:flex" aria-label="Primary">
+        <nav className="absolute left-[38%] z-20 hidden -translate-x-1/2 items-center gap-6 xl:flex" aria-label="Primary">
           {links.map((link) => {
             const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-[15px] font-semibold tracking-[-0.01em] ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
+                className={`relative text-[16px] font-bold tracking-[-0.015em] ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
               >
                 {link.label}
                 {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}
@@ -53,20 +53,22 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
         </nav>
         <div className="ml-auto flex items-center gap-5">
           <a href={`tel:${phone.replace(/\s/g, "")}`} className="hidden items-center gap-2.5 text-[#171717] lg:flex">
-            <Phone size={18} className="text-[#F47B20]" strokeWidth={1.75} />
+            <span className="call-pulse flex h-10 w-10 items-center justify-center rounded-full bg-[#F47B20] text-white">
+              <Phone size={16} strokeWidth={2} />
+            </span>
             <span className="leading-tight">
-              <span className="block text-[11px] text-[#8a8a8a]">Call Us</span>
-              <span className="text-sm font-semibold">{phone}</span>
+              <span className="block text-[11px] font-medium text-[#6B6B6B]">Call Us</span>
+              <span className="text-sm font-bold">{phone}</span>
             </span>
           </a>
-          <Link href="/contact" className="hidden items-center gap-2 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#e06d12] sm:inline-flex">
+          <Link href="/contact" className="hidden items-center gap-2 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#e06d12] sm:inline-flex">
             <Calendar size={16} />
             Book Appointment
             <span aria-hidden>→</span>
           </Link>
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center text-[#1c1a17] xl:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center text-[#171717] xl:hidden"
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
@@ -79,12 +81,12 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
         <div className="fixed inset-0 top-[72px] z-40 flex flex-col bg-white px-6 py-8 xl:hidden">
           <nav className="flex flex-col gap-4" aria-label="Mobile">
             {links.map((link) => (
-              <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="text-lg font-semibold text-[#171717]">
+              <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="text-lg font-bold text-[#171717]">
                 {link.label}
               </Link>
             ))}
           </nav>
-          <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="mt-8 text-sm">
+          <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="mt-8 text-sm font-semibold">
             Call Us {site.phone}
           </a>
           <Link href="/contact" onClick={() => setOpen(false)} className="btn-primary mt-6 w-fit rounded-full">

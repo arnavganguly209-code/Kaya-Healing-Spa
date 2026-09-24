@@ -1,43 +1,73 @@
 "use client";
 
 import type { OrbitContent } from "@/lib/orbit-store";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
-const sections = ["Hero", "Therapies", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
+const sections = ["Hero", "Media", "Therapies", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
+
+type MediaItem = { path: string; name: string; kind: "image" | "video"; size: number };
 
 export function OrbitPanel({ initial }: { initial: OrbitContent }) {
-  const router = useRouter();
   const [content, setContent] = useState(initial);
   const [section, setSection] = useState<(typeof sections)[number]>("Hero");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [library, setLibrary] = useState<MediaItem[]>([]);
+  const [picker, setPicker] = useState<((path: string, kind: "image" | "video") => void) | null>(null);
+  const contentRef = useRef(content);
+  contentRef.current = content;
 
-  async function save() {
+  useEffect(() => {
+    loadLibrary();
+  }, []);
+
+  async function loadLibrary() {
+    const response = await fetch("/api/orbit/media", { credentials: "same-origin" });
+    const body = await response.json().catch(() => ({}));
+    if (response.ok) setLibrary(body.data || []);
+  }
+
+  async function persist(next = contentRef.current) {
     setSaving(true);
-    setMessage("");
+    setError("");
     const response = await fetch("/api/orbit", {
       method: "PUT",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(content),
+      body: JSON.stringify(next),
     });
+    const body = await response.json().catch(() => ({}));
     setSaving(false);
-    setMessage(response.ok ? "Saved. The live site uses this copy now." : "Could not save.");
-    if (response.ok) router.refresh();
+    if (!response.ok) {
+      setError(body.message || "Could not save. The live site was not changed.");
+      return false;
+    }
+    setMessage("Live site updated.");
+    return true;
   }
 
-  async function upload(file: File, apply: (path: string) => void) {
+  function publish(next: OrbitContent) {
+    setContent(next);
+    contentRef.current = next;
+    void persist(next);
+  }
+
+  async function upload(file: File, apply: (path: string, kind: "image" | "video") => void) {
+    setError("");
+    setMessage(`Uploading ${file.name}…`);
     const form = new FormData();
     form.set("file", file);
-    const response = await fetch("/api/orbit", { method: "PATCH", credentials: "same-origin", body: form });
+    const response = await fetch("/api/orbit/media", { method: "POST", credentials: "same-origin", body: form });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setMessage(body.message || "Upload failed.");
+      setError(body.message || `Upload failed for ${file.name}.`);
+      setMessage("");
       return;
     }
-    apply(body.path);
-    setMessage("Image uploaded. Save to publish it.");
+    apply(body.path, body.kind);
+    await loadLibrary();
+    setMessage("Uploaded and published to the live site.");
   }
 
   async function logout() {
@@ -77,52 +107,48 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
             <p className="text-[11px] tracking-[0.22em] text-[#F47B20] uppercase">Studio</p>
             <h1 className="mt-1 font-serif text-4xl">{section}</h1>
           </div>
-          <button type="button" onClick={save} disabled={saving} className="rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white hover:bg-[#e06d12] disabled:opacity-60">
+          <button type="button" onClick={() => persist()} disabled={saving} className="rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white hover:bg-[#e06d12] disabled:opacity-60">
             {saving ? "Saving…" : "Save changes"}
           </button>
         </div>
         {message && <p className="mt-3 text-sm text-[#2f8f45]">{message}</p>}
+        {error && <p className="mt-3 text-sm text-[#c45e0a]">{error}</p>}
         <div className="mt-8 max-w-4xl space-y-5">
           {section === "Hero" && (
             <>
               <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
-                <p className="text-sm font-semibold">Hero photographs</p>
-                <p className="mt-1 text-sm text-[#6B6B6B]">Keep one still image, or add up to 8 slides.</p>
+                <p className="text-sm font-semibold">Hero media</p>
+                <p className="mt-1 text-sm text-[#6B6B6B]">One still photo or video, or fade 1–10 files. Uploads publish immediately.</p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <label className="text-sm">
-                    Display
+                    Mode
                     <select
                       value={hero.display}
-                      onChange={(event) => setContent({ ...content, hero: { ...hero, display: event.target.value as typeof hero.display } })}
+                      onChange={(event) => publish({ ...content, hero: { ...hero, display: event.target.value as typeof hero.display } })}
                       className="mt-1 w-full rounded-xl border border-[#efe8e0] px-3 py-3"
                     >
-                      <option value="still">Still image</option>
-                      <option value="slider">Slider</option>
+                      <option value="still">Single image or video</option>
+                      <option value="slider">Fade through media</option>
                     </select>
                   </label>
                   <label className="text-sm">
                     Animation
                     <select
                       value={hero.animation}
-                      onChange={(event) => setContent({ ...content, hero: { ...hero, animation: event.target.value as typeof hero.animation } })}
+                      onChange={(event) => publish({ ...content, hero: { ...hero, animation: event.target.value as typeof hero.animation } })}
                       className="mt-1 w-full rounded-xl border border-[#efe8e0] px-3 py-3"
                     >
                       <option value="fade">Fade</option>
-                      <option value="slide">Slide</option>
-                      <option value="none">None</option>
+                      <option value="none">Off</option>
                     </select>
                   </label>
                 </div>
-                <Field
-                  label="Slide duration (ms)"
-                  value={String(hero.intervalMs)}
-                  onChange={(value) => setContent({ ...content, hero: { ...hero, intervalMs: Number(value) || 6000 } })}
-                />
+                <Field label="Fade duration (ms)" value={String(hero.intervalMs)} onChange={(value) => setContent({ ...content, hero: { ...hero, intervalMs: Number(value) || 6000 } })} />
               </div>
               {hero.slides.map((slide, index) => (
                 <div key={`${slide.src}-${index}`} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold">Slide {index + 1}</p>
+                    <p className="text-sm font-semibold">{slide.kind === "video" ? "Video" : "Image"} {index + 1}</p>
                     {hero.slides.length > 1 && (
                       <button type="button" className="text-xs text-[#c45e0a]" onClick={() => updateSlides(hero.slides.filter((_, i) => i !== index))}>
                         Remove
@@ -130,19 +156,36 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                     )}
                   </div>
                   <Field label="Alt text" value={slide.alt} onChange={(value) => updateSlide(index, { alt: value })} />
-                  <ImageField label="Photograph" src={slide.src} onUpload={(file) => upload(file, (src) => updateSlide(index, { src }))} />
+                  <MediaField
+                    label="Replace file"
+                    src={slide.src}
+                    kind={slide.kind}
+                    onUpload={(file) => upload(file, (src, kind) => updateSlide(index, { src, kind }))}
+                    onLibrary={() => setPicker((src, kind) => updateSlide(index, { src, kind }))}
+                  />
                 </div>
               ))}
-              {hero.slides.length < 8 && (
-                <button
-                  type="button"
-                  className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
-                  onClick={() => updateSlides([...hero.slides, { src: hero.image, alt: hero.alt }])}
-                >
-                  Add slide
+              {hero.slides.length < 10 && (
+                <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => updateSlides([...hero.slides, { src: "", alt: "KAYA SPA hero", kind: "image" }])}>
+                  Add image or video
                 </button>
               )}
               <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold">Hero text</p>
+                  <button
+                    type="button"
+                    className="text-xs text-[#c45e0a]"
+                    onClick={() =>
+                      publish({
+                        ...content,
+                        hero: { ...hero, eyebrow: "", titleOrange: "", titleDark: "", subtitle: "", body: "", explore: "", book: "" },
+                      })
+                    }
+                  >
+                    Clear text
+                  </button>
+                </div>
                 <Field label="Eyebrow" value={hero.eyebrow} onChange={(value) => setContent({ ...content, hero: { ...hero, eyebrow: value } })} />
                 <Field label="Title orange" value={hero.titleOrange} onChange={(value) => setContent({ ...content, hero: { ...hero, titleOrange: value } })} />
                 <Field label="Title dark" value={hero.titleDark} onChange={(value) => setContent({ ...content, hero: { ...hero, titleDark: value } })} />
@@ -165,18 +208,36 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               ))}
             </>
           )}
+          {section === "Media" && (
+            <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
+              <p className="text-sm font-semibold">Media library</p>
+              <p className="mt-1 text-sm text-[#6B6B6B]">Images up to 25 MB. Videos up to 120 MB. Click a file to copy its path, or use Replace on any section.</p>
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" className="mt-4 block text-sm" onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void upload(file, () => undefined);
+              }} />
+              <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3">
+                {library.map((item) => (
+                  <article key={item.path} className="overflow-hidden rounded-xl border border-[#efe8e0]">
+                    {item.kind === "video" ? <video src={item.path} className="h-28 w-full object-cover" muted /> : <img src={item.path} alt="" className="h-28 w-full object-cover" />}
+                    <p className="truncate px-2 py-2 text-[11px] text-[#6B6B6B]">{item.name}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          )}
           {section === "Therapies" && (
             <>
               <Field label="Eyebrow" value={content.therapies.eyebrow} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, eyebrow: value } })} />
               <Field label="Title orange" value={content.therapies.titleOrange} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, titleOrange: value } })} />
               <Field label="Title dark" value={content.therapies.titleDark} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, titleDark: value } })} />
               <Area label="Intro" value={content.therapies.intro} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, intro: value } })} />
-              <ImageField label="Section image" src={content.therapies.image} onUpload={(file) => upload(file, (image) => setContent({ ...content, therapies: { ...content.therapies, image } }))} />
+              <MediaField label="Section image" src={content.therapies.image} onUpload={(file) => upload(file, (image) => publish({ ...content, therapies: { ...content.therapies, image } }))} onLibrary={() => setPicker((image) => publish({ ...content, therapies: { ...content.therapies, image } }))} />
               {content.therapies.cards.map((card, index) => (
                 <div key={index} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                   <Field label="Card title" value={card.title} onChange={(value) => updateCard(index, { title: value })} />
                   <Area label="Card text" value={card.text} onChange={(value) => updateCard(index, { text: value })} />
-                  <ImageField label="Card image" src={card.image} onUpload={(file) => upload(file, (image) => updateCard(index, { image }))} />
+                  <MediaField label="Card image" src={card.image} onUpload={(file) => upload(file, (image) => updateCard(index, { image }))} onLibrary={() => setPicker((image) => updateCard(index, { image }))} />
                 </div>
               ))}
             </>
@@ -192,7 +253,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   <Field label="Category" value={service.category} onChange={(value) => updateService(index, { category: value as typeof service.category })} />
                   <Area label="Summary" value={service.summary} onChange={(value) => updateService(index, { summary: value })} />
                   <Field label="Price from NPR" value={String(service.priceFromNpr)} onChange={(value) => updateService(index, { priceFromNpr: Number(value) || 0 })} />
-                  <ImageField label="Image" src={service.image} onUpload={(file) => upload(file, (image) => updateService(index, { image }))} />
+                  <MediaField label="Image" src={service.image} onUpload={(file) => upload(file, (image) => updateService(index, { image }))} onLibrary={() => setPicker((image) => updateService(index, { image }))} />
                 </div>
               ))}
             </>
@@ -222,14 +283,14 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 <Field label="Name" value={item.name} onChange={(value) => updatePackage(index, { name: value })} />
                 <Area label="Summary" value={item.summary} onChange={(value) => updatePackage(index, { summary: value })} />
                 <Field label="Price NPR" value={String(item.priceNpr)} onChange={(value) => updatePackage(index, { priceNpr: Number(value) || 0 })} />
-                <ImageField label="Image" src={item.image} onUpload={(file) => upload(file, (image) => updatePackage(index, { image }))} />
+                <MediaField label="Image" src={item.image} onUpload={(file) => upload(file, (image) => updatePackage(index, { image }))} onLibrary={() => setPicker((image) => updatePackage(index, { image }))} />
               </div>
             ))}
           {section === "Gallery" &&
             content.gallery.map((image, index) => (
               <div key={image.id} className="rounded-2xl border border-[#efe8e0] bg-white p-5">
                 <Field label="Alt text" value={image.alt} onChange={(value) => updateGallery(index, { alt: value })} />
-                <ImageField label={image.category} src={image.src} onUpload={(file) => upload(file, (src) => updateGallery(index, { src }))} />
+                <MediaField label={image.category} src={image.src} onUpload={(file) => upload(file, (src) => updateGallery(index, { src }))} onLibrary={() => setPicker((src) => updateGallery(index, { src }))} />
               </div>
             ))}
           {section === "Footer" && (
@@ -241,14 +302,39 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
         </div>
       </section>
+      {picker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
+          <div className="max-h-[80vh] w-full max-w-3xl overflow-auto rounded-2xl bg-white p-6">
+            <div className="flex items-center justify-between">
+              <p className="font-serif text-2xl">Choose from library</p>
+              <button type="button" onClick={() => setPicker(null)}>Close</button>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              {library.map((item) => (
+                <button
+                  key={item.path}
+                  type="button"
+                  className="overflow-hidden rounded-xl border border-[#efe8e0]"
+                  onClick={() => {
+                    picker(item.path, item.kind);
+                    setPicker(null);
+                  }}
+                >
+                  {item.kind === "video" ? <video src={item.path} className="h-24 w-full object-cover" muted /> : <img src={item.path} alt="" className="h-24 w-full object-cover" />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
   function updateSlides(slides: OrbitContent["hero"]["slides"]) {
-    setContent({ ...content, hero: { ...content.hero, slides, image: slides[0]?.src || content.hero.image } });
+    publish({ ...contentRef.current, hero: { ...contentRef.current.hero, slides, image: slides[0]?.src || contentRef.current.hero.image } });
   }
   function updateSlide(index: number, patch: Partial<OrbitContent["hero"]["slides"][number]>) {
-    updateSlides(content.hero.slides.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+    updateSlides(contentRef.current.hero.slides.map((item, i) => (i === index ? { ...item, ...patch } : item)));
   }
   function updatePoint(index: number, patch: Partial<OrbitContent["hero"]["points"][number]>) {
     const points = content.hero.points.map((item, i) => (i === index ? { ...item, ...patch } : item));
@@ -259,17 +345,23 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
     setContent({ ...content, hero: { ...content.hero, features } });
   }
   function updateCard(index: number, patch: Partial<OrbitContent["therapies"]["cards"][number]>) {
-    const cards = content.therapies.cards.map((item, i) => (i === index ? { ...item, ...patch } : item));
-    setContent({ ...content, therapies: { ...content.therapies, cards } });
+    const cards = contentRef.current.therapies.cards.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    publish({ ...contentRef.current, therapies: { ...contentRef.current.therapies, cards } });
   }
   function updateService(index: number, patch: Partial<OrbitContent["services"][number]>) {
-    setContent({ ...content, services: content.services.map((item, i) => (i === index ? { ...item, ...patch } : item)) });
+    const next = { ...contentRef.current, services: contentRef.current.services.map((item, i) => (i === index ? { ...item, ...patch } : item)) };
+    if (patch.image) publish(next);
+    else setContent(next);
   }
   function updatePackage(index: number, patch: Partial<OrbitContent["packages"][number]>) {
-    setContent({ ...content, packages: content.packages.map((item, i) => (i === index ? { ...item, ...patch } : item)) });
+    const next = { ...contentRef.current, packages: contentRef.current.packages.map((item, i) => (i === index ? { ...item, ...patch } : item)) };
+    if (patch.image) publish(next);
+    else setContent(next);
   }
   function updateGallery(index: number, patch: Partial<OrbitContent["gallery"][number]>) {
-    setContent({ ...content, gallery: content.gallery.map((item, i) => (i === index ? { ...item, ...patch } : item)) });
+    const next = { ...contentRef.current, gallery: contentRef.current.gallery.map((item, i) => (i === index ? { ...item, ...patch } : item)) };
+    if (patch.src) publish(next);
+    else setContent(next);
   }
 }
 
@@ -291,20 +383,37 @@ function Area({ label, value, onChange }: { label: string; value: string; onChan
   );
 }
 
-function ImageField({ label, src, onUpload }: { label: string; src: string; onUpload: (file: File) => void }) {
+function MediaField({
+  label,
+  src,
+  kind,
+  onUpload,
+  onLibrary,
+}: {
+  label: string;
+  src: string;
+  kind?: "image" | "video";
+  onUpload: (file: File) => void;
+  onLibrary: () => void;
+}) {
   return (
     <div className="mt-3 text-sm">
       <p>{label}</p>
-      {src && <img src={src} alt="" className="mt-2 h-28 w-44 rounded-xl object-cover" />}
-      <input
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        className="mt-2 block text-xs"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) onUpload(file);
-        }}
-      />
+      {src && (kind === "video" || /\.(mp4|webm|mov)$/i.test(src) ? <video src={src} className="mt-2 h-28 w-44 rounded-xl object-cover" muted /> : <img src={src} alt="" className="mt-2 h-28 w-44 rounded-xl object-cover" />)}
+      <div className="mt-2 flex flex-wrap gap-3">
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
+          className="block text-xs"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) onUpload(file);
+          }}
+        />
+        <button type="button" className="text-xs text-[#F47B20]" onClick={onLibrary}>
+          Choose from library
+        </button>
+      </div>
     </div>
   );
 }

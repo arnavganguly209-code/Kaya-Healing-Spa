@@ -1,8 +1,8 @@
 import { createSessionToken, isOrbitAuthed, orbitCookie, orbitCookieOptions, passkeyConfigured, passkeyMatches } from "@/lib/orbit-auth";
+import { saveUpload } from "@/lib/orbit-media";
 import { readOrbitContent, writeOrbitContent, type OrbitContent } from "@/lib/orbit-store";
-import { mkdirSync, writeFileSync } from "fs";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import path from "path";
 
 function cookieOptions(request: Request) {
   const proto = request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
@@ -41,21 +41,21 @@ export async function PUT(request: Request) {
     return NextResponse.json({ message: "Content is incomplete." }, { status: 400 });
   }
   writeOrbitContent(body);
+  revalidatePath("/", "layout");
+  revalidatePath("/orbit");
   return NextResponse.json({ success: true });
 }
 
 export async function PATCH(request: Request) {
-  if (!(await isOrbitAuthed())) return NextResponse.json({ message: "Sign in required." }, { status: 401 });
-  const form = await request.formData();
-  const file = form.get("file");
-  if (!(file instanceof File)) return NextResponse.json({ message: "Choose an image." }, { status: 400 });
-  const allowed = ["image/jpeg", "image/png", "image/webp"];
-  if (!allowed.includes(file.type)) return NextResponse.json({ message: "Use a JPG, PNG, or WebP image." }, { status: 400 });
-  if (file.size > 8_000_000) return NextResponse.json({ message: "Image must be under 8 MB." }, { status: 400 });
-  const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
-  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(path.join(dir, name), Buffer.from(await file.arrayBuffer()));
-  return NextResponse.json({ success: true, path: `/uploads/${name}` });
+  if (!(await isOrbitAuthed())) return NextResponse.json({ message: "Sign in required. Open /orbit/login first." }, { status: 401 });
+  try {
+    const form = await request.formData();
+    const file = form.get("file");
+    if (!(file instanceof File)) return NextResponse.json({ message: "Choose an image or video to upload." }, { status: 400 });
+    const saved = await saveUpload(file);
+    return NextResponse.json({ success: true, ...saved });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "The file could not be saved.";
+    return NextResponse.json({ message }, { status: 400 });
+  }
 }
