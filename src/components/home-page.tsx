@@ -1,6 +1,6 @@
 import { Reveal } from "@/components/reveal";
 import { formatNpr, gallery, packages, reviews, services, site } from "@/lib/content";
-import { Calendar, Flower2, Leaf, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Calendar, Droplets, Flower2, Leaf, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -39,6 +39,40 @@ const pillars = [
   ["Release", "Let held shoulders, jaws, and pace soften."],
   ["Renew", "Leave with more room in the afternoon than you arrived with."],
 ];
+
+function TherapyCard({
+  href,
+  image,
+  alt,
+  icon: Icon,
+  title,
+  text,
+}: {
+  href: string;
+  image: string;
+  alt: string;
+  icon: typeof Flower2;
+  title: string;
+  text: string;
+}) {
+  return (
+    <article className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(40,24,8,0.08)]">
+      <div className="relative h-36 sm:h-40 lg:h-[148px]">
+        <Image src={image} alt={alt} fill className="object-cover" sizes="(min-width: 1024px) 22vw, 50vw" />
+      </div>
+      <div className="relative flex flex-1 flex-col px-4 pb-4 pt-5">
+        <span className="absolute -top-5 left-4 flex h-10 w-10 items-center justify-center rounded-full border border-[#f3d7c2] bg-white text-[#e8771a]">
+          <Icon size={18} strokeWidth={1.6} />
+        </span>
+        <h3 className="text-[15px] font-semibold text-[#1a1614]">{title}</h3>
+        <p className="mt-2 flex-1 text-[13px] leading-5 text-[#6d665e]">{text}</p>
+        <Link href={href} className="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-[#e8771a] px-4 py-2 text-xs font-medium text-white hover:bg-[#d06812]">
+          Learn More <span aria-hidden>→</span>
+        </Link>
+      </div>
+    </article>
+  );
+}
 
 function Feature({
   icon: Icon,
@@ -128,6 +162,74 @@ export function HomePage() {
             <Feature icon={Sparkles} title="Wellness Rituals" text="Ancient wisdom, modern care" />
             <Feature icon={Flower2} title="Personalized Care" text="Tailored to your unique needs" />
           </ul>
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden bg-[#fffaf6] px-4 py-8 sm:px-6 lg:flex lg:min-h-[100svh] lg:flex-col lg:justify-center lg:px-10 lg:py-6">
+        <div className="pointer-events-none absolute -left-8 bottom-8 hidden h-40 w-40 rounded-full bg-[#e8f5e6] opacity-80 blur-2xl lg:block" />
+        <div className="relative mx-auto flex w-full max-w-[1240px] flex-1 flex-col justify-center">
+          <div className="grid items-center gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+            <div>
+              <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.28em] text-[#8d857c]">
+                OUR SIGNATURE TREATMENTS
+                <span className="h-px w-16 bg-[#e8771a]" />
+              </p>
+              <h2
+                className="mt-3 text-4xl leading-[0.95] font-semibold tracking-[-0.03em] text-[#1a1614] sm:text-5xl lg:text-[56px]"
+                style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+              >
+                <span className="text-[#e8771a]">Natural Therapies</span>
+                <br />
+                for a Healthier You
+              </h2>
+              <p className="mt-4 max-w-xl text-sm leading-6 text-[#5c564f] sm:text-[15px]">
+                Experience a carefully crafted range of traditional and modern therapies designed to relax your body, calm your mind, and restore your natural balance.
+              </p>
+            </div>
+            <div className="relative h-44 overflow-hidden rounded-2xl sm:h-56 lg:h-[220px]">
+              <Image
+                src="/therapies/therapies-still.png"
+                alt="Rolled towels, a candle, and flowers in the spa"
+                fill
+                className="object-cover"
+                sizes="(min-width: 1024px) 46vw, 100vw"
+              />
+            </div>
+          </div>
+          <div className="relative z-10 mt-6 grid gap-4 sm:grid-cols-2 lg:-mt-8 lg:grid-cols-4 lg:gap-5">
+            <TherapyCard
+              href="/services/signature-massage"
+              image="/therapies/card-massage.png"
+              alt="Guest receiving a traditional massage"
+              icon={Flower2}
+              title="Traditional Massage"
+              text="Release tension, relieve stress and restore your natural balance with expert massage techniques."
+            />
+            <TherapyCard
+              href="/services/shirodhara"
+              image="/therapies/card-ayurveda.png"
+              alt="Warm oil poured during an Ayurvedic treatment"
+              icon={Droplets}
+              title="Ayurvedic Therapy"
+              text="Ancient healing practices to detoxify, rejuvenate and promote complete wellness."
+            />
+            <TherapyCard
+              href="/services/calm-facial"
+              image="/therapies/card-facial.png"
+              alt="Guest resting during a facial"
+              icon={Sparkles}
+              title="Facial Treatments"
+              text="Rejuvenate your skin with natural care and professional skincare therapies."
+            />
+            <TherapyCard
+              href="/services/hot-stone"
+              image="/therapies/card-stones.png"
+              alt="Warm stones prepared for hot stone therapy"
+              icon={Flower2}
+              title="Hot Stone Therapy"
+              text="Deep relaxation, improve circulation and relieve muscle tension with warm stone therapy."
+            />
+          </div>
         </div>
       </section>
 
