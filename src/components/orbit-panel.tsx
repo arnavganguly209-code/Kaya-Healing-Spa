@@ -1,7 +1,7 @@
 "use client";
 
 import type { OrbitContent } from "@/lib/orbit-store";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const sections = ["Hero", "Therapies", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
@@ -13,13 +13,12 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const imageFields = useMemo(() => collectImages(content), [content]);
-
   async function save() {
     setSaving(true);
     setMessage("");
     const response = await fetch("/api/orbit", {
       method: "PUT",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(content),
     });
@@ -31,7 +30,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   async function upload(file: File, apply: (path: string) => void) {
     const form = new FormData();
     form.set("file", file);
-    const response = await fetch("/api/orbit", { method: "PATCH", body: form });
+    const response = await fetch("/api/orbit", { method: "PATCH", credentials: "same-origin", body: form });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) {
       setMessage(body.message || "Upload failed.");
@@ -42,55 +41,124 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   }
 
   async function logout() {
-    await fetch("/api/orbit", { method: "DELETE" });
-    router.push("/orbit/login");
-    router.refresh();
+    await fetch("/api/orbit", { method: "DELETE", credentials: "same-origin" });
+    window.location.assign("/orbit/login");
   }
 
+  const hero = content.hero;
+
   return (
-    <div className="flex min-h-[100svh] bg-[#f6f1e8] text-[#141210]">
-      <aside className="flex w-64 shrink-0 flex-col bg-[#141210] text-white">
-        <div className="border-b border-white/10 px-5 py-6">
-          <p className="text-xs tracking-[0.22em] uppercase text-[#e8771a]">KAYA SPA</p>
-          <p className="mt-2 font-serif text-3xl">Orbit</p>
+    <div className="flex min-h-[100svh] bg-[#f7f2ea] text-[#171717]">
+      <aside className="flex w-64 shrink-0 flex-col bg-[#171717] text-white">
+        <div className="px-6 py-8">
+          <p className="text-[11px] tracking-[0.28em] text-[#F47B20] uppercase">KAYA SPA</p>
+          <p className="mt-2 font-serif text-4xl">Orbit</p>
+          <p className="mt-2 text-xs text-white/50">Edit the living site</p>
         </div>
-        <nav className="flex flex-1 flex-col gap-1 p-3">
+        <nav className="flex flex-1 flex-col gap-1 px-3">
           {sections.map((item) => (
             <button
               key={item}
               type="button"
               onClick={() => setSection(item)}
-              className={`px-3 py-3 text-left text-sm ${section === item ? "bg-white/10 text-[#e8771a]" : "text-white/75"}`}
+              className={`rounded-xl px-4 py-3 text-left text-sm ${section === item ? "bg-white/10 text-[#F47B20]" : "text-white/70 hover:text-white"}`}
             >
               {item}
             </button>
           ))}
         </nav>
-        <button type="button" onClick={logout} className="m-3 border border-white/20 px-3 py-2 text-xs tracking-[0.14em] uppercase">
+        <button type="button" onClick={logout} className="m-4 rounded-full border border-white/15 px-4 py-2 text-xs tracking-[0.16em] uppercase">
           Sign out
         </button>
       </aside>
       <section className="min-w-0 flex-1 px-6 py-8 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-serif text-4xl">{section}</h1>
-          <button type="button" onClick={save} disabled={saving} className="btn-primary">
+          <div>
+            <p className="text-[11px] tracking-[0.22em] text-[#F47B20] uppercase">Studio</p>
+            <h1 className="mt-1 font-serif text-4xl">{section}</h1>
+          </div>
+          <button type="button" onClick={save} disabled={saving} className="rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white hover:bg-[#e06d12] disabled:opacity-60">
             {saving ? "Saving…" : "Save changes"}
           </button>
         </div>
         {message && <p className="mt-3 text-sm text-[#2f8f45]">{message}</p>}
-        <div className="mt-8 max-w-3xl space-y-5">
+        <div className="mt-8 max-w-4xl space-y-5">
           {section === "Hero" && (
             <>
-              <Field label="Eyebrow" value={content.hero.eyebrow} onChange={(value) => setContent({ ...content, hero: { ...content.hero, eyebrow: value } })} />
-              <Field label="Title orange" value={content.hero.titleOrange} onChange={(value) => setContent({ ...content, hero: { ...content.hero, titleOrange: value } })} />
-              <Field label="Title dark" value={content.hero.titleDark} onChange={(value) => setContent({ ...content, hero: { ...content.hero, titleDark: value } })} />
-              <Field label="Subtitle" value={content.hero.subtitle} onChange={(value) => setContent({ ...content, hero: { ...content.hero, subtitle: value } })} />
-              <Area label="Intro" value={content.hero.body} onChange={(value) => setContent({ ...content, hero: { ...content.hero, body: value } })} />
-              <Field label="Explore button" value={content.hero.explore} onChange={(value) => setContent({ ...content, hero: { ...content.hero, explore: value } })} />
-              <Field label="Book button" value={content.hero.book} onChange={(value) => setContent({ ...content, hero: { ...content.hero, book: value } })} />
-              <ImageField label="Hero image" src={content.hero.image} onUpload={(file) => upload(file, (image) => setContent({ ...content, hero: { ...content.hero, image } }))} />
-              {content.hero.features.map((feature, index) => (
-                <div key={index} className="grid gap-3 border border-[#e6dfd4] bg-white p-4 md:grid-cols-2">
+              <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
+                <p className="text-sm font-semibold">Hero photographs</p>
+                <p className="mt-1 text-sm text-[#6B6B6B]">Keep one still image, or add up to 8 slides.</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <label className="text-sm">
+                    Display
+                    <select
+                      value={hero.display}
+                      onChange={(event) => setContent({ ...content, hero: { ...hero, display: event.target.value as typeof hero.display } })}
+                      className="mt-1 w-full rounded-xl border border-[#efe8e0] px-3 py-3"
+                    >
+                      <option value="still">Still image</option>
+                      <option value="slider">Slider</option>
+                    </select>
+                  </label>
+                  <label className="text-sm">
+                    Animation
+                    <select
+                      value={hero.animation}
+                      onChange={(event) => setContent({ ...content, hero: { ...hero, animation: event.target.value as typeof hero.animation } })}
+                      className="mt-1 w-full rounded-xl border border-[#efe8e0] px-3 py-3"
+                    >
+                      <option value="fade">Fade</option>
+                      <option value="slide">Slide</option>
+                      <option value="none">None</option>
+                    </select>
+                  </label>
+                </div>
+                <Field
+                  label="Slide duration (ms)"
+                  value={String(hero.intervalMs)}
+                  onChange={(value) => setContent({ ...content, hero: { ...hero, intervalMs: Number(value) || 6000 } })}
+                />
+              </div>
+              {hero.slides.map((slide, index) => (
+                <div key={`${slide.src}-${index}`} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Slide {index + 1}</p>
+                    {hero.slides.length > 1 && (
+                      <button type="button" className="text-xs text-[#c45e0a]" onClick={() => updateSlides(hero.slides.filter((_, i) => i !== index))}>
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <Field label="Alt text" value={slide.alt} onChange={(value) => updateSlide(index, { alt: value })} />
+                  <ImageField label="Photograph" src={slide.src} onUpload={(file) => upload(file, (src) => updateSlide(index, { src }))} />
+                </div>
+              ))}
+              {hero.slides.length < 8 && (
+                <button
+                  type="button"
+                  className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
+                  onClick={() => updateSlides([...hero.slides, { src: hero.image, alt: hero.alt }])}
+                >
+                  Add slide
+                </button>
+              )}
+              <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
+                <Field label="Eyebrow" value={hero.eyebrow} onChange={(value) => setContent({ ...content, hero: { ...hero, eyebrow: value } })} />
+                <Field label="Title orange" value={hero.titleOrange} onChange={(value) => setContent({ ...content, hero: { ...hero, titleOrange: value } })} />
+                <Field label="Title dark" value={hero.titleDark} onChange={(value) => setContent({ ...content, hero: { ...hero, titleDark: value } })} />
+                <Field label="Subtitle" value={hero.subtitle} onChange={(value) => setContent({ ...content, hero: { ...hero, subtitle: value } })} />
+                <Area label="Intro" value={hero.body} onChange={(value) => setContent({ ...content, hero: { ...hero, body: value } })} />
+                <Field label="Explore button" value={hero.explore} onChange={(value) => setContent({ ...content, hero: { ...hero, explore: value } })} />
+                <Field label="Book button" value={hero.book} onChange={(value) => setContent({ ...content, hero: { ...hero, book: value } })} />
+              </div>
+              {hero.points.map((point, index) => (
+                <div key={index} className="grid gap-3 rounded-2xl border border-[#efe8e0] bg-white p-5 md:grid-cols-2">
+                  <Field label={`Point ${index + 1} title`} value={point.title} onChange={(value) => updatePoint(index, { title: value })} />
+                  <Field label="Line" value={point.text} onChange={(value) => updatePoint(index, { text: value })} />
+                </div>
+              ))}
+              {hero.features.map((feature, index) => (
+                <div key={index} className="grid gap-3 rounded-2xl border border-[#efe8e0] bg-white p-5 md:grid-cols-2">
                   <Field label={`Feature ${index + 1} title`} value={feature.title} onChange={(value) => updateFeature(index, { title: value })} />
                   <Field label="Text" value={feature.text} onChange={(value) => updateFeature(index, { text: value })} />
                 </div>
@@ -105,7 +173,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <Area label="Intro" value={content.therapies.intro} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, intro: value } })} />
               <ImageField label="Section image" src={content.therapies.image} onUpload={(file) => upload(file, (image) => setContent({ ...content, therapies: { ...content.therapies, image } }))} />
               {content.therapies.cards.map((card, index) => (
-                <div key={index} className="space-y-3 border border-[#e6dfd4] bg-white p-4">
+                <div key={index} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                   <Field label="Card title" value={card.title} onChange={(value) => updateCard(index, { title: value })} />
                   <Area label="Card text" value={card.text} onChange={(value) => updateCard(index, { text: value })} />
                   <ImageField label="Card image" src={card.image} onUpload={(file) => upload(file, (image) => updateCard(index, { image }))} />
@@ -115,11 +183,11 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Services" && (
             <>
-              <button type="button" className="btn-line" onClick={() => setContent({ ...content, services: [...content.services, { ...content.services[0], slug: `service-${Date.now()}`, name: "New treatment", summary: "Describe this treatment." }] })}>
+              <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, services: [...content.services, { ...content.services[0], slug: `service-${Date.now()}`, name: "New treatment", summary: "Describe this treatment." }] })}>
                 Add treatment
               </button>
               {content.services.map((service, index) => (
-                <div key={service.slug} className="space-y-3 border border-[#e6dfd4] bg-white p-4">
+                <div key={service.slug} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                   <Field label="Name" value={service.name} onChange={(value) => updateService(index, { name: value })} />
                   <Field label="Category" value={service.category} onChange={(value) => updateService(index, { category: value as typeof service.category })} />
                   <Area label="Summary" value={service.summary} onChange={(value) => updateService(index, { summary: value })} />
@@ -131,7 +199,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Categories" && (
             <>
-              <button type="button" className="btn-line" onClick={() => setContent({ ...content, categories: [...content.categories, "new-category"] })}>
+              <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, categories: [...content.categories, "new-category"] })}>
                 Add category
               </button>
               {content.categories.map((category, index) => (
@@ -150,7 +218,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Packages" &&
             content.packages.map((item, index) => (
-              <div key={item.slug} className="space-y-3 border border-[#e6dfd4] bg-white p-4">
+              <div key={item.slug} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                 <Field label="Name" value={item.name} onChange={(value) => updatePackage(index, { name: value })} />
                 <Area label="Summary" value={item.summary} onChange={(value) => updatePackage(index, { summary: value })} />
                 <Field label="Price NPR" value={String(item.priceNpr)} onChange={(value) => updatePackage(index, { priceNpr: Number(value) || 0 })} />
@@ -159,7 +227,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
             ))}
           {section === "Gallery" &&
             content.gallery.map((image, index) => (
-              <div key={image.id} className="border border-[#e6dfd4] bg-white p-4">
+              <div key={image.id} className="rounded-2xl border border-[#efe8e0] bg-white p-5">
                 <Field label="Alt text" value={image.alt} onChange={(value) => updateGallery(index, { alt: value })} />
                 <ImageField label={image.category} src={image.src} onUpload={(file) => upload(file, (src) => updateGallery(index, { src }))} />
               </div>
@@ -171,14 +239,21 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <Area label="Footer description" value={content.footerText} onChange={(value) => setContent({ ...content, footerText: value })} />
             </>
           )}
-          {section === "Hero" && (
-            <p className="text-xs text-[#8a8175]">{imageFields.length} images across the site can be replaced from these sections.</p>
-          )}
         </div>
       </section>
     </div>
   );
 
+  function updateSlides(slides: OrbitContent["hero"]["slides"]) {
+    setContent({ ...content, hero: { ...content.hero, slides, image: slides[0]?.src || content.hero.image } });
+  }
+  function updateSlide(index: number, patch: Partial<OrbitContent["hero"]["slides"][number]>) {
+    updateSlides(content.hero.slides.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+  }
+  function updatePoint(index: number, patch: Partial<OrbitContent["hero"]["points"][number]>) {
+    const points = content.hero.points.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    setContent({ ...content, hero: { ...content.hero, points } });
+  }
   function updateFeature(index: number, patch: Partial<OrbitContent["hero"]["features"][number]>) {
     const features = content.hero.features.map((item, i) => (i === index ? { ...item, ...patch } : item));
     setContent({ ...content, hero: { ...content.hero, features } });
@@ -188,46 +263,39 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
     setContent({ ...content, therapies: { ...content.therapies, cards } });
   }
   function updateService(index: number, patch: Partial<OrbitContent["services"][number]>) {
-    const next = content.services.map((item, i) => (i === index ? { ...item, ...patch } : item));
-    setContent({ ...content, services: next });
+    setContent({ ...content, services: content.services.map((item, i) => (i === index ? { ...item, ...patch } : item)) });
   }
   function updatePackage(index: number, patch: Partial<OrbitContent["packages"][number]>) {
-    const next = content.packages.map((item, i) => (i === index ? { ...item, ...patch } : item));
-    setContent({ ...content, packages: next });
+    setContent({ ...content, packages: content.packages.map((item, i) => (i === index ? { ...item, ...patch } : item)) });
   }
   function updateGallery(index: number, patch: Partial<OrbitContent["gallery"][number]>) {
-    const next = content.gallery.map((item, i) => (i === index ? { ...item, ...patch } : item));
-    setContent({ ...content, gallery: next });
+    setContent({ ...content, gallery: content.gallery.map((item, i) => (i === index ? { ...item, ...patch } : item)) });
   }
-}
-
-function collectImages(content: OrbitContent) {
-  return [content.hero.image, content.therapies.image, ...content.therapies.cards.map((card) => card.image), ...content.services.map((service) => service.image), ...content.gallery.map((image) => image.src)];
 }
 
 function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
-    <label className="block text-sm">
+    <label className="mt-3 block text-sm">
       {label}
-      <input value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full border border-[#e6dfd4] bg-white px-3 py-3" />
+      <input value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full rounded-xl border border-[#efe8e0] bg-white px-3 py-3" />
     </label>
   );
 }
 
 function Area({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
-    <label className="block text-sm">
+    <label className="mt-3 block text-sm">
       {label}
-      <textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} className="mt-1 w-full border border-[#e6dfd4] bg-white px-3 py-3" />
+      <textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} className="mt-1 w-full rounded-xl border border-[#efe8e0] bg-white px-3 py-3" />
     </label>
   );
 }
 
 function ImageField({ label, src, onUpload }: { label: string; src: string; onUpload: (file: File) => void }) {
   return (
-    <div className="text-sm">
+    <div className="mt-3 text-sm">
       <p>{label}</p>
-      {src && <img src={src} alt="" className="mt-2 h-28 w-44 object-cover" />}
+      {src && <img src={src} alt="" className="mt-2 h-28 w-44 rounded-xl object-cover" />}
       <input
         type="file"
         accept="image/jpeg,image/png,image/webp"

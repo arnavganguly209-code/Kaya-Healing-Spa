@@ -1,3 +1,4 @@
+import { HeroMedia } from "@/components/hero-media";
 import { Reveal } from "@/components/reveal";
 import { formatNpr, reviews, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
@@ -109,19 +110,18 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative bg-white pt-[72px] lg:h-[100svh] lg:pt-[112px]">
+      <section className="relative bg-white pt-[72px] lg:h-[100svh] lg:pt-[120px]">
         <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 hidden lg:block">
-          <div className="absolute inset-y-0 right-0 w-[60%]">
-            <Image
-              src={hero.image}
-              alt={hero.alt}
-              fill
-              priority
-              className="object-cover object-[72%_center]"
-              sizes="60vw"
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.9)_10%,rgba(255,255,255,0.35)_24%,transparent_40%)]" />
-          </div>
+          <HeroMedia
+            slides={hero.slides}
+            display={hero.display}
+            animation={hero.animation}
+            intervalMs={hero.intervalMs}
+            className="absolute inset-y-0 right-0 w-[60%]"
+            priority
+            sizes="60vw"
+          />
+          <div className="absolute inset-y-0 right-0 w-[60%] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.9)_10%,rgba(255,255,255,0.35)_24%,transparent_40%)]" />
         </div>
 
         <div className="relative z-10 mx-auto flex max-w-[1400px] flex-col px-5 sm:px-8 lg:h-full">
@@ -173,7 +173,15 @@ export function HomePage() {
           </div>
 
           <div className="relative mb-8 h-64 overflow-hidden sm:h-80 lg:hidden">
-            <Image src={hero.image} alt={hero.alt} fill className="object-cover object-[70%_center]" sizes="100vw" />
+            <HeroMedia
+              slides={hero.slides}
+              display={hero.display}
+              animation={hero.animation}
+              intervalMs={hero.intervalMs}
+              className="absolute inset-0"
+              objectPosition="70% center"
+              sizes="100vw"
+            />
           </div>
 
           <div className="relative z-20 mb-5 rounded-2xl border border-[#eeeae6] bg-white shadow-[0_10px_30px_rgba(23,23,23,0.06)] lg:mb-7">

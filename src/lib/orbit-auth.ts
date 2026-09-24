@@ -1,10 +1,29 @@
 import { createHmac, timingSafeEqual } from "crypto";
+import { existsSync, readFileSync } from "fs";
 import { cookies } from "next/headers";
+import path from "path";
 
 const COOKIE = "orbit_session";
 
+function readPasskeyFromFile(filePath: string) {
+  if (!existsSync(filePath)) return "";
+  try {
+    const match = readFileSync(filePath, "utf8").match(/^\s*ORBIT_PASSKEY\s*=\s*(.*)\s*$/m);
+    return (match?.[1] ?? "").trim().replace(/^["']|["']$/g, "");
+  } catch {
+    return "";
+  }
+}
+
 function passkey() {
-  return process.env.ORBIT_PASSKEY ?? "";
+  const fromEnv = (process.env.ORBIT_PASSKEY ?? "").trim();
+  if (fromEnv.length >= 6) return fromEnv;
+  const root = process.cwd();
+  return (
+    readPasskeyFromFile(path.join(root, ".env.local")) ||
+    readPasskeyFromFile(path.join(root, ".env")) ||
+    readPasskeyFromFile(path.join(root, ".env.production"))
+  );
 }
 
 export function passkeyConfigured() {
@@ -13,8 +32,9 @@ export function passkeyConfigured() {
 
 export function passkeyMatches(input: string) {
   const expected = passkey();
-  if (!expected || !input) return false;
-  const a = Buffer.from(input);
+  const received = input.trim();
+  if (!expected || !received) return false;
+  const a = Buffer.from(received);
   const b = Buffer.from(expected);
   if (a.length !== b.length) return false;
   return timingSafeEqual(a, b);
@@ -45,13 +65,16 @@ export async function isOrbitAuthed() {
   return sessionTokenValid(jar.get(COOKIE)?.value);
 }
 
-export const orbitCookie = {
-  name: COOKIE,
-  options: {
+export function orbitCookieOptions(secure: boolean) {
+  return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     path: "/",
     maxAge: 60 * 60 * 12,
-  },
+  };
+}
+
+export const orbitCookie = {
+  name: COOKIE,
 };

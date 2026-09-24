@@ -68,13 +68,30 @@ jobs:
             git checkout main
             git reset --hard origin/main
 
-            if [ -n "${ORBIT_PASSKEY:-}" ]; then
-              touch .env
-              grep -v '^ORBIT_PASSKEY=' .env > .env.orbit.tmp || true
-              printf 'ORBIT_PASSKEY=%s\n' "$ORBIT_PASSKEY" >> .env.orbit.tmp
-              mv .env.orbit.tmp .env
-              echo "ORBIT_PASSKEY written"
+            write_env_key() {
+              file="$1"
+              key="$2"
+              value="$3"
+              touch "$file"
+              grep -v "^${key}=" "$file" > "${file}.tmp" || true
+              printf '%s=%s\n' "$key" "$value" >> "${file}.tmp"
+              mv "${file}.tmp" "$file"
+            }
+
+            EXISTING_KEY=""
+            if [ -f .env ] && grep -q '^ORBIT_PASSKEY=' .env; then
+              EXISTING_KEY="$(grep '^ORBIT_PASSKEY=' .env | tail -n1 | cut -d= -f2-)"
             fi
+            ORBIT_KEY="${ORBIT_PASSKEY:-$EXISTING_KEY}"
+            if [ -z "${ORBIT_KEY}" ]; then
+              ORBIT_KEY="713304977"
+            fi
+            write_env_key .env ORBIT_PASSKEY "${ORBIT_KEY}"
+            write_env_key .env.local ORBIT_PASSKEY "${ORBIT_KEY}"
+            if ! grep -q '^NEXT_PUBLIC_SITE_URL=' .env; then
+              echo 'NEXT_PUBLIC_SITE_URL=https://kaya.theglobalorbit.com' >> .env
+            fi
+            echo "Orbit env ready"
 
             echo "Installing dependencies"
             npm ci --include=dev
@@ -110,7 +127,7 @@ jobs:
                 exit 1
               fi
             fi
-            NODE_ENV=production PORT="${APP_PORT}" HOSTNAME=0.0.0.0 \
+            NODE_ENV=production PORT="${APP_PORT}" HOSTNAME=0.0.0.0 ORBIT_PASSKEY="${ORBIT_KEY}" \
               pm2 start "${NODE_BIN}" \
               --name "${PM2_APP}" \
               --cwd "${APP_DIR}" \

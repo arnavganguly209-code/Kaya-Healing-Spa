@@ -3,9 +3,15 @@ import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+export type HeroSlide = { src: string; alt: string };
+
 export type OrbitHero = {
   image: string;
   alt: string;
+  slides: HeroSlide[];
+  display: "still" | "slider";
+  animation: "fade" | "slide" | "none";
+  intervalMs: number;
   eyebrow: string;
   titleOrange: string;
   titleDark: string;
@@ -49,6 +55,15 @@ export function defaultOrbitContent(): OrbitContent {
     hero: {
       image: "/hero/kaya-hero-wide.png",
       alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
+      slides: [
+        {
+          src: "/hero/kaya-hero-wide.png",
+          alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
+        },
+      ],
+      display: "still",
+      animation: "fade",
+      intervalMs: 6000,
       eyebrow: "A COMPLETE WELLNESS EXPERIENCE",
       titleOrange: "Kaya",
       titleDark: "Spa",
@@ -129,12 +144,29 @@ function merge<T>(base: T, saved: Partial<T> | undefined): T {
   return out as T;
 }
 
+function normalizeHero(hero: OrbitHero): OrbitHero {
+  const slides = (hero.slides?.length ? hero.slides : [{ src: hero.image, alt: hero.alt }])
+    .filter((slide) => slide.src)
+    .slice(0, 8);
+  const first = slides[0] ?? { src: hero.image, alt: hero.alt };
+  return {
+    ...hero,
+    slides,
+    image: first.src,
+    alt: first.alt || hero.alt,
+    display: hero.display === "slider" ? "slider" : "still",
+    animation: hero.animation === "slide" || hero.animation === "none" ? hero.animation : "fade",
+    intervalMs: Math.min(20000, Math.max(2500, Number(hero.intervalMs) || 6000)),
+  };
+}
+
 export function readOrbitContent(): OrbitContent {
   const defaults = defaultOrbitContent();
   if (!existsSync(filePath)) return defaults;
   try {
     const saved = JSON.parse(readFileSync(filePath, "utf8")) as Partial<OrbitContent>;
-    return merge(defaults, saved);
+    const merged = merge(defaults, saved);
+    return { ...merged, hero: normalizeHero(merged.hero) };
   } catch {
     return defaults;
   }
@@ -142,5 +174,5 @@ export function readOrbitContent(): OrbitContent {
 
 export function writeOrbitContent(content: OrbitContent) {
   mkdirSync(path.dirname(filePath), { recursive: true });
-  writeFileSync(filePath, JSON.stringify(content, null, 2));
+  writeFileSync(filePath, JSON.stringify({ ...content, hero: normalizeHero(content.hero) }, null, 2));
 }

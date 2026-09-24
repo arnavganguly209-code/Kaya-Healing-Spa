@@ -32,11 +32,11 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-[#eeeae6] bg-white">
-      <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-4 md:px-8 lg:h-[112px]">
-        <Link href="/" className="relative z-10 shrink-0" aria-label="KAYA SPA home">
-          <Logo size={90} priority />
+      <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-4 md:px-8 lg:h-[120px]">
+        <Link href="/" className="relative z-10 shrink-0 bg-transparent" aria-label="KAYA SPA home">
+          <Logo size={99} priority />
         </Link>
-        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 xl:flex" aria-label="Primary">
+        <nav className="absolute left-[44%] z-20 hidden -translate-x-1/2 items-center gap-6 xl:flex" aria-label="Primary">
           {links.map((link) => {
             const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (

@@ -1,25 +1,31 @@
-import { isOrbitAuthed, orbitCookie, passkeyConfigured, passkeyMatches, createSessionToken } from "@/lib/orbit-auth";
+import { createSessionToken, isOrbitAuthed, orbitCookie, orbitCookieOptions, passkeyConfigured, passkeyMatches } from "@/lib/orbit-auth";
 import { readOrbitContent, writeOrbitContent, type OrbitContent } from "@/lib/orbit-store";
 import { mkdirSync, writeFileSync } from "fs";
 import { NextResponse } from "next/server";
 import path from "path";
+
+function cookieOptions(request: Request) {
+  const proto = request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
+  return orbitCookieOptions(proto === "https");
+}
 
 export async function POST(request: Request) {
   if (!passkeyConfigured()) {
     return NextResponse.json({ message: "Orbit passkey is not configured." }, { status: 503 });
   }
   const body = (await request.json().catch(() => null)) as { passkey?: string } | null;
-  if (!body?.passkey || !passkeyMatches(body.passkey)) {
+  const passkey = typeof body?.passkey === "string" ? body.passkey.trim() : "";
+  if (!passkey || !passkeyMatches(passkey)) {
     return NextResponse.json({ message: "That passkey is not correct." }, { status: 401 });
   }
   const response = NextResponse.json({ success: true });
-  response.cookies.set(orbitCookie.name, createSessionToken(), orbitCookie.options);
+  response.cookies.set(orbitCookie.name, createSessionToken(), cookieOptions(request));
   return response;
 }
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
   const response = NextResponse.json({ success: true });
-  response.cookies.set(orbitCookie.name, "", { ...orbitCookie.options, maxAge: 0 });
+  response.cookies.set(orbitCookie.name, "", { ...cookieOptions(request), maxAge: 0 });
   return response;
 }
 
