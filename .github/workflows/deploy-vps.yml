@@ -5,6 +5,7 @@
 #   VPS_SSH_KEY  private key that can log in as that user
 # Optional:
 #   VPS_PORT     SSH port, defaults to 22
+#   ORBIT_PASSKEY  written into the server .env when present
 
 name: Deploy to Hostinger VPS
 
@@ -21,6 +22,7 @@ jobs:
   deploy:
     name: Update kaya-healing-spa
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       ORBIT_PASSKEY: ${{ secrets.ORBIT_PASSKEY }}
     steps:
@@ -31,21 +33,135 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT != '' && secrets.VPS_PORT || 22 }}
+          command_timeout: 20m
           envs: ORBIT_PASSKEY
           script_stop: true
           script: |
             set -euo pipefail
-            cd /var/www/kaya-healing-spa
+            export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+            if [ -s "${NVM_DIR}/nvm.sh" ]; then
+              # shellcheck disable=SC1091
+              . "${NVM_DIR}/nvm.sh"
+              nvm use 22 >/dev/null 2>&1 || nvm use default >/dev/null 2>&1 || true
+            fi
+            export PATH="/usr/local/bin:/usr/bin:${HOME}/.local/bin:${PATH}"
+
+            if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+              echo "ERROR: node/npm not found in PATH for SSH session."
+              exit 1
+            fi
+            if ! command -v pm2 >/dev/null 2>&1; then
+              echo "ERROR: pm2 not found in PATH for SSH session."
+              exit 1
+            fi
+
+            APP_DIR="/var/www/kaya-healing-spa"
+            PM2_APP="kaya-healing-spa"
+            APP_PORT="3005"
+            NODE_BIN="$(command -v node)"
+
+            cd "${APP_DIR}"
+            test "$(pwd)" = "${APP_DIR}"
+
+            echo "Syncing origin/main"
             git fetch origin main
             git checkout main
             git reset --hard origin/main
-            npm ci --include=dev
-            npm run build
+
             if [ -n "${ORBIT_PASSKEY:-}" ]; then
               touch .env
               grep -v '^ORBIT_PASSKEY=' .env > .env.orbit.tmp || true
               printf 'ORBIT_PASSKEY=%s\n' "$ORBIT_PASSKEY" >> .env.orbit.tmp
               mv .env.orbit.tmp .env
+              echo "ORBIT_PASSKEY written"
             fi
-            pm2 startOrReload /var/www/kaya-healing-spa/ecosystem.config.cjs --only kaya-healing-spa --update-env
+
+            echo "Installing dependencies"
+            npm ci --include=dev
+
+            echo "Building"
+            npm run build
+            test -f .next/BUILD_ID
+
+            port_busy() {
+              if command -v ss >/dev/null 2>&1; then
+                ss -ltn | grep -Eq ":${1}\\b"
+              else
+                return 1
+              fi
+            }
+
+            echo "Restarting only ${PM2_APP}"
+            pm2 delete "${PM2_APP}" >/dev/null 2>&1 || true
+            sleep 1
+
+            if port_busy "${APP_PORT}"; then
+              echo "Port ${APP_PORT} is still in use by another process. Leaving it alone."
+              APP_PORT=""
+              for candidate in 3015 3016 3017 3018 3019 3020; do
+                if ! port_busy "${candidate}"; then
+                  APP_PORT="${candidate}"
+                  echo "Kaya will listen on ${APP_PORT}"
+                  break
+                fi
+              done
+              if [ -z "${APP_PORT}" ]; then
+                echo "ERROR: no free port for kaya-healing-spa"
+                exit 1
+              fi
+            fi
+            NODE_ENV=production PORT="${APP_PORT}" HOSTNAME=0.0.0.0 \
+              pm2 start "${NODE_BIN}" \
+              --name "${PM2_APP}" \
+              --cwd "${APP_DIR}" \
+              -- node_modules/next/dist/bin/next start -H 0.0.0.0 -p "${APP_PORT}"
             pm2 save
+
+            echo "Waiting for local HTTP 200 on ${APP_PORT}"
+            local_ok=0
+            for i in $(seq 1 30); do
+              CODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 5 "http://127.0.0.1:${APP_PORT}/" || true)"
+              echo "local attempt ${i}: ${CODE}"
+              if [ "${CODE}" = "200" ]; then
+                local_ok=1
+                break
+              fi
+              sleep 2
+            done
+            if [ "${local_ok}" -ne 1 ]; then
+              echo "ERROR: kaya-healing-spa is not serving on ${APP_PORT}"
+              pm2 describe "${PM2_APP}" || true
+              pm2 logs "${PM2_APP}" --lines 80 --nostream || true
+              exit 1
+            fi
+
+            echo "Aligning nginx for kaya.theglobalorbit.com only"
+            if ! python3 "${APP_DIR}/scripts/align-kaya-nginx.py" "${APP_PORT}"; then
+              sudo python3 "${APP_DIR}/scripts/align-kaya-nginx.py" "${APP_PORT}"
+            fi
+            if nginx -t; then
+              systemctl reload nginx
+            elif sudo nginx -t; then
+              sudo systemctl reload nginx
+            else
+              echo "ERROR: nginx config test failed"
+              exit 1
+            fi
+
+            echo "Kaya deploy ready on port ${APP_PORT}"
+
+      - name: Verify live site
+        run: |
+          set -euo pipefail
+          sleep 5
+          CODE="$(curl -sS -o /tmp/kaya.html -w '%{http_code}' --retry 8 --retry-delay 3 --retry-all-errors https://kaya.theglobalorbit.com || true)"
+          echo "public HTTP ${CODE}"
+          if [ "${CODE}" != "200" ]; then
+            echo "ERROR: https://kaya.theglobalorbit.com returned ${CODE}"
+            exit 1
+          fi
+          if ! grep -qi "Kaya" /tmp/kaya.html; then
+            echo "ERROR: homepage HTML did not contain Kaya"
+            exit 1
+          fi
+          echo "Live site is serving"
