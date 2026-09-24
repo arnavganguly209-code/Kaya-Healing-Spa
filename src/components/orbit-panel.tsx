@@ -262,15 +262,104 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Therapies" && (
             <>
+              <p className="text-sm text-[#6B6B6B]">Signature treatments under the hero — text, header photo, and carousel cards. Use arrows on the site to slide through extra cards.</p>
               <Field label="Eyebrow" value={content.therapies.eyebrow} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, eyebrow: value } })} />
               <Field label="Title orange" value={content.therapies.titleOrange} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, titleOrange: value } })} />
               <Field label="Title dark" value={content.therapies.titleDark} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, titleDark: value } })} />
               <Area label="Intro" value={content.therapies.intro} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, intro: value } })} />
-              <MediaField label="Section image" src={content.therapies.image} onUpload={(file) => upload(file, (image: string) => publish({ ...content, therapies: { ...content.therapies, image } }))} onLibrary={() => setPicker((image: string) => publish({ ...content, therapies: { ...content.therapies, image } }))} />
+              <MediaField
+                label="Header image (top right)"
+                src={content.therapies.image}
+                onUpload={(file) => upload(file, (image: string) => publish({ ...content, therapies: { ...content.therapies, image } }))}
+                onLibrary={() => setPicker((image: string) => publish({ ...content, therapies: { ...content.therapies, image } }))}
+              />
+              <Field
+                label="Header image alt"
+                value={content.therapies.imageAlt}
+                onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, imageAlt: value } })}
+              />
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
+                  onClick={() =>
+                    publish({
+                      ...contentRef.current,
+                      therapies: {
+                        ...contentRef.current.therapies,
+                        cards: [
+                          ...contentRef.current.therapies.cards,
+                          {
+                            title: "New treatment",
+                            text: "Describe this therapy for guests.",
+                            image: "/therapies/card-massage.png",
+                            href: "/services",
+                            alt: "Treatment at KAYA SPA",
+                            buttonLabel: "Learn More",
+                          },
+                        ],
+                      },
+                    })
+                  }
+                >
+                  Add carousel card
+                </button>
+                {content.packages.map((pkg) => (
+                  <button
+                    key={pkg.slug}
+                    type="button"
+                    className="rounded-full border border-[#efe8e0] bg-white px-4 py-2 text-xs"
+                    onClick={() =>
+                      publish({
+                        ...contentRef.current,
+                        therapies: {
+                          ...contentRef.current.therapies,
+                          cards: [
+                            ...contentRef.current.therapies.cards,
+                            {
+                              title: pkg.name,
+                              text: pkg.summary,
+                              image: pkg.image,
+                              href: `/packages/${pkg.slug}`,
+                              alt: pkg.name,
+                              buttonLabel: "Learn More",
+                            },
+                          ],
+                        },
+                      })
+                    }
+                  >
+                    + {pkg.name}
+                  </button>
+                ))}
+              </div>
               {content.therapies.cards.map((card, index) => (
                 <div key={index} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Card {index + 1}</p>
+                    {content.therapies.cards.length > 1 && (
+                      <button
+                        type="button"
+                        className="text-xs text-[#c45e0a]"
+                        onClick={() =>
+                          publish({
+                            ...contentRef.current,
+                            therapies: {
+                              ...contentRef.current.therapies,
+                              cards: contentRef.current.therapies.cards.filter((_, i) => i !== index),
+                            },
+                          })
+                        }
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
                   <Field label="Card title" value={card.title} onChange={(value) => updateCard(index, { title: value })} />
                   <Area label="Card text" value={card.text} onChange={(value) => updateCard(index, { text: value })} />
+                  <Field label="Link URL" value={card.href} onChange={(value) => updateCard(index, { href: value })} />
+                  <Field label="Button label" value={card.buttonLabel || "Learn More"} onChange={(value) => updateCard(index, { buttonLabel: value })} />
+                  <Field label="Image alt" value={card.alt} onChange={(value) => updateCard(index, { alt: value })} />
                   <MediaField label="Card image" src={card.image} onUpload={(file) => upload(file, (image: string) => updateCard(index, { image }))} onLibrary={() => setPicker((image: string) => updateCard(index, { image }))} />
                 </div>
               ))}

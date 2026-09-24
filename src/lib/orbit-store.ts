@@ -23,7 +23,14 @@ export type OrbitHero = {
   features: { title: string; text: string }[];
 };
 
-export type OrbitTherapyCard = { title: string; text: string; image: string; href: string; alt: string };
+export type OrbitTherapyCard = {
+  title: string;
+  text: string;
+  image: string;
+  href: string;
+  alt: string;
+  buttonLabel?: string;
+};
 
 export type OrbitContent = {
   phone: string;
@@ -36,6 +43,7 @@ export type OrbitContent = {
     titleDark: string;
     intro: string;
     image: string;
+    imageAlt: string;
     cards: OrbitTherapyCard[];
   };
   services: Service[];
@@ -91,6 +99,7 @@ export function defaultOrbitContent(): OrbitContent {
       intro:
         "Experience a carefully crafted range of traditional and modern therapies designed to relax your body, calm your mind, and restore your natural balance.",
       image: "/therapies/therapies-still.png",
+      imageAlt: "Rolled towels, a candle, and flowers in the spa",
       cards: [
         {
           title: "Traditional Massage",
@@ -98,6 +107,7 @@ export function defaultOrbitContent(): OrbitContent {
           image: "/therapies/card-massage.png",
           href: "/services/signature-massage",
           alt: "Guest receiving a traditional massage",
+          buttonLabel: "Learn More",
         },
         {
           title: "Ayurvedic Therapy",
@@ -105,6 +115,7 @@ export function defaultOrbitContent(): OrbitContent {
           image: "/therapies/card-ayurveda.png",
           href: "/services/shirodhara",
           alt: "Warm oil poured during an Ayurvedic treatment",
+          buttonLabel: "Learn More",
         },
         {
           title: "Facial Treatments",
@@ -112,6 +123,7 @@ export function defaultOrbitContent(): OrbitContent {
           image: "/therapies/card-facial.png",
           href: "/services/calm-facial",
           alt: "Guest resting during a facial",
+          buttonLabel: "Learn More",
         },
         {
           title: "Hot Stone Therapy",
@@ -119,6 +131,7 @@ export function defaultOrbitContent(): OrbitContent {
           image: "/therapies/card-stones.png",
           href: "/services/hot-stone",
           alt: "Warm stones prepared for hot stone therapy",
+          buttonLabel: "Learn More",
         },
       ],
     },
@@ -177,13 +190,30 @@ function normalizeHero(hero: OrbitHero): OrbitHero {
   };
 }
 
+function normalizeTherapies(therapies: OrbitContent["therapies"]): OrbitContent["therapies"] {
+  const cards = (therapies.cards || [])
+    .filter((card) => card.title && card.image)
+    .slice(0, 24)
+    .map((card) => ({
+      ...card,
+      href: card.href || "/services",
+      alt: card.alt || card.title,
+      buttonLabel: card.buttonLabel?.trim() || "Learn More",
+    }));
+  return {
+    ...therapies,
+    imageAlt: therapies.imageAlt || "Spa still life with towels, candle, and flowers",
+    cards: cards.length ? cards : defaultOrbitContent().therapies.cards,
+  };
+}
+
 export function readOrbitContent(): OrbitContent {
   const defaults = defaultOrbitContent();
   if (!existsSync(filePath)) return defaults;
   try {
     const saved = JSON.parse(readFileSync(filePath, "utf8")) as Partial<OrbitContent>;
     const merged = merge(defaults, saved);
-    return { ...merged, hero: normalizeHero(merged.hero) };
+    return { ...merged, hero: normalizeHero(merged.hero), therapies: normalizeTherapies(merged.therapies) };
   } catch {
     return defaults;
   }
@@ -191,5 +221,8 @@ export function readOrbitContent(): OrbitContent {
 
 export function writeOrbitContent(content: OrbitContent) {
   mkdirSync(path.dirname(filePath), { recursive: true });
-  writeFileSync(filePath, JSON.stringify({ ...content, hero: normalizeHero(content.hero) }, null, 2));
+  writeFileSync(
+    filePath,
+    JSON.stringify({ ...content, hero: normalizeHero(content.hero), therapies: normalizeTherapies(content.therapies) }, null, 2),
+  );
 }
