@@ -20,10 +20,11 @@ export function isVideoName(name: string) {
 }
 
 export function describeFile(file: File) {
-  const type = file.type || "";
-  const image = IMAGE_TYPES.includes(type) || /\.(jpe?g|png|webp|gif)$/i.test(file.name);
-  const video = VIDEO_TYPES.includes(type) || isVideoName(file.name);
-  return { image, video, kind: video ? "video" : image ? "image" : "" };
+  const type = (file.type || "").toLowerCase();
+  const name = file.name || "";
+  const image = IMAGE_TYPES.includes(type) || type.startsWith("image/") || /\.(jpe?g|png|webp|gif)$/i.test(name);
+  const video = VIDEO_TYPES.includes(type) || type.startsWith("video/") || isVideoName(name);
+  return { image, video, kind: (video ? "video" : image ? "image" : "") as "image" | "video" | "" };
 }
 
 export function rejectUpload(file: File) {

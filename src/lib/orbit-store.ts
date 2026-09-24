@@ -156,7 +156,10 @@ function normalizeHero(hero: OrbitHero): OrbitHero {
       src: stock.includes(slide.src) ? latest : slide.src,
       kind: (slide.kind === "video" || /\.(mp4|webm|mov)$/i.test(slide.src) ? "video" : "image") as HeroSlide["kind"],
     }));
-  const first = slides[0] ?? { src: hero.image, alt: hero.alt, kind: "image" as const };
+  if (!slides.length) {
+    slides.push({ src: latest, alt: hero.alt || "KAYA SPA hero", kind: "image" });
+  }
+  const first = slides[0] ?? { src: latest, alt: hero.alt, kind: "image" as const };
   return {
     ...hero,
     slides,

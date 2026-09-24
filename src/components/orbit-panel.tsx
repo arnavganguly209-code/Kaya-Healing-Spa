@@ -56,18 +56,49 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   async function upload(file: File, apply: (path: string, kind: "image" | "video") => void) {
     setError("");
     setMessage(`Uploading ${file.name}…`);
-    const form = new FormData();
-    form.set("file", file);
-    const response = await fetch("/api/orbit/media", { method: "POST", credentials: "same-origin", body: form });
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      setError(body.message || `Upload failed for ${file.name}.`);
+    if (!file || file.size <= 0) {
+      setError("Choose a real image or video file.");
       setMessage("");
       return;
     }
-    apply(body.path, body.kind);
-    await loadLibrary();
-    setMessage("Uploaded and published to the live site.");
+    if (file.size > 120 * 1024 * 1024) {
+      setError("That file is over 120 MB.");
+      setMessage("");
+      return;
+    }
+    try {
+      const form = new FormData();
+      form.set("file", file);
+      const response = await fetch("/api/orbit/media", { method: "POST", credentials: "same-origin", body: form });
+      const raw = await response.text();
+      let body: { message?: string; path?: string; kind?: "image" | "video" } = {};
+      try {
+        body = raw ? JSON.parse(raw) : {};
+      } catch {
+        body = {};
+      }
+      if (response.status === 413) {
+        setError("The server said the file is too large. Use an image under 25 MB or a video under 120 MB.");
+        setMessage("");
+        return;
+      }
+      if (response.status === 401) {
+        setError("Sign in expired. Open /orbit/login and enter the passkey again.");
+        setMessage("");
+        return;
+      }
+      if (!response.ok || !body.path) {
+        setError(body.message || `Upload failed (${response.status}). ${raw.slice(0, 140)}`);
+        setMessage("");
+        return;
+      }
+      apply(body.path, body.kind === "video" ? "video" : "image");
+      await loadLibrary();
+      setMessage("Uploaded and published to the live site.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Upload could not reach the server.");
+      setMessage("");
+    }
   }
 
   async function logout() {
@@ -76,6 +107,9 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   }
 
   const hero = content.hero;
+  const heroSlides = hero.slides.length
+    ? hero.slides
+    : [{ src: hero.image || "/hero/kaya-hero-match.png", alt: hero.alt, kind: "image" as const }];
 
   return (
     <div className="flex min-h-[100svh] bg-[#f7f2ea] text-[#171717]">
@@ -145,12 +179,12 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 </div>
                 <Field label="Fade duration (ms)" value={String(hero.intervalMs)} onChange={(value) => setContent({ ...content, hero: { ...hero, intervalMs: Number(value) || 6000 } })} />
               </div>
-              {hero.slides.map((slide, index) => (
+              {heroSlides.map((slide, index) => (
                 <div key={`${slide.src}-${index}`} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold">{slide.kind === "video" ? "Video" : "Image"} {index + 1}</p>
-                    {hero.slides.length > 1 && (
-                      <button type="button" className="text-xs text-[#c45e0a]" onClick={() => updateSlides(hero.slides.filter((_, i) => i !== index))}>
+                    {heroSlides.length > 1 && (
+                      <button type="button" className="text-xs text-[#c45e0a]" onClick={() => updateSlides(heroSlides.filter((_, i) => i !== index))}>
                         Remove
                       </button>
                     )}
@@ -158,7 +192,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   <Field label="Alt text" value={slide.alt} onChange={(value) => updateSlide(index, { alt: value })} />
                   <MediaField
                     label="Replace file"
-                    src={slide.src}
+                    src={slide.src || hero.image || "/hero/kaya-hero-match.png"}
                     kind={slide.kind}
                     onUpload={(file) => upload(file, (src, kind) => updateSlide(index, { src, kind }))}
                     onLibrary={() => setPicker((src, kind) => updateSlide(index, { src, kind }))}
@@ -166,7 +200,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 </div>
               ))}
               {hero.slides.length < 10 && (
-                <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => updateSlides([...hero.slides, { src: "", alt: "KAYA SPA hero", kind: "image" }])}>
+                <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => updateSlides([...heroSlides, { src: "/hero/kaya-hero-match.png", alt: "KAYA SPA hero", kind: "image" }])}>
                   Add image or video
                 </button>
               )}
@@ -396,21 +430,32 @@ function MediaField({
   onUpload: (file: File) => void;
   onLibrary: () => void;
 }) {
+  const video = kind === "video" || /\.(mp4|webm|mov)$/i.test(src);
   return (
     <div className="mt-3 text-sm">
-      <p>{label}</p>
-      {src && (kind === "video" || /\.(mp4|webm|mov)$/i.test(src) ? <video src={src} className="mt-2 h-28 w-44 rounded-xl object-cover" muted /> : <img src={src} alt="" className="mt-2 h-28 w-44 rounded-xl object-cover" />)}
-      <div className="mt-2 flex flex-wrap gap-3">
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
-          className="block text-xs"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) onUpload(file);
-          }}
-        />
-        <button type="button" className="text-xs text-[#F47B20]" onClick={onLibrary}>
+      <p className="font-medium">{label}</p>
+      <div className="mt-2 overflow-hidden rounded-xl border border-[#efe8e0] bg-[#faf7f3]">
+        {src ? (
+          video ? <video src={src} className="h-40 w-full object-cover" muted controls /> : <img src={src} alt="" className="h-40 w-full object-cover" />
+        ) : (
+          <div className="flex h-40 items-center justify-center text-[#8a8a8a]">No file yet</div>
+        )}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-3">
+        <label className="inline-flex cursor-pointer items-center rounded-full bg-[#F47B20] px-4 py-2 text-sm font-medium text-white">
+          Replace
+          <input
+            type="file"
+            accept="image/*,video/mp4,video/webm,video/quicktime"
+            className="sr-only"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (file) onUpload(file);
+            }}
+          />
+        </label>
+        <button type="button" className="rounded-full border border-[#efe8e0] px-4 py-2 text-sm" onClick={onLibrary}>
           Choose from library
         </button>
       </div>

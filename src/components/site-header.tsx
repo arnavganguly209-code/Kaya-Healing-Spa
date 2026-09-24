@@ -31,19 +31,19 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   if (pathname.startsWith("/orbit")) return null;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-white">
-      <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-5 md:px-10 lg:h-[104px]">
-        <Link href="/" className="relative z-10 shrink-0 bg-transparent" aria-label="KAYA SPA home">
-          <Logo size={86} priority />
+    <header className="fixed inset-x-0 top-0 z-50 bg-transparent">
+      <div className="mx-auto flex h-[72px] max-w-[1440px] items-center gap-6 px-5 md:px-8 lg:h-[108px] lg:gap-10">
+        <Link href="/" className="relative z-10 shrink-0" aria-label="KAYA SPA home">
+          <Logo size={92} priority />
         </Link>
-        <nav className="absolute left-1/2 z-20 hidden -translate-x-1/2 items-center gap-7 xl:flex" aria-label="Primary">
+        <nav className="relative z-20 hidden items-center gap-6 xl:flex" aria-label="Primary">
           {links.map((link) => {
             const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-[15px] font-semibold ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
+                className={`relative text-[15px] font-bold ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
               >
                 {link.label}
                 {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}

@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "KAYA SPA",
     description: "A complete wellness experience in Kathmandu.",
-    images: ["/brand/kaya-logo.webp"],
+    images: ["/brand/kaya-logo-hd.png"],
   },
   keywords: [
     "Kaya Spa",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     "wellness spa Kathmandu",
     "Ayurvedic massage Kathmandu",
   ],
-  icons: { icon: "/brand/kaya-logo.webp", apple: "/brand/kaya-logo.webp" },
+  icons: { icon: "/brand/kaya-logo-hd.png", apple: "/brand/kaya-logo-hd.png" },
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     url: site.url,
     title: "KAYA SPA | A Complete Wellness Experience",
     description: "Luxury spa and wellness in Kathmandu. Massage, Ayurveda, and unhurried spa packages.",
-    images: ["/brand/kaya-logo.webp"],
+    images: ["/brand/kaya-logo-hd.png"],
   },
 };
 
@@ -70,7 +70,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     name: "KAYA SPA",
     description: "Luxury spa and wellness in Kathmandu, Nepal.",
     slogan: site.tagline,
-    image: `${site.url}/brand/kaya-logo.webp`,
+    image: `${site.url}/brand/kaya-logo-hd.png`,
     address: {
       "@type": "PostalAddress",
       addressLocality: "Kathmandu",

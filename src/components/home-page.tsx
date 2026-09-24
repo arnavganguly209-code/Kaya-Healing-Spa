@@ -110,7 +110,7 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-white pt-[72px] lg:h-[100svh] lg:pt-[104px]">
+      <section className="relative overflow-hidden bg-white pt-[72px] lg:h-[100svh] lg:pt-[108px]">
         <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 hidden lg:block">
           <HeroMedia
             slides={hero.slides}

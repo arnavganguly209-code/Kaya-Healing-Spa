@@ -118,8 +118,14 @@ def main() -> int:
         if status == "missing":
             print(f"no kaya proxy_pass in {path}")
             continue
-        if status == "aligned":
-            print(f"already pointing at 127.0.0.1:{port} in {path}")
+        if "client_max_body_size 120m" not in updated:
+            updated = updated.replace(
+                f"server_name {DOMAIN}",
+                f"server_name {DOMAIN};\n        client_max_body_size 120m;\n        proxy_read_timeout 300s;\n        proxy_send_timeout 300s",
+                1,
+            )
+        if updated == original:
+            print(f"already aligned {path}")
             touched += 1
             continue
         try:
