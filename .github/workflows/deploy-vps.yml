@@ -1,0 +1,46 @@
+# Deploys only this site to the existing Hostinger VPS.
+# Required GitHub Actions secrets:
+#   VPS_HOST     server IP or hostname
+#   VPS_USER     SSH user
+#   VPS_SSH_KEY  private key that can log in as that user
+# Optional:
+#   VPS_PORT     SSH port, defaults to 22
+
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: kaya-healing-spa-vps
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Update kaya-healing-spa
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull, build, and restart this app only
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT != '' && secrets.VPS_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd /var/www/kaya-healing-spa
+            git fetch origin main
+            git checkout main
+            git reset --hard origin/main
+            npm install
+            npm run build
+            if pm2 describe kaya-healing-spa >/dev/null 2>&1; then
+              pm2 restart kaya-healing-spa --update-env
+            else
+              pm2 start /var/www/kaya-healing-spa/ecosystem.config.cjs --only kaya-healing-spa
+            fi
+            pm2 save
