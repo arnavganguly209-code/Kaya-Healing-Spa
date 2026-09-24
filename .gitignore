@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+!backend/.env.example
+backend/node_modules
+backend/dist
+public/hero/reference-hero.jpg
 
 # vercel
 .vercel

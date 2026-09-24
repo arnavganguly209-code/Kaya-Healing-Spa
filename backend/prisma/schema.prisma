@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+}
+
+model ServiceCategory {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  services Service[]
+}
+
+model Service {
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  name            String
+  summary         String
+  overview        String
+  durationMinutes Int
+  image           String
+  imageAlt        String
+  category        ServiceCategory @relation(fields: [categoryId], references: [id])
+  categoryId      String
+  prices          ServicePrice[]
+  appointments    Appointment[]
+}
+
+model ServicePrice {
+  id        String  @id @default(cuid())
+  label     String
+  amountNpr Int
+  service   Service @relation(fields: [serviceId], references: [id])
+  serviceId String
+}
+
+model Package {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  name         String
+  summary      String
+  description  String
+  durationLabel String
+  priceNpr     Int
+  compareAtNpr Int?
+  image        String
+  items        PackageItem[]
+  appointments Appointment[]
+}
+
+model PackageItem {
+  id        String  @id @default(cuid())
+  name      String
+  detail    String
+  package   Package @relation(fields: [packageId], references: [id])
+  packageId String
+}
+
+model Appointment {
+  id            String   @id @default(cuid())
+  name          String
+  email         String
+  phone         String
+  preferredDate String
+  preferredTime String
+  guests        Int
+  notes         String?
+  service       Service? @relation(fields: [serviceId], references: [id])
+  serviceId     String?
+  package       Package? @relation(fields: [packageId], references: [id])
+  packageId     String?
+  createdAt     DateTime @default(now())
+}
+
+model Review {
+  id            String  @id @default(cuid())
+  name          String
+  rating        Int
+  text          String
+  isPlaceholder Boolean @default(true)
+  published     Boolean @default(false)
+}
+
+model GalleryImage {
+  id       String @id @default(cuid())
+  src      String
+  alt      String
+  category String
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model SiteSetting {
+  key   String @id
+  value String
+}
