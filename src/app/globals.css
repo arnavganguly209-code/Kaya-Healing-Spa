@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-kaya: #e8771a;
-  --color-kaya-deep: #c45e0a;
+  --color-kaya: #f47b20;
+  --color-kaya-deep: #e06d12;
   --color-leaf: #2f8f45;
   --color-ink: #141210;
   --color-charcoal: #1c1a17;

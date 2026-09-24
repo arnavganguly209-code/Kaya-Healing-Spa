@@ -75,25 +75,27 @@ function TherapyCard({
   );
 }
 
-function Feature({
-  icon: Icon,
-  title,
-  text,
-}: {
-  icon: typeof Flower2;
-  title: string;
-  text: string;
-}) {
+function StonesIcon({ className = "text-[#F47B20]" }: { className?: string; size?: number; strokeWidth?: number }) {
   return (
-    <li className="flex items-start gap-3">
-      <Icon className="mt-0.5 shrink-0 text-[#e8771a]" size={22} strokeWidth={1.5} />
-      <span>
-        <span className="block text-sm font-semibold text-[#1a1614]">{title}</span>
-        <span className="text-sm text-[#8d857c]">{text}</span>
-      </span>
-    </li>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
+      <ellipse cx="12" cy="6" rx="5" ry="2.2" stroke="currentColor" strokeWidth="1.4" />
+      <ellipse cx="12" cy="12" rx="6.2" ry="2.4" stroke="currentColor" strokeWidth="1.4" />
+      <ellipse cx="12" cy="18" rx="7.2" ry="2.6" stroke="currentColor" strokeWidth="1.4" />
+    </svg>
   );
 }
+
+function CareIcon({ className = "text-[#F47B20]" }: { className?: string; size?: number; strokeWidth?: number }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
+      <path d="M8 13c0-2 1.2-3.5 2.6-3.5 1 0 1.6.6 2 1.3.4-.7 1-1.3 2-1.3C16 9.5 17.2 11 17.2 13c0 2.6-2.4 4.6-5.2 6.2C9.2 17.6 8 15.6 8 13Z" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M12 8.2V5.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M12 6.2c1.2-1 2.4-1.2 3.2-.6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const featureIcons = [Flower2, Leaf, StonesIcon, CareIcon];
 
 export function HomePage() {
   const orbit = readOrbitContent();
@@ -107,64 +109,92 @@ export function HomePage() {
 
   return (
     <>
-      <section className="flex flex-col bg-[#fffdfb] pt-[108px] lg:h-[100svh] lg:overflow-hidden">
-        <div className="relative min-h-[520px] flex-1 overflow-hidden lg:min-h-0">
-          <Image
-            src={hero.image}
-            alt={hero.alt}
-            fill
-            priority
-            className="object-cover object-[78%_center]"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#fffdfb_0%,#fffdfb_34%,rgba(255,253,251,0.88)_46%,rgba(255,253,251,0.2)_62%,transparent_74%)]" />
-          <div className="relative z-10 mx-auto flex h-full min-h-[520px] max-w-[1280px] items-center px-6 py-6 lg:min-h-0 lg:px-8">
-            <div className="max-w-[520px]">
-              <p className="flex items-center gap-4 text-[11px] font-medium tracking-[0.28em] text-[#9a9188]">
+      <section className="relative bg-white pt-[72px] lg:h-[100svh] lg:pt-[112px]">
+        <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 hidden lg:block">
+          <div className="absolute inset-y-0 right-0 w-[60%]">
+            <Image
+              src={hero.image}
+              alt={hero.alt}
+              fill
+              priority
+              className="object-cover object-[72%_center]"
+              sizes="60vw"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.9)_10%,rgba(255,255,255,0.35)_24%,transparent_40%)]" />
+          </div>
+        </div>
+
+        <div className="relative z-10 mx-auto flex max-w-[1400px] flex-col px-5 sm:px-8 lg:h-full">
+          <div className="py-8 lg:flex lg:flex-1 lg:items-center lg:py-0 lg:pt-2 lg:pb-2">
+            <div className="max-w-[460px]">
+              <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.22em] text-[#6B6B6B] uppercase">
                 {hero.eyebrow}
-                <span className="h-px w-14 bg-[#e8771a]" />
+                <span className="h-px w-12 bg-[#F47B20]" />
               </p>
               <h1
-                className="mt-3 text-[56px] leading-[0.9] font-semibold tracking-[-0.03em] text-[#1a1614] sm:text-[72px] lg:text-[4.6rem]"
+                className="mt-4 text-[52px] leading-[0.92] font-medium tracking-[-0.03em] text-[#171717] sm:text-[68px] lg:text-[76px]"
                 style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
               >
-                <span className="text-[#e8771a]">{hero.titleOrange}</span> {hero.titleDark}
+                <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
               </h1>
-              <p className="mt-3 font-serif text-[26px] leading-tight text-[#1a1614] lg:text-[30px]">
+              <p className="mt-3 font-serif text-[26px] leading-tight text-[#171717] sm:text-[30px]">
                 {hero.subtitle}
               </p>
-              <p className="mt-4 max-w-[430px] text-[15px] leading-7 text-[#5c564f]">
+              <p className="mt-4 max-w-[420px] text-[15px] leading-7 text-[#6B6B6B]">
                 {hero.body}
               </p>
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[#e8771a] px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-[#d06812]">
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[#e06d12]">
                   {hero.explore} <span aria-hidden>→</span>
                 </Link>
-                <Link href="/contact" className="inline-flex items-center gap-2 rounded-full border border-[#eadfd4] bg-white px-6 py-3 text-sm font-medium text-[#1a1614] hover:border-[#e8771a]">
+                <Link href="/contact" className="inline-flex items-center gap-2 rounded-full border border-[#e6e1dc] bg-white px-6 py-3 text-sm font-medium text-[#171717] transition hover:-translate-y-0.5 hover:border-[#F47B20]">
                   <Calendar size={16} />
                   {hero.book}
                 </Link>
               </div>
-              <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-4 text-[13px] leading-tight text-[#1a1614]">
+              <ul className="mt-7 flex flex-wrap gap-x-7 gap-y-4">
                 {hero.points.map((point, index) => {
                   const Icon = pointIcons[index % pointIcons.length];
                   return (
-                    <li key={point.title} className="flex items-center gap-3">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#e4ddd4]"><Icon size={18} strokeWidth={1.4} /></span>
-                      {point.title}<br />{point.text}
+                    <li key={point.title} className="flex items-center gap-2.5 text-[13px] leading-tight text-[#171717]">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#efe8e2] bg-[#fffaf7] text-[#F47B20]">
+                        <Icon size={16} strokeWidth={1.6} />
+                      </span>
+                      <span>
+                        {point.title}
+                        <br />
+                        {point.text}
+                      </span>
                     </li>
                   );
                 })}
               </ul>
             </div>
           </div>
-        </div>
-        <div className="border-t border-[#f3ebe3] bg-[#fffdfb]">
-          <ul className="mx-auto grid max-w-[1280px] gap-4 px-6 py-3 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
-            {hero.features.map((feature, index) => (
-              <Feature key={feature.title} icon={[Flower2, Leaf, Sparkles, Flower2][index % 4]} title={feature.title} text={feature.text} />
-            ))}
-          </ul>
+
+          <div className="relative mb-8 h-64 overflow-hidden sm:h-80 lg:hidden">
+            <Image src={hero.image} alt={hero.alt} fill className="object-cover object-[70%_center]" sizes="100vw" />
+          </div>
+
+          <div className="relative z-20 mb-5 rounded-2xl border border-[#eeeae6] bg-white shadow-[0_10px_30px_rgba(23,23,23,0.06)] lg:mb-7">
+            <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
+              {hero.features.map((feature, index) => {
+                const Icon = featureIcons[index % featureIcons.length];
+                return (
+                  <li
+                    key={feature.title}
+                    className="flex items-center gap-3 px-5 py-4 lg:px-6 lg:py-5 [&:not(:first-child)]:lg:border-l [&:not(:first-child)]:lg:border-[#eeeae6]"
+                  >
+                    <Icon className="shrink-0 text-[#F47B20]" size={22} strokeWidth={1.5} />
+                    <span>
+                      <span className="block text-sm font-semibold text-[#171717]">{feature.title}</span>
+                      <span className="text-[13px] text-[#6B6B6B]">{feature.text}</span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       </section>
 

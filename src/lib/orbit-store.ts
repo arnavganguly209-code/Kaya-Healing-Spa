@@ -47,7 +47,7 @@ export function defaultOrbitContent(): OrbitContent {
     footerText:
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
     hero: {
-      image: "/hero/kaya-hero-uhd.png",
+      image: "/hero/kaya-hero-wide.png",
       alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
       eyebrow: "A COMPLETE WELLNESS EXPERIENCE",
       titleOrange: "Kaya",

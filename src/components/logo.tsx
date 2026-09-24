@@ -8,7 +8,7 @@ export function Logo({ size = 56, priority = false }: { size?: number; priority?
       width={size}
       height={size}
       priority={priority}
-      className="rounded-full object-cover"
+      className="h-16 w-16 rounded-full object-cover lg:h-[90px] lg:w-[90px]"
     />
   );
 }
