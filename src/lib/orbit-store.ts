@@ -151,7 +151,7 @@ function normalizeHero(hero: OrbitHero): OrbitHero {
     .slice(0, 10)
     .map((slide) => ({
       ...slide,
-      kind: slide.kind === "video" || /\.(mp4|webm|mov)$/i.test(slide.src) ? "video" : "image",
+      kind: (slide.kind === "video" || /\.(mp4|webm|mov)$/i.test(slide.src) ? "video" : "image") as HeroSlide["kind"],
     }));
   const first = slides[0] ?? { src: hero.image, alt: hero.alt, kind: "image" as const };
   return {

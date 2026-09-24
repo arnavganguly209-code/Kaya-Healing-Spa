@@ -232,12 +232,12 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <Field label="Title orange" value={content.therapies.titleOrange} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, titleOrange: value } })} />
               <Field label="Title dark" value={content.therapies.titleDark} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, titleDark: value } })} />
               <Area label="Intro" value={content.therapies.intro} onChange={(value) => setContent({ ...content, therapies: { ...content.therapies, intro: value } })} />
-              <MediaField label="Section image" src={content.therapies.image} onUpload={(file) => upload(file, (image) => publish({ ...content, therapies: { ...content.therapies, image } }))} onLibrary={() => setPicker((image) => publish({ ...content, therapies: { ...content.therapies, image } }))} />
+              <MediaField label="Section image" src={content.therapies.image} onUpload={(file) => upload(file, (image: string) => publish({ ...content, therapies: { ...content.therapies, image } }))} onLibrary={() => setPicker((image: string) => publish({ ...content, therapies: { ...content.therapies, image } }))} />
               {content.therapies.cards.map((card, index) => (
                 <div key={index} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                   <Field label="Card title" value={card.title} onChange={(value) => updateCard(index, { title: value })} />
                   <Area label="Card text" value={card.text} onChange={(value) => updateCard(index, { text: value })} />
-                  <MediaField label="Card image" src={card.image} onUpload={(file) => upload(file, (image) => updateCard(index, { image }))} onLibrary={() => setPicker((image) => updateCard(index, { image }))} />
+                  <MediaField label="Card image" src={card.image} onUpload={(file) => upload(file, (image: string) => updateCard(index, { image }))} onLibrary={() => setPicker((image: string) => updateCard(index, { image }))} />
                 </div>
               ))}
             </>
@@ -253,7 +253,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   <Field label="Category" value={service.category} onChange={(value) => updateService(index, { category: value as typeof service.category })} />
                   <Area label="Summary" value={service.summary} onChange={(value) => updateService(index, { summary: value })} />
                   <Field label="Price from NPR" value={String(service.priceFromNpr)} onChange={(value) => updateService(index, { priceFromNpr: Number(value) || 0 })} />
-                  <MediaField label="Image" src={service.image} onUpload={(file) => upload(file, (image) => updateService(index, { image }))} onLibrary={() => setPicker((image) => updateService(index, { image }))} />
+                  <MediaField label="Image" src={service.image} onUpload={(file) => upload(file, (image: string) => updateService(index, { image }))} onLibrary={() => setPicker((image: string) => updateService(index, { image }))} />
                 </div>
               ))}
             </>
@@ -283,14 +283,14 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 <Field label="Name" value={item.name} onChange={(value) => updatePackage(index, { name: value })} />
                 <Area label="Summary" value={item.summary} onChange={(value) => updatePackage(index, { summary: value })} />
                 <Field label="Price NPR" value={String(item.priceNpr)} onChange={(value) => updatePackage(index, { priceNpr: Number(value) || 0 })} />
-                <MediaField label="Image" src={item.image} onUpload={(file) => upload(file, (image) => updatePackage(index, { image }))} onLibrary={() => setPicker((image) => updatePackage(index, { image }))} />
+                <MediaField label="Image" src={item.image} onUpload={(file) => upload(file, (image: string) => updatePackage(index, { image }))} onLibrary={() => setPicker((image: string) => updatePackage(index, { image }))} />
               </div>
             ))}
           {section === "Gallery" &&
             content.gallery.map((image, index) => (
               <div key={image.id} className="rounded-2xl border border-[#efe8e0] bg-white p-5">
                 <Field label="Alt text" value={image.alt} onChange={(value) => updateGallery(index, { alt: value })} />
-                <MediaField label={image.category} src={image.src} onUpload={(file) => upload(file, (src) => updateGallery(index, { src }))} onLibrary={() => setPicker((src) => updateGallery(index, { src }))} />
+                <MediaField label={image.category} src={image.src} onUpload={(file) => upload(file, (src: string) => updateGallery(index, { src }))} onLibrary={() => setPicker((src: string) => updateGallery(index, { src }))} />
               </div>
             ))}
           {section === "Footer" && (

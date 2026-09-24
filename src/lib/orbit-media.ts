@@ -76,7 +76,7 @@ export function listUploads(): MediaItem[] {
       return {
         path: `/uploads/${name}`,
         name,
-        kind: isVideoName(name) ? "video" : "image",
+        kind: (isVideoName(name) ? "video" : "image") as MediaItem["kind"],
         size,
       };
     })
