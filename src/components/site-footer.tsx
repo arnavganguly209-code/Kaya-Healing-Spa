@@ -5,10 +5,11 @@ import Link from "next/link";
 
 const explore = [
   ["Home", "/"],
-  ["About", "/about"],
   ["Services", "/services"],
   ["Packages", "/packages"],
   ["Gallery", "/gallery"],
+  ["Blog", "/blog"],
+  ["About", "/about"],
   ["Contact", "/contact"],
 ];
 

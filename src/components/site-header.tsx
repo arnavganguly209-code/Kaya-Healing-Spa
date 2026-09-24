@@ -9,10 +9,11 @@ import { useEffect, useState } from "react";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/services", label: "Treatments" },
-  { href: "/packages", label: "Wellness" },
+  { href: "/services", label: "Services" },
+  { href: "/packages", label: "Packages" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/blog", label: "Blog" },
+  { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -31,18 +32,18 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-[#f3ebe3] bg-white">
-      <div className="mx-auto flex h-[96px] max-w-[1440px] items-center gap-6 px-4 md:px-8">
-        <Link href="/" className="shrink-0" aria-label="KAYA SPA home">
-          <Logo size={78} priority />
+      <div className="relative mx-auto flex h-[108px] max-w-[1440px] items-center px-4 md:px-8">
+        <Link href="/" className="relative z-10 shrink-0" aria-label="KAYA SPA home">
+          <Logo size={90} priority />
         </Link>
-        <nav className="hidden flex-1 items-center justify-center gap-7 xl:flex" aria-label="Primary">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 xl:flex" aria-label="Primary">
           {links.map((link) => {
             const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-[15px] font-medium ${active ? "text-[#e8771a]" : "text-[#1c1a17] hover:text-[#e8771a]"}`}
+                className={`relative text-[15px] font-bold ${active ? "text-[#e8771a]" : "text-[#1c1a17] hover:text-[#e8771a]"}`}
               >
                 {link.label}
                 {active && <span className="absolute -bottom-2 left-0 h-[2px] w-full bg-[#e8771a]" />}
@@ -77,7 +78,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
         </div>
       </div>
       {open && (
-        <div className="fixed inset-0 top-[96px] z-40 flex flex-col bg-white px-6 py-8 xl:hidden">
+        <div className="fixed inset-0 top-[108px] z-40 flex flex-col bg-white px-6 py-8 xl:hidden">
           <nav className="flex flex-col gap-5" aria-label="Mobile">
             {links.map((link) => (
               <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="font-serif text-4xl">

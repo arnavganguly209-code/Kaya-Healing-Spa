@@ -107,7 +107,7 @@ export function HomePage() {
 
   return (
     <>
-      <section className="flex flex-col bg-[#fffdfb] pt-[96px] lg:h-[100svh] lg:overflow-hidden">
+      <section className="flex flex-col bg-[#fffdfb] pt-[108px] lg:h-[100svh] lg:overflow-hidden">
         <div className="relative min-h-[520px] flex-1 overflow-hidden lg:min-h-0">
           <Image
             src={hero.image}
