@@ -1,27 +1,12 @@
 import { HeroMedia } from "@/components/hero-media";
 import { Reveal } from "@/components/reveal";
 import { TherapiesSection } from "@/components/therapies-section";
+import { WhyKayaSection } from "@/components/why-kaya-section";
 import { formatNpr, reviews, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
-import { Calendar, Droplets, Flower2, Leaf, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Calendar, Flower2, Leaf, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
-const trust = [
-  { icon: UserRound, title: "Experienced therapists", text: "Sessions are led by therapists who adjust pressure and pace with you, not against a script." },
-  { icon: Sparkles, title: "A considered visit", text: "Rooms, timing, and sequences are arranged so the hour feels settled from the moment you arrive." },
-  { icon: Leaf, title: "Treatments shaped to you", text: "Tell us what you need — quiet, recovery, or a longer ritual — and the booking follows that." },
-  { icon: ShieldCheck, title: "Clean, quiet rooms", text: "Linens, tools, and surfaces are prepared between every guest. The rooms stay simple and calm." },
-];
-
-const why = [
-  ["Personalized care", "Each booking starts with what you want from the hour."],
-  ["Experienced therapists", "Pressure, draping, and pace are discussed before work begins."],
-  ["Premium products", "Oils and scrubs are chosen for comfort and a light, clean finish."],
-  ["Serene environment", "Soft light, low voices, and rooms kept free of clutter."],
-  ["Hygiene & standards", "Fresh linen and cleaned tools for every treatment."],
-  ["Kathmandu", "A city spa for travellers and residents who want a proper pause."],
-];
 
 const journey = [
   ["01", "Arrive", "You are greeted, offered water, and given a few quiet minutes before the room."],
@@ -71,6 +56,7 @@ export function HomePage() {
   const gallery = orbit.gallery;
   const hero = orbit.hero;
   const therapies = orbit.therapies;
+  const whyKaya = orbit.whyKaya;
   const pointIcons = [Flower2, Leaf, CareIcon];
   const featuredServices = services.slice(0, 6);
   const preview = gallery.slice(0, 6);
@@ -190,24 +176,7 @@ export function HomePage() {
         cards={therapies.cards}
       />
 
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8 md:py-32">
-        <Reveal>
-          <p className="eyebrow">KAYA SPA</p>
-          <h2 className="display mt-4 max-w-3xl text-5xl md:text-6xl">Wellness, reimagined</h2>
-          <p className="prose-quiet mt-6 max-w-2xl text-lg">
-            Traditional oil work and contemporary hospitality sit in the same room here. The visit is personal, the setting is quiet, and nothing is asked of you except to arrive.
-          </p>
-        </Reveal>
-        <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {trust.map((item, i) => (
-            <Reveal key={item.title} delay={i * 0.05}>
-              <item.icon className="text-[#2f8f45]" strokeWidth={1.25} />
-              <h3 className="mt-4 font-serif text-2xl">{item.title}</h3>
-              <p className="prose-quiet mt-3 text-sm">{item.text}</p>
-            </Reveal>
-          ))}
-        </div>
-      </section>
+      <WhyKayaSection data={whyKaya} />
 
       <section className="bg-[#f6f1e8]">
         <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-20 md:px-8 lg:grid-cols-2 lg:py-28">
@@ -317,20 +286,6 @@ export function HomePage() {
           ))}
         </div>
         <Link href="/packages" className="btn-line mt-10">All packages</Link>
-      </section>
-
-      <section className="bg-[#1c1a17] text-[#f6f1e8]">
-        <div className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
-          <h2 className="display text-5xl md:text-6xl">Why choose KAYA SPA</h2>
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {why.map(([title, text]) => (
-              <div key={title} className="border-t border-white/15 pt-5">
-                <h3 className="font-serif text-2xl">{title}</h3>
-                <p className="mt-2 text-sm text-white/65">{text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">

@@ -32,6 +32,19 @@ export type OrbitTherapyCard = {
   buttonLabel?: string;
 };
 
+export type OrbitWhyItem = { title: string; text: string };
+
+export type OrbitWhyKaya = {
+  eyebrow: string;
+  titleOrange: string;
+  titleDark: string;
+  intro: string;
+  image: string;
+  imageAlt: string;
+  highlights: OrbitWhyItem[];
+  pillars: OrbitWhyItem[];
+};
+
 export type OrbitContent = {
   phone: string;
   email: string;
@@ -46,6 +59,7 @@ export type OrbitContent = {
     imageAlt: string;
     cards: OrbitTherapyCard[];
   };
+  whyKaya: OrbitWhyKaya;
   services: Service[];
   categories: string[];
   packages: SpaPackage[];
@@ -135,6 +149,51 @@ export function defaultOrbitContent(): OrbitContent {
         },
       ],
     },
+    whyKaya: {
+      eyebrow: "WHY CHOOSE KAYA SPA",
+      titleOrange: "Authentic Care",
+      titleDark: "for Your Wellbeing",
+      intro:
+        "At Kaya Spa, we combine traditional healing wisdom with modern wellness practices to create a truly personalized experience. Our goal is to help you relax, rejuvenate and restore balance in a peaceful and welcoming environment.",
+      image: "/why-kaya/why-kaya-spa.png",
+      imageAlt: "Guest resting during a spa treatment with candles and herbal compress nearby",
+      highlights: [
+        {
+          title: "Natural & Safe Products",
+          text: "We use high-quality, natural ingredients for your safety and wellbeing.",
+        },
+        {
+          title: "Experienced Therapists",
+          text: "Our skilled and certified therapists provide professional and caring treatments.",
+        },
+        {
+          title: "Peaceful Environment",
+          text: "A calm and serene space designed to help you relax and heal.",
+        },
+        {
+          title: "Personalized Care",
+          text: "Each treatment is tailored to your unique needs and wellness goals.",
+        },
+      ],
+      pillars: [
+        {
+          title: "Safe & Hygienic",
+          text: "Clean and comfortable facilities for a worry-free experience.",
+        },
+        {
+          title: "Holistic Approach",
+          text: "Mind, body and soul wellness through natural healing methods.",
+        },
+        {
+          title: "Client Focused",
+          text: "Your comfort, satisfaction and wellbeing are our priority.",
+        },
+        {
+          title: "Relax & Rejuvenate",
+          text: "Escape daily stress and rediscover your inner balance.",
+        },
+      ],
+    },
     services,
     categories: ["massage", "ayurvedic", "holistic", "body-care", "facial", "wellness", "recovery"],
     packages,
@@ -207,13 +266,39 @@ function normalizeTherapies(therapies: OrbitContent["therapies"]): OrbitContent[
   };
 }
 
+function normalizeWhyKaya(why: OrbitWhyKaya): OrbitWhyKaya {
+  const defaults = defaultOrbitContent().whyKaya;
+  const fillFour = (items: OrbitWhyItem[] | undefined, fallback: OrbitWhyItem[]) => {
+    const source = items?.length ? items : fallback;
+    const out = [...source];
+    while (out.length < 4) out.push(fallback[out.length % fallback.length]);
+    return out.slice(0, 4);
+  };
+  return {
+    ...why,
+    eyebrow: why.eyebrow || defaults.eyebrow,
+    titleOrange: why.titleOrange || defaults.titleOrange,
+    titleDark: why.titleDark || defaults.titleDark,
+    intro: why.intro || defaults.intro,
+    image: why.image || defaults.image,
+    imageAlt: why.imageAlt || defaults.imageAlt,
+    highlights: fillFour(why.highlights, defaults.highlights),
+    pillars: fillFour(why.pillars, defaults.pillars),
+  };
+}
+
 export function readOrbitContent(): OrbitContent {
   const defaults = defaultOrbitContent();
   if (!existsSync(filePath)) return defaults;
   try {
     const saved = JSON.parse(readFileSync(filePath, "utf8")) as Partial<OrbitContent>;
     const merged = merge(defaults, saved);
-    return { ...merged, hero: normalizeHero(merged.hero), therapies: normalizeTherapies(merged.therapies) };
+    return {
+      ...merged,
+      hero: normalizeHero(merged.hero),
+      therapies: normalizeTherapies(merged.therapies),
+      whyKaya: normalizeWhyKaya(merged.whyKaya ?? defaults.whyKaya),
+    };
   } catch {
     return defaults;
   }
@@ -223,6 +308,15 @@ export function writeOrbitContent(content: OrbitContent) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(
     filePath,
-    JSON.stringify({ ...content, hero: normalizeHero(content.hero), therapies: normalizeTherapies(content.therapies) }, null, 2),
+    JSON.stringify(
+      {
+        ...content,
+        hero: normalizeHero(content.hero),
+        therapies: normalizeTherapies(content.therapies),
+        whyKaya: normalizeWhyKaya(content.whyKaya),
+      },
+      null,
+      2,
+    ),
   );
 }

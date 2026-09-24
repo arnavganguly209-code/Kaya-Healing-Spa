@@ -3,7 +3,7 @@
 import type { OrbitContent } from "@/lib/orbit-store";
 import { useEffect, useRef, useState } from "react";
 
-const sections = ["Hero", "Media", "Therapies", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
+const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
 
 type MediaItem = { path: string; name: string; kind: "image" | "video"; size: number };
 
@@ -365,6 +365,36 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               ))}
             </>
           )}
+          {section === "Why Kaya" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">Why Choose Kaya Spa block below signature treatments — full text, photo, and feature lists.</p>
+              <Field label="Eyebrow" value={content.whyKaya.eyebrow} onChange={(value) => setContent({ ...content, whyKaya: { ...content.whyKaya, eyebrow: value } })} />
+              <Field label="Title orange" value={content.whyKaya.titleOrange} onChange={(value) => setContent({ ...content, whyKaya: { ...content.whyKaya, titleOrange: value } })} />
+              <Field label="Title dark" value={content.whyKaya.titleDark} onChange={(value) => setContent({ ...content, whyKaya: { ...content.whyKaya, titleDark: value } })} />
+              <Area label="Intro" value={content.whyKaya.intro} onChange={(value) => setContent({ ...content, whyKaya: { ...content.whyKaya, intro: value } })} />
+              <MediaField
+                label="Main photo (left)"
+                src={content.whyKaya.image}
+                onUpload={(file) => upload(file, (image: string) => publish({ ...content, whyKaya: { ...content.whyKaya, image } }))}
+                onLibrary={() => setPicker((image: string) => publish({ ...content, whyKaya: { ...content.whyKaya, image } }))}
+              />
+              <Field label="Photo alt" value={content.whyKaya.imageAlt} onChange={(value) => setContent({ ...content, whyKaya: { ...content.whyKaya, imageAlt: value } })} />
+              <p className="text-sm font-semibold">Highlight grid (4)</p>
+              {content.whyKaya.highlights.map((item, index) => (
+                <div key={`h-${index}`} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <Field label={`Highlight ${index + 1} title`} value={item.title} onChange={(value) => updateWhyHighlight(index, { title: value })} />
+                  <Area label="Text" value={item.text} onChange={(value) => updateWhyHighlight(index, { text: value })} />
+                </div>
+              ))}
+              <p className="text-sm font-semibold">Bottom row (4)</p>
+              {content.whyKaya.pillars.map((item, index) => (
+                <div key={`p-${index}`} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <Field label={`Column ${index + 1} title`} value={item.title} onChange={(value) => updateWhyPillar(index, { title: value })} />
+                  <Area label="Text" value={item.text} onChange={(value) => updateWhyPillar(index, { text: value })} />
+                </div>
+              ))}
+            </>
+          )}
           {section === "Services" && (
             <>
               <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, services: [...content.services, { ...content.services[0], slug: `service-${Date.now()}`, name: "New treatment", summary: "Describe this treatment." }] })}>
@@ -470,6 +500,14 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   function updateCard(index: number, patch: Partial<OrbitContent["therapies"]["cards"][number]>) {
     const cards = contentRef.current.therapies.cards.map((item, i) => (i === index ? { ...item, ...patch } : item));
     publish({ ...contentRef.current, therapies: { ...contentRef.current.therapies, cards } });
+  }
+  function updateWhyHighlight(index: number, patch: Partial<OrbitContent["whyKaya"]["highlights"][number]>) {
+    const highlights = contentRef.current.whyKaya.highlights.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    setContent({ ...contentRef.current, whyKaya: { ...contentRef.current.whyKaya, highlights } });
+  }
+  function updateWhyPillar(index: number, patch: Partial<OrbitContent["whyKaya"]["pillars"][number]>) {
+    const pillars = contentRef.current.whyKaya.pillars.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    setContent({ ...contentRef.current, whyKaya: { ...contentRef.current.whyKaya, pillars } });
   }
   function updateService(index: number, patch: Partial<OrbitContent["services"][number]>) {
     const next = { ...contentRef.current, services: contentRef.current.services.map((item, i) => (i === index ? { ...item, ...patch } : item)) };

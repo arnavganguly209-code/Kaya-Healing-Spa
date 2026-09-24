@@ -37,7 +37,7 @@ export async function GET() {
 export async function PUT(request: Request) {
   if (!(await isOrbitAuthed())) return NextResponse.json({ message: "Sign in required." }, { status: 401 });
   const body = (await request.json().catch(() => null)) as OrbitContent | null;
-  if (!body?.hero || !body.therapies || !Array.isArray(body.services)) {
+  if (!body?.hero || !body.therapies || !body.whyKaya || !Array.isArray(body.services)) {
     return NextResponse.json({ message: "Content is incomplete." }, { status: 400 });
   }
   writeOrbitContent(body);
