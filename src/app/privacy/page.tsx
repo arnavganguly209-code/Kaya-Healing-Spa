@@ -1,9 +1,10 @@
 import { LegalLayout } from "@/components/page-hero";
+import { site } from "@/lib/content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How KAYA SPA handles appointment requests and newsletter emails.",
+  description: `How ${site.name} handles appointment requests and newsletter emails.`,
   alternates: { canonical: "/privacy" },
 };
 

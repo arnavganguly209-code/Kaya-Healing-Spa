@@ -11,7 +11,7 @@ export default function Page() {
         data={{
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "KAYA SPA",
+          name: site.name,
           url: site.url,
           description: "Luxury spa in Kathmandu.",
         }}

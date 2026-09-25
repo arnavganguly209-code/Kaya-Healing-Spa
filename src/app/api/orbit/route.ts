@@ -40,7 +40,17 @@ export async function PUT(request: Request) {
   if (!body?.hero || !body.therapies || !body.whyKaya || !Array.isArray(body.services)) {
     return NextResponse.json({ message: "Content is incomplete." }, { status: 400 });
   }
-  writeOrbitContent(body);
+  const current = readOrbitContent();
+  writeOrbitContent({
+    ...current,
+    ...body,
+    hero: body.hero,
+    therapies: body.therapies,
+    whyKaya: body.whyKaya,
+    homeAbout: body.homeAbout ? { ...current.homeAbout, ...body.homeAbout } : current.homeAbout,
+    services: body.services,
+    footerBrand: body.footerBrand ?? current.footerBrand,
+  });
   revalidatePath("/", "layout");
   revalidatePath("/orbit");
   return NextResponse.json({ success: true });

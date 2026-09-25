@@ -1,14 +1,14 @@
 import { PageHero } from "@/components/page-hero";
-import { formatNpr, packages } from "@/lib/content";
+import { formatNpr, packages, site } from "@/lib/content";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Spa Packages in Kathmandu",
-  description: "Half-day and full-day spa packages, couple sessions, and recovery rituals at KAYA SPA.",
+  description: `Half-day and full-day spa packages, couple sessions, and recovery rituals at ${site.name}.`,
   alternates: { canonical: "/packages" },
-  openGraph: { title: "KAYA SPA packages", description: "Complete wellness experiences in Kathmandu." },
+  openGraph: { title: `${site.name} packages`, description: "Complete wellness experiences in Kathmandu." },
 };
 
 export default function PackagesPage() {

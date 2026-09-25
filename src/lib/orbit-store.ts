@@ -47,10 +47,22 @@ export type OrbitWhyKaya = {
   pillars: OrbitWhyItem[];
 };
 
+export type OrbitHomeAbout = {
+  eyebrow: string;
+  title: string;
+  paragraph1: string;
+  paragraph2: string;
+  linkLabel: string;
+  linkHref: string;
+  image: string;
+  imageAlt: string;
+};
+
 export type OrbitContent = {
   phone: string;
   email: string;
   footerText: string;
+  footerBrand: string;
   hero: OrbitHero;
   therapies: {
     eyebrow: string;
@@ -62,6 +74,7 @@ export type OrbitContent = {
     cards: OrbitTherapyCard[];
   };
   whyKaya: OrbitWhyKaya;
+  homeAbout: OrbitHomeAbout;
   services: Service[];
   categories: string[];
   packages: SpaPackage[];
@@ -76,6 +89,7 @@ export function defaultOrbitContent(): OrbitContent {
     email: site.email,
     footerText:
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
+    footerBrand: "Kaya Healing Spa",
     hero: {
       image: "/hero/kaya-hero-spa-hd.png",
       alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
@@ -90,7 +104,7 @@ export function defaultOrbitContent(): OrbitContent {
       animation: "fade",
       intervalMs: 6000,
       eyebrow: "A COMPLETE WELLNESS EXPERIENCE",
-      titleOrange: "Kaya",
+      titleOrange: "Kaya Healing",
       titleDark: "Spa",
       subtitle: "Heal Your Body, Calm Your Mind",
       body: "Experience the perfect blend of traditional therapies and modern wellness in a serene and peaceful environment. Rejuvenate, relax and restore your natural balance.",
@@ -152,11 +166,11 @@ export function defaultOrbitContent(): OrbitContent {
       ],
     },
     whyKaya: {
-      eyebrow: "WHY CHOOSE KAYA SPA",
+      eyebrow: "WHY CHOOSE KAYA HEALING SPA",
       titleOrange: "Authentic Care",
       titleDark: "for Your Wellbeing",
       intro:
-        "At Kaya Spa, we combine traditional healing wisdom with modern wellness practices to create a truly personalized experience. Our goal is to help you relax, rejuvenate and restore balance in a peaceful and welcoming environment.",
+        "At Kaya Healing Spa, we combine traditional healing wisdom with modern wellness practices to create a truly personalized experience. Our goal is to help you relax, rejuvenate and restore balance in a peaceful and welcoming environment.",
       image: "/why-kaya/why-kaya-spa.png",
       imageAlt: "Guest resting during a spa treatment with candles and herbal compress nearby",
       highlights: [
@@ -195,6 +209,18 @@ export function defaultOrbitContent(): OrbitContent {
           text: "Escape daily stress and rediscover your inner balance.",
         },
       ],
+    },
+    homeAbout: {
+      eyebrow: "About",
+      title: "A spa with a slower standard",
+      paragraph1:
+        "Kaya Healing Spa was imagined for Kathmandu guests who already know what a hurried treatment feels like. The philosophy is simple: hospitality first, then skilled bodywork, then enough time afterward that the benefit is not lost in the lobby.",
+      paragraph2:
+        "Wellness here means practical care — pressure you agree to, oil that is warm, rooms that smell clean rather than loud, and a therapist who listens before they begin.",
+      linkLabel: "Discover Kaya Healing Spa",
+      linkHref: "/about",
+      image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=80",
+      imageAlt: "Spa stones and folded towels",
     },
     services,
     categories: ["massage", "ayurvedic", "holistic", "body-care", "facial", "wellness", "recovery"],
@@ -241,16 +267,20 @@ function normalizeHero(hero: OrbitHero): OrbitHero {
     slides.push({ src: latest, alt: hero.alt || "KAYA SPA hero", kind: "image" });
   }
   const first = slides[0] ?? { src: latest, alt: hero.alt, kind: "image" as const };
+  const titleOrange = hero.titleOrange === "Kaya" ? "Kaya Healing" : hero.titleOrange || "Kaya Healing";
+  const titleDark = hero.titleDark || "Spa";
   return {
     ...hero,
     slides,
     image: first.src,
     alt: first.alt || hero.alt,
+    titleOrange,
+    titleDark,
     display: hero.display === "slider" ? "slider" : "still",
     animation: hero.animation === "none" ? "none" : "fade",
     intervalMs: Math.min(20000, Math.max(2500, Number(hero.intervalMs) || 6000)),
     flipHorizontal: hero.flipHorizontal === true,
-    objectPosition: hero.objectPosition?.trim() || "68% center",
+    objectPosition: hero.objectPosition?.trim() || "62% center",
   };
 }
 
@@ -303,6 +333,8 @@ export function readOrbitContent(): OrbitContent {
       hero: normalizeHero(merged.hero),
       therapies: normalizeTherapies(merged.therapies),
       whyKaya: normalizeWhyKaya(merged.whyKaya ?? defaults.whyKaya),
+      homeAbout: { ...defaults.homeAbout, ...merged.homeAbout },
+      footerBrand: merged.footerBrand || defaults.footerBrand,
     };
   } catch {
     return defaults;

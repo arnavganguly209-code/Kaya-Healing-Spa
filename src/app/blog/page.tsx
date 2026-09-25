@@ -1,10 +1,11 @@
 import { PageHero } from "@/components/page-hero";
+import { site } from "@/lib/content";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Journal",
-  description: "Notes from KAYA SPA on rest, recovery, and visiting the spa in Kathmandu.",
+  description: `Notes from ${site.name} on rest, recovery, and visiting the spa in Kathmandu.`,
   alternates: { canonical: "/blog" },
 };
 

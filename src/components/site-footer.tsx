@@ -24,23 +24,24 @@ const treatments = [
 
 export function SiteFooter() {
   const orbit = readOrbitContent();
+  const brand = orbit.footerBrand || site.name;
   return (
-    <footer className="bg-[#141210] text-[#f6f1e8]">
-      <div className="h-px w-full bg-gradient-to-r from-[#e8771a] via-[#2f8f45] to-transparent" />
-      <div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 md:grid-cols-2 md:px-8 lg:grid-cols-4">
+    <footer className="relative overflow-hidden bg-[#12100e] text-[#f6f1e8]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F47B20]/80 to-transparent" />
+      <div className="pointer-events-none absolute -left-32 top-0 h-64 w-64 rounded-full bg-[#F47B20]/10 blur-3xl" />
+      <div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-20 md:grid-cols-2 md:px-10 lg:grid-cols-4 lg:gap-14">
         <div>
-          <Logo size={72} />
-          <p className="mt-4 text-sm tracking-[0.18em] uppercase text-white/70">{site.tagline}</p>
-          <p className="prose-quiet mt-4 max-w-xs text-sm text-white/60">
-            {orbit.footerText}
-          </p>
+          <Logo />
+          <p className="mt-5 font-serif text-2xl text-white">{brand}</p>
+          <p className="mt-2 text-xs tracking-[0.22em] uppercase text-[#F47B20]">{site.tagline}</p>
+          <p className="mt-5 max-w-xs text-sm leading-7 text-white/65">{orbit.footerText}</p>
         </div>
         <div>
-          <p className="text-xs tracking-[0.2em] uppercase text-[#e8771a]">Explore</p>
-          <ul className="mt-4 space-y-2 text-sm text-white/75">
+          <p className="text-[11px] font-semibold tracking-[0.24em] text-[#F47B20] uppercase">Explore</p>
+          <ul className="mt-5 space-y-3 text-sm text-white/78">
             {explore.map(([label, href]) => (
               <li key={href}>
-                <Link href={href} className="hover:text-white">
+                <Link href={href} className="transition hover:text-white">
                   {label}
                 </Link>
               </li>
@@ -48,11 +49,11 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <p className="text-xs tracking-[0.2em] uppercase text-[#e8771a]">Treatments</p>
-          <ul className="mt-4 space-y-2 text-sm text-white/75">
+          <p className="text-[11px] font-semibold tracking-[0.24em] text-[#F47B20] uppercase">Treatments</p>
+          <ul className="mt-5 space-y-3 text-sm text-white/78">
             {treatments.map(([label, href]) => (
               <li key={label}>
-                <Link href={href} className="hover:text-white">
+                <Link href={href} className="transition hover:text-white">
                   {label}
                 </Link>
               </li>
@@ -60,22 +61,29 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <p className="text-xs tracking-[0.2em] uppercase text-[#e8771a]">Contact</p>
-          <ul className="mt-4 space-y-2 text-sm text-white/75">
+          <p className="text-[11px] font-semibold tracking-[0.24em] text-[#F47B20] uppercase">Contact</p>
+          <ul className="mt-5 space-y-3 text-sm text-white/78">
             <li>{site.city}</li>
-            <li>{orbit.phone || "Phone shared when you book"}</li>
-            <li>{orbit.email || "Email shared when you book"}</li>
+            <li>
+              <a href={`tel:${(orbit.phone || site.phone).replace(/\s/g, "")}`} className="hover:text-white">
+                {orbit.phone || site.phone}
+              </a>
+            </li>
+            {orbit.email ? <li>{orbit.email}</li> : null}
             {site.hours.map((row) => (
               <li key={row.day}>
                 {row.day}: {row.hours}
               </li>
             ))}
           </ul>
-          <p className="mt-6 text-xs tracking-[0.16em] uppercase text-white/50">Receive wellness updates & exclusive offers</p>
-          <Link href="/contact#newsletter" className="btn-primary !py-3">
+          <p className="mt-8 text-[11px] tracking-[0.18em] text-white/45 uppercase">Wellness updates</p>
+          <Link
+            href="/contact#newsletter"
+            className="mt-3 inline-flex rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#e06d12]"
+          >
             Join the list
           </Link>
-          <div className="mt-6 flex flex-wrap gap-4 text-xs tracking-[0.14em] uppercase text-white/60">
+          <div className="mt-8 flex flex-wrap gap-4 text-[11px] tracking-[0.14em] text-white/50 uppercase">
             {(
               [
                 ["Instagram", site.social.instagram],
@@ -87,19 +95,27 @@ export function SiteFooter() {
             )
               .filter(([, href]) => href.startsWith("https://"))
               .map(([label, href]) => (
-                <a key={label} href={href} target="_blank" rel="noreferrer">
+                <a key={label} href={href} target="_blank" rel="noreferrer" className="hover:text-white">
                   {label}
                 </a>
               ))}
           </div>
         </div>
       </div>
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-3 border-t border-white/10 px-5 py-6 text-xs text-white/45 md:flex-row md:items-center md:justify-between md:px-8">
-        <p>© {new Date().getFullYear()} KAYA SPA. All Rights Reserved.</p>
-        <div className="flex gap-4">
-          <Link href="/privacy">Privacy Policy</Link>
-          <Link href="/terms">Terms & Conditions</Link>
-          <Link href="/cookies">Cookie Policy</Link>
+      <div className="border-t border-white/10 bg-black/20">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-5 py-7 text-xs text-white/50 md:flex-row md:items-center md:justify-between md:px-10">
+          <p>© {new Date().getFullYear()} {brand}. All rights reserved.</p>
+          <div className="flex flex-wrap gap-5">
+            <Link href="/privacy" className="hover:text-white/80">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-white/80">
+              Terms & Conditions
+            </Link>
+            <Link href="/cookies" className="hover:text-white/80">
+              Cookie Policy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

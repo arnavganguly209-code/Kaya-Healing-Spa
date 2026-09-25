@@ -6,9 +6,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Contact & Booking",
-  description: "Request a spa appointment at KAYA SPA in Kathmandu. Share a preferred treatment, package, date, and time.",
+  description: `Request a spa appointment at ${site.name} in Kathmandu. Share a preferred treatment, package, date, and time.`,
   alternates: { canonical: "/contact" },
-  openGraph: { title: "Book KAYA SPA", description: "Request a wellness appointment in Kathmandu." },
+  openGraph: { title: `Book ${site.name}`, description: "Request a wellness appointment in Kathmandu." },
 };
 
 export default async function ContactPage({
@@ -40,7 +40,7 @@ export default async function ContactPage({
       <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 md:px-8 lg:grid-cols-[1.1fr_0.9fr]">
         <BookingForm service={params.service} packageSlug={params.package} />
         <aside>
-          <h2 className="font-serif text-3xl">KAYA SPA</h2>
+          <h2 className="font-serif text-3xl">{site.name}</h2>
           <p className="mt-3">{site.city}</p>
           <p className="prose-quiet mt-2 text-sm">Street address, phone, and email will appear here when the spa publishes them.</p>
           <ul className="mt-6 space-y-2 text-sm">

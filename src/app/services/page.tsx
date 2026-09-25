@@ -8,10 +8,10 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Spa Treatments in Kathmandu",
   description:
-    "Massage, Ayurvedic rituals, body care, facials, and recovery treatments at KAYA SPA in Kathmandu.",
+    `Massage, Ayurvedic rituals, body care, facials, and recovery treatments at ${site.name} in Kathmandu.`,
   alternates: { canonical: "/services" },
   openGraph: {
-    title: "Treatments at KAYA SPA",
+    title: `Treatments at ${site.name}`,
     description: "A full treatment menu for massage, Ayurveda, and wellness in Kathmandu.",
   },
 };
@@ -32,7 +32,7 @@ export default async function ServicesPage({
           "@type": "Service",
           name: service.name,
           description: service.summary,
-          provider: { "@type": "HealthAndBeautyBusiness", name: "KAYA SPA", url: site.url },
+          provider: { "@type": "HealthAndBeautyBusiness", name: site.name, url: site.url },
           areaServed: "Kathmandu",
           url: `${site.url}/services/${service.slug}`,
         }))}

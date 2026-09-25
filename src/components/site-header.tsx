@@ -49,7 +49,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
       }`}
     >
       <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-5 md:px-8 lg:h-[108px]">
-        <Link href="/" className="relative z-10 shrink-0" aria-label="KAYA SPA home">
+        <Link href="/" className="relative z-10 shrink-0" aria-label="Kaya Healing Spa home">
           <Logo priority />
         </Link>
         <nav
@@ -62,7 +62,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-[15px] font-bold tracking-[0.01em] ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
+                className={`relative text-[15px] font-extrabold tracking-[0.02em] ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
               >
                 {link.label}
                 {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}
@@ -72,7 +72,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
         </nav>
         <div className="relative z-10 ml-auto flex shrink-0 items-center gap-4 lg:gap-5">
           <a href={`tel:${phone.replace(/\s/g, "")}`} className="hidden items-center gap-3 text-[#171717] lg:flex">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#fff1e6]">
+            <span className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${glass ? "bg-[#fff1e6]" : "bg-[#fff1e6]/35 backdrop-blur-[2px]"}`}>
               <Phone size={18} className="call-pulse text-[#F47B20]" strokeWidth={1.8} />
             </span>
             <span className="leading-tight">

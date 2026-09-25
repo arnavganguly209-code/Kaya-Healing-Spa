@@ -1,15 +1,16 @@
 import { PageHero } from "@/components/page-hero";
 import { Reveal } from "@/components/reveal";
+import { site } from "@/lib/content";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About KAYA SPA",
+  title: `About ${site.name}`,
   description:
-    "The story, philosophy, and standards behind KAYA SPA, a luxury wellness spa in Kathmandu.",
+    `The story, philosophy, and standards behind ${site.name}, a luxury wellness spa in Kathmandu.`,
   alternates: { canonical: "/about" },
-  openGraph: { title: "About KAYA SPA", description: "Wellness with intention in Kathmandu." },
+  openGraph: { title: `About ${site.name}`, description: "Wellness with intention in Kathmandu." },
 };
 
 const values = [
@@ -57,13 +58,13 @@ export default function AboutPage() {
       <PageHero
         eyebrow="About"
         title="Wellness with intention"
-        text="KAYA SPA is a Kathmandu house for guests who want skilled bodywork and a visit that respects their time and privacy."
+        text={`${site.name} is a Kathmandu house for guests who want skilled bodywork and a visit that respects their time and privacy.`}
         image="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=2000&q=80"
         crumbs={[{ label: "Home", href: "/" }, { label: "About" }]}
       />
       <section className="mx-auto grid max-w-[1440px] items-center gap-12 px-5 py-24 md:px-8 lg:grid-cols-2">
         <Reveal>
-          <p className="eyebrow">About KAYA SPA</p>
+          <p className="eyebrow">About {site.name}</p>
           <h2 className="display mt-4 text-5xl">Hospitality, then the treatment</h2>
           <p className="prose-quiet mt-6">
             The spa exists for people moving through Kathmandu — residents between workdays, travellers between flights, walkers coming down from the hills. The offer is not spectacle. It is a well-run room, a therapist who listens, and a sequence that finishes with you still feeling looked after.

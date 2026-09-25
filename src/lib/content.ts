@@ -1,7 +1,7 @@
 import type { Faq, GalleryImage, Review, Service, ServiceCategory, SpaPackage } from "./types";
 
 export const site = {
-  name: "KAYA SPA",
+  name: "Kaya Healing Spa",
   tagline: "A Complete Wellness Experience",
   city: "Kathmandu, Nepal",
   addressLine: "Kathmandu, Nepal",

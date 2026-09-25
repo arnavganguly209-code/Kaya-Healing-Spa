@@ -42,7 +42,7 @@ export default async function ServiceDetail({ params }: Props) {
           "@type": "Service",
           name: service.name,
           description: service.overview,
-          provider: { "@type": "HealthAndBeautyBusiness", name: "KAYA SPA" },
+          provider: { "@type": "HealthAndBeautyBusiness", name: site.name },
           url: `${site.url}/services/${service.slug}`,
         }}
       />

@@ -1,10 +1,11 @@
 import { Logo } from "@/components/logo";
+import { site } from "@/lib/content";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Page not found",
-  description: "This page is not part of the KAYA SPA website.",
+  description: `This page is not part of the ${site.name} website.`,
 };
 
 export default function NotFound() {

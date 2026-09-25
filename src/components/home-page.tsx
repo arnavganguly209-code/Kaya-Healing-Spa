@@ -57,14 +57,15 @@ export function HomePage() {
   const hero = orbit.hero;
   const therapies = orbit.therapies;
   const whyKaya = orbit.whyKaya;
+  const homeAbout = orbit.homeAbout;
   const pointIcons = [Flower2, Leaf, CareIcon];
   const featuredServices = services.slice(0, 6);
   const preview = gallery.slice(0, 6);
 
   return (
     <>
-      <section className="relative min-h-[100svh] overflow-hidden bg-white">
-        <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 lg:top-[108px] lg:bottom-[52px]">
+      <section className="relative isolate min-h-[100svh] overflow-hidden bg-[#0a0a0a]">
+        <div className="pointer-events-none absolute inset-0 z-0">
           <HeroMedia
             slides={hero.slides}
             display={hero.display}
@@ -72,12 +73,12 @@ export function HomePage() {
             intervalMs={hero.intervalMs}
             flipHorizontal={hero.flipHorizontal}
             objectPosition={hero.objectPosition}
-            className="absolute inset-y-0 right-0 left-[36%] hidden md:block lg:left-[40%] xl:left-[42%] 2xl:left-[44%]"
+            className="absolute inset-0"
             priority
-            sizes="(min-width: 1920px) 58vw, (min-width: 1280px) 56vw, 50vw"
+            sizes="100vw"
           />
-          <div className="absolute inset-y-0 right-0 left-[36%] hidden bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.94)_14%,rgba(255,255,255,0.45)_32%,transparent_52%)] md:block lg:left-[40%] xl:left-[42%] 2xl:left-[44%]" />
-          <div className="absolute inset-x-0 bottom-0 hidden h-24 bg-gradient-to-t from-white via-white/85 to-transparent md:block" />
+          <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(255,255,255,0.97)_0%,rgba(255,255,255,0.88)_32%,rgba(255,255,255,0.45)_48%,rgba(255,255,255,0.08)_65%,transparent_85%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white via-white/90 to-transparent" />
         </div>
 
         <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col px-5 pt-[72px] sm:px-8 md:px-10 lg:px-12 lg:pt-[108px] xl:px-14">
@@ -125,20 +126,6 @@ export function HomePage() {
             </div>
           </div>
 
-          <div className="relative mb-5 aspect-[5/4] w-full overflow-hidden rounded-[20px] sm:aspect-[16/10] md:hidden">
-            <HeroMedia
-              slides={hero.slides}
-              display={hero.display}
-              animation={hero.animation}
-              intervalMs={hero.intervalMs}
-              flipHorizontal={hero.flipHorizontal}
-              objectPosition={hero.objectPosition}
-              className="absolute inset-0"
-              priority
-              sizes="100vw"
-            />
-          </div>
-
           <div className="relative z-20 mb-5 w-full sm:mb-6">
             <div className="rounded-[24px] border border-white/80 bg-white/70 shadow-[0_16px_40px_rgba(23,23,23,0.08)] backdrop-blur-xl sm:rounded-[28px]">
             <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
@@ -179,25 +166,24 @@ export function HomePage() {
         <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-20 md:px-8 lg:grid-cols-2 lg:py-28">
           <Reveal className="relative min-h-[420px]">
             <Image
-              src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=80"
-              alt="Spa stones and folded towels"
+              src={homeAbout.image}
+              alt={homeAbout.imageAlt}
               fill
               className="object-cover"
               sizes="(min-width: 1024px) 50vw, 100vw"
+              unoptimized={homeAbout.image.startsWith("/uploads/")}
             />
           </Reveal>
           <Reveal>
-            <p className="eyebrow">About</p>
-            <h2 className="display mt-4 text-5xl md:text-6xl">A spa with a slower standard</h2>
+            <p className="eyebrow">{homeAbout.eyebrow}</p>
+            <h2 className="display mt-4 text-5xl md:text-6xl">{homeAbout.title}</h2>
             <div className="prose-quiet mt-6 space-y-4">
-              <p>
-                KAYA SPA was imagined for Kathmandu guests who already know what a hurried treatment feels like. The philosophy is simple: hospitality first, then skilled bodywork, then enough time afterward that the benefit is not lost in the lobby.
-              </p>
-              <p>
-                Wellness here means practical care — pressure you agree to, oil that is warm, rooms that smell clean rather than loud, and a therapist who listens before they begin.
-              </p>
+              <p>{homeAbout.paragraph1}</p>
+              <p>{homeAbout.paragraph2}</p>
             </div>
-            <Link href="/about" className="btn-line mt-8">Discover KAYA SPA</Link>
+            <Link href={homeAbout.linkHref} className="btn-line mt-8">
+              {homeAbout.linkLabel}
+            </Link>
           </Reveal>
         </div>
       </section>
@@ -380,7 +366,7 @@ export function HomePage() {
       <section className="mx-auto grid max-w-[1440px] gap-10 px-5 py-24 md:px-8 lg:grid-cols-2">
         <div>
           <p className="eyebrow">Visit</p>
-          <h2 className="display mt-3 text-5xl">KAYA SPA</h2>
+          <h2 className="display mt-3 text-5xl">{site.name}</h2>
           <p className="mt-4 text-lg">{site.city}</p>
           <p className="prose-quiet mt-2 text-sm">A street address will be published when the spa confirms it. Until then, use the booking form and we will share directions.</p>
           <ul className="mt-6 space-y-2 text-sm">

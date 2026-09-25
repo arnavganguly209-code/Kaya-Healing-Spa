@@ -1,6 +1,6 @@
 "use client";
 
-import { packages, services } from "@/lib/content";
+import { packages, services, site } from "@/lib/content";
 import { useState } from "react";
 
 const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "";
@@ -49,7 +49,7 @@ export function BookingForm({ service, packageSlug }: { service?: string; packag
         throw new Error(detail || "The request could not be sent.");
       }
       setStatus("success");
-      setMessage("Your request is with the spa. This is not a confirmed booking until KAYA SPA replies.");
+      setMessage(`Your request is with the spa. This is not a confirmed booking until ${site.name} replies.`);
       form.reset();
     } catch (error) {
       setStatus("error");

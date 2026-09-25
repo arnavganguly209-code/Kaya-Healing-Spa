@@ -1,9 +1,10 @@
 "use client";
 
 import type { OrbitContent } from "@/lib/orbit-store";
+import { site } from "@/lib/content";
 import { useEffect, useRef, useState } from "react";
 
-const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
+const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home about", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
 
 type MediaItem = { path: string; name: string; kind: "image" | "video"; size: number };
 
@@ -23,9 +24,14 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   }, []);
 
   async function loadLibrary() {
+    setError("");
     const response = await fetch("/api/orbit/media", { credentials: "same-origin" });
     const body = await response.json().catch(() => ({}));
-    if (response.ok) setLibrary(body.data || []);
+    if (!response.ok) {
+      setError(body.message || "Media library could not load. Sign in again at /orbit/login.");
+      return;
+    }
+    setLibrary(body.data || []);
   }
 
   async function persist(next = contentRef.current) {
@@ -115,7 +121,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
     <div className="flex min-h-[100svh] bg-[#f7f2ea] text-[#171717]">
       <aside className="flex w-64 shrink-0 flex-col bg-[#171717] text-white">
         <div className="px-6 py-8">
-          <p className="text-[11px] tracking-[0.28em] text-[#F47B20] uppercase">KAYA SPA</p>
+          <p className="text-[11px] tracking-[0.28em] text-[#F47B20] uppercase">{site.name.toUpperCase()}</p>
           <p className="mt-2 font-serif text-4xl">Orbit</p>
           <p className="mt-2 text-xs text-white/50">Hero · Therapies · Why Kaya · Services · Packages · Gallery · Footer — edit then Save changes</p>
         </div>
@@ -258,11 +264,25 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           {section === "Media" && (
             <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
               <p className="text-sm font-semibold">Media library</p>
-              <p className="mt-1 text-sm text-[#6B6B6B]">Images up to 25 MB. Videos up to 120 MB. Click a file to copy its path, or use Replace on any section.</p>
-              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" className="mt-4 block text-sm" onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) void upload(file, () => undefined);
-              }} />
+              <p className="mt-1 text-sm text-[#6B6B6B]">Images up to 25 MB. Videos up to 120 MB. Uploads save instantly and appear below.</p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <label className="inline-flex cursor-pointer items-center rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-medium text-white">
+                  Upload file
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
+                    className="sr-only"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      event.target.value = "";
+                      if (file) void upload(file, () => undefined);
+                    }}
+                  />
+                </label>
+                <button type="button" className="rounded-full border border-[#efe8e0] px-5 py-2.5 text-sm" onClick={() => void loadLibrary()}>
+                  Refresh library
+                </button>
+              </div>
               <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3">
                 {library.map((item) => (
                   <article key={item.path} className="overflow-hidden rounded-xl border border-[#efe8e0]">
@@ -380,7 +400,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Why Kaya" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Why Choose Kaya Spa block below signature treatments — full text, photo, and feature lists.</p>
+              <p className="text-sm text-[#6B6B6B]">Why Choose {site.name} block below signature treatments — full text, photo, and feature lists.</p>
               <Field label="Eyebrow" value={content.whyKaya.eyebrow} onChange={(value) => setContent({ ...content, whyKaya: { ...content.whyKaya, eyebrow: value } })} />
               <Field label="Title orange" value={content.whyKaya.titleOrange} onChange={(value) => setContent({ ...content, whyKaya: { ...content.whyKaya, titleOrange: value } })} />
               <Field label="Title dark" value={content.whyKaya.titleDark} onChange={(value) => setContent({ ...content, whyKaya: { ...content.whyKaya, titleDark: value } })} />
@@ -406,6 +426,24 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   <Area label="Text" value={item.text} onChange={(value) => updateWhyPillar(index, { text: value })} />
                 </div>
               ))}
+            </>
+          )}
+          {section === "Home about" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">About block on the homepage (below Why Kaya).</p>
+              <Field label="Eyebrow" value={content.homeAbout.eyebrow} onChange={(value) => setContent({ ...content, homeAbout: { ...content.homeAbout, eyebrow: value } })} />
+              <Field label="Title" value={content.homeAbout.title} onChange={(value) => setContent({ ...content, homeAbout: { ...content.homeAbout, title: value } })} />
+              <Area label="Paragraph 1" value={content.homeAbout.paragraph1} onChange={(value) => setContent({ ...content, homeAbout: { ...content.homeAbout, paragraph1: value } })} />
+              <Area label="Paragraph 2" value={content.homeAbout.paragraph2} onChange={(value) => setContent({ ...content, homeAbout: { ...content.homeAbout, paragraph2: value } })} />
+              <Field label="Link label" value={content.homeAbout.linkLabel} onChange={(value) => setContent({ ...content, homeAbout: { ...content.homeAbout, linkLabel: value } })} />
+              <Field label="Link URL" value={content.homeAbout.linkHref} onChange={(value) => setContent({ ...content, homeAbout: { ...content.homeAbout, linkHref: value } })} />
+              <MediaField
+                label="Photo"
+                src={content.homeAbout.image}
+                onUpload={(file) => upload(file, (image: string) => publish({ ...content, homeAbout: { ...content.homeAbout, image } }))}
+                onLibrary={() => setPicker((image: string) => publish({ ...content, homeAbout: { ...content.homeAbout, image } }))}
+              />
+              <Field label="Photo alt" value={content.homeAbout.imageAlt} onChange={(value) => setContent({ ...content, homeAbout: { ...content.homeAbout, imageAlt: value } })} />
             </>
           )}
           {section === "Services" && (
@@ -461,6 +499,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
             ))}
           {section === "Footer" && (
             <>
+              <Field label="Brand name" value={content.footerBrand} onChange={(value) => setContent({ ...content, footerBrand: value })} />
               <Field label="Phone" value={content.phone} onChange={(value) => setContent({ ...content, phone: value })} />
               <Field label="Email" value={content.email} onChange={(value) => setContent({ ...content, email: value })} />
               <Area label="Footer description" value={content.footerText} onChange={(value) => setContent({ ...content, footerText: value })} />

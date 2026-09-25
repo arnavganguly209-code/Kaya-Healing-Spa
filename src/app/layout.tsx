@@ -30,19 +30,19 @@ const serif = Cormorant_Garamond({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "KAYA SPA | Luxury Spa in Kathmandu",
-    template: "%s | KAYA SPA",
+    default: `${site.name} | Luxury Spa in Kathmandu`,
+    template: `%s | ${site.name}`,
   },
   description:
-    "KAYA SPA is a luxury wellness spa in Kathmandu. Book massage, Ayurvedic rituals, and spa packages for a calm, complete visit.",
+    `${site.name} is a luxury wellness spa in Kathmandu. Book massage, Ayurvedic rituals, and spa packages for a calm, complete visit.`,
   twitter: {
     card: "summary_large_image",
-    title: "KAYA SPA",
+    title: site.name,
     description: "A complete wellness experience in Kathmandu.",
     images: ["/brand/kaya-logo-hd.png"],
   },
   keywords: [
-    "Kaya Spa",
+    "Kaya Healing Spa",
     "spa in Kathmandu",
     "luxury spa in Kathmandu",
     "massage in Kathmandu",
@@ -53,9 +53,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    siteName: "KAYA SPA",
+    siteName: site.name,
     url: site.url,
-    title: "KAYA SPA | A Complete Wellness Experience",
+    title: `${site.name} | A Complete Wellness Experience`,
     description: "Luxury spa and wellness in Kathmandu. Massage, Ayurveda, and unhurried spa packages.",
     images: ["/brand/kaya-logo-hd.png"],
   },
@@ -67,7 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   const business = {
     "@context": "https://schema.org",
     "@type": "HealthAndBeautyBusiness",
-    name: "KAYA SPA",
+    name: site.name,
     description: "Luxury spa and wellness in Kathmandu, Nepal.",
     slogan: site.tagline,
     image: `${site.url}/brand/kaya-logo-hd.png`,

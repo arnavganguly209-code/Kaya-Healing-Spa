@@ -1,9 +1,10 @@
 import { LegalLayout } from "@/components/page-hero";
+import { site } from "@/lib/content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Cookie Policy",
-  description: "How KAYA SPA uses cookies.",
+  description: `How ${site.name} uses cookies.`,
   alternates: { canonical: "/cookies" },
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { Logo } from "@/components/logo";
+import { site } from "@/lib/content";
 import { useState } from "react";
 
 export default function OrbitLoginPage() {
@@ -32,7 +33,7 @@ export default function OrbitLoginPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(244,123,32,0.12),transparent_42%),linear-gradient(180deg,#fffdf9_0%,#f7f2ea_100%)]" />
       <div className="relative mx-auto flex min-h-[100svh] max-w-6xl items-center justify-center px-5 py-12 lg:justify-between lg:px-10">
         <div className="hidden max-w-md lg:block">
-          <p className="text-[11px] font-medium tracking-[0.28em] text-[#F47B20] uppercase">KAYA SPA</p>
+          <p className="text-[11px] font-medium tracking-[0.28em] text-[#F47B20] uppercase">{site.name.toUpperCase()}</p>
           <h1 className="mt-4 font-serif text-6xl leading-[0.95] text-[#171717]">The studio for the living site.</h1>
           <p className="mt-5 text-[15px] leading-7 text-[#6B6B6B]">
             Change hero copy, photographs, slides, and the rest of the house from one quiet dashboard.
@@ -42,7 +43,7 @@ export default function OrbitLoginPage() {
           <Logo size={84} />
           <p className="mt-6 text-[11px] font-medium tracking-[0.28em] text-[#F47B20] uppercase">Orbit</p>
           <h2 className="mt-2 font-serif text-4xl text-[#171717]">Welcome back</h2>
-          <p className="mt-3 text-sm leading-6 text-[#6B6B6B]">Enter the site passkey to edit KAYA SPA.</p>
+          <p className="mt-3 text-sm leading-6 text-[#6B6B6B]">Enter the site passkey to edit {site.name}.</p>
           <label className="mt-8 block text-[11px] font-medium tracking-[0.18em] text-[#8a8a8a] uppercase">
             Passkey
             <input
