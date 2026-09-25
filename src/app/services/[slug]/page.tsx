@@ -68,30 +68,46 @@ export default async function ServiceDetail({ params }: Props) {
         <div>
           <h2 className="font-serif text-3xl">Treatment overview</h2>
           <p className="prose-quiet mt-4">{service.overview}</p>
-          <h2 className="mt-10 font-serif text-3xl">Benefits</h2>
-          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-[#4a453e]">
-            {service.benefits.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <h2 className="mt-10 font-serif text-3xl">What to expect</h2>
-          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-[#4a453e]">
-            {service.expect.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <h2 className="mt-10 font-serif text-3xl">Recommended for</h2>
-          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-[#4a453e]">
-            {service.recommendedFor.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <h2 className="mt-10 font-serif text-3xl">Preparation</h2>
-          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-[#4a453e]">
-            {service.preparation.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          {service.benefits.length > 0 ? (
+            <>
+              <h2 className="mt-10 font-serif text-3xl">Benefits</h2>
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-[#4a453e]">
+                {service.benefits.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+          {service.expect.length > 0 ? (
+            <>
+              <h2 className="mt-10 font-serif text-3xl">What to expect</h2>
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-[#4a453e]">
+                {service.expect.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+          {service.recommendedFor.length > 0 ? (
+            <>
+              <h2 className="mt-10 font-serif text-3xl">Recommended for</h2>
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-[#4a453e]">
+                {service.recommendedFor.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+          {service.preparation.length > 0 ? (
+            <>
+              <h2 className="mt-10 font-serif text-3xl">Preparation</h2>
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-[#4a453e]">
+                {service.preparation.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
         </div>
         <aside className="h-fit border border-[#e6dfd4] bg-[#f6f1e8] p-6 lg:sticky lg:top-28">
           <p className="text-xs tracking-[0.16em] uppercase text-[#8a8175]">Duration options</p>
