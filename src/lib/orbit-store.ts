@@ -21,6 +21,8 @@ export type OrbitHero = {
   book: string;
   points: { title: string; text: string }[];
   features: { title: string; text: string }[];
+  flipHorizontal?: boolean;
+  objectPosition?: string;
 };
 
 export type OrbitTherapyCard = {
@@ -75,11 +77,11 @@ export function defaultOrbitContent(): OrbitContent {
     footerText:
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
     hero: {
-      image: "/hero/kaya-hero-spa.png",
+      image: "/hero/kaya-hero-spa-hd.png",
       alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
       slides: [
         {
-          src: "/hero/kaya-hero-spa.png",
+          src: "/hero/kaya-hero-spa-hd.png",
           alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
           kind: "image",
         },
@@ -218,14 +220,15 @@ function merge<T>(base: T, saved: Partial<T> | undefined): T {
 }
 
 function normalizeHero(hero: OrbitHero): OrbitHero {
+  const latest = "/hero/kaya-hero-spa-hd.png";
   const stock = [
     "/hero/kaya-hero-wide.png",
     "/hero/kaya-hero-uhd.png",
     "/hero/kaya-hero-match.png",
     "/hero/kaya-hero-design.png",
     "/uploads/1790263964706-po5z83.png",
+    "/hero/kaya-hero-spa.png",
   ];
-  const latest = "/hero/kaya-hero-spa.png";
   const slides = (hero.slides?.length ? hero.slides : [{ src: hero.image, alt: hero.alt, kind: "image" as const }])
     .filter((slide) => slide.src)
     .slice(0, 10)
@@ -246,6 +249,8 @@ function normalizeHero(hero: OrbitHero): OrbitHero {
     display: hero.display === "slider" ? "slider" : "still",
     animation: hero.animation === "none" ? "none" : "fade",
     intervalMs: Math.min(20000, Math.max(2500, Number(hero.intervalMs) || 6000)),
+    flipHorizontal: hero.flipHorizontal === true,
+    objectPosition: hero.objectPosition?.trim() || "68% center",
   };
 }
 

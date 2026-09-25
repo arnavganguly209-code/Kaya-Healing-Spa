@@ -63,44 +63,37 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-white lg:h-[max(680px,min(100svh,52vw))]">
-        <div className="pointer-events-none absolute inset-x-0 top-[108px] bottom-[56px] hidden lg:block">
+      <section className="relative min-h-[100svh] overflow-hidden bg-white lg:min-h-[max(720px,min(100svh,54vw))]">
+        <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 md:bottom-[48px] lg:top-[108px] lg:bottom-[56px]">
           <HeroMedia
             slides={hero.slides}
             display={hero.display}
             animation={hero.animation}
             intervalMs={hero.intervalMs}
-            className="absolute inset-y-0 right-0 w-[64%]"
-            objectPosition="72% center"
+            flipHorizontal={hero.flipHorizontal}
+            objectPosition={hero.objectPosition}
+            className="absolute inset-y-0 right-0 hidden w-[52%] min-w-[280px] max-w-[920px] md:block md:w-[56%] lg:w-[60%] xl:w-[58%] 2xl:w-[55%]"
             priority
-            sizes="64vw"
+            sizes="(min-width: 1536px) 920px, 58vw"
           />
-          <div className="absolute inset-y-0 right-0 w-[64%] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.9)_10%,rgba(255,255,255,0.35)_24%,transparent_40%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/60 to-transparent" />
+          <div className="absolute inset-y-0 right-0 hidden w-[52%] min-w-[280px] max-w-[920px] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.92)_12%,rgba(255,255,255,0.4)_28%,transparent_46%)] md:block md:w-[56%] lg:w-[60%] xl:w-[58%] 2xl:w-[55%]" />
+          <div className="absolute inset-x-0 bottom-0 hidden h-20 bg-gradient-to-t from-white via-white/80 to-transparent md:block" />
         </div>
-        <Image
-          src="/hero/kaya-leaves.png"
-          alt=""
-          aria-hidden
-          width={520}
-          height={520}
-          className="pointer-events-none absolute -bottom-10 -left-16 z-[5] hidden w-[340px] mix-blend-multiply lg:block xl:w-[400px]"
-        />
 
-        <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col px-5 pt-[72px] sm:px-10 lg:px-14 lg:pt-[108px]">
-          <div className="flex flex-1 items-center py-8 lg:py-0">
-            <div className="max-w-[520px]">
+        <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1400px] flex-col px-5 pt-[72px] sm:px-8 md:min-h-0 md:px-10 lg:min-h-[calc(100svh-108px)] lg:px-14 lg:pt-[108px]">
+          <div className="flex flex-1 items-center py-6 md:py-10 lg:py-0">
+            <div className="w-full max-w-[540px] md:max-w-[480px] lg:max-w-[520px]">
               <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.26em] text-[#8a8a8a] uppercase">
                 {hero.eyebrow}
                 <span className="h-px w-10 bg-[#F47B20]" />
               </p>
               <h1
-                className="mt-5 text-[60px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#171717] sm:text-[80px] lg:text-[96px] xl:text-[108px]"
+                className="mt-4 text-[48px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#171717] sm:mt-5 sm:text-[64px] md:text-[72px] lg:text-[92px] xl:text-[102px]"
                 style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
               >
                 <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
               </h1>
-              <p className="mt-3 font-serif text-[28px] leading-tight font-medium text-[#171717] lg:text-[36px]">
+              <p className="mt-3 font-serif text-[22px] leading-tight font-medium text-[#171717] sm:text-[26px] lg:text-[34px] xl:text-[36px]">
                 {hero.subtitle}
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
@@ -132,19 +125,21 @@ export function HomePage() {
             </div>
           </div>
 
-          <div className="relative mb-6 h-64 overflow-hidden sm:h-80 lg:hidden">
+          <div className="relative mb-5 aspect-[5/4] w-full overflow-hidden rounded-[20px] sm:aspect-[16/10] md:hidden">
             <HeroMedia
               slides={hero.slides}
               display={hero.display}
               animation={hero.animation}
               intervalMs={hero.intervalMs}
+              flipHorizontal={hero.flipHorizontal}
+              objectPosition={hero.objectPosition}
               className="absolute inset-0"
-              objectPosition="70% center"
+              priority
               sizes="100vw"
             />
           </div>
 
-          <div className="relative z-20 mb-6 rounded-[28px] border border-white/80 bg-white/70 shadow-[0_16px_40px_rgba(23,23,23,0.08)] backdrop-blur-xl">
+          <div className="relative z-20 mb-5 rounded-[24px] border border-white/80 bg-white/70 shadow-[0_16px_40px_rgba(23,23,23,0.08)] backdrop-blur-xl sm:mb-6 sm:rounded-[28px]">
             <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];

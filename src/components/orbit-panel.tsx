@@ -109,7 +109,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   const hero = content.hero;
   const heroSlides = hero.slides.length
     ? hero.slides
-    : [{ src: hero.image || "/hero/kaya-hero-spa.png", alt: hero.alt, kind: "image" as const }];
+    : [{ src: hero.image || "/hero/kaya-hero-spa-hd.png", alt: hero.alt, kind: "image" as const }];
 
   return (
     <div className="flex min-h-[100svh] bg-[#f7f2ea] text-[#171717]">
@@ -117,7 +117,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
         <div className="px-6 py-8">
           <p className="text-[11px] tracking-[0.28em] text-[#F47B20] uppercase">KAYA SPA</p>
           <p className="mt-2 font-serif text-4xl">Orbit</p>
-          <p className="mt-2 text-xs text-white/50">Edit the living site</p>
+          <p className="mt-2 text-xs text-white/50">Hero · Therapies · Why Kaya · Services · Packages · Gallery · Footer — edit then Save changes</p>
         </div>
         <nav className="flex flex-1 flex-col gap-1 px-3">
           {sections.map((item) => (
@@ -178,6 +178,19 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   </label>
                 </div>
                 <Field label="Fade duration (ms)" value={String(hero.intervalMs)} onChange={(value) => setContent({ ...content, hero: { ...hero, intervalMs: Number(value) || 6000 } })} />
+                <Field
+                  label="Photo focus (object-position)"
+                  value={hero.objectPosition || "68% center"}
+                  onChange={(value) => setContent({ ...content, hero: { ...hero, objectPosition: value } })}
+                />
+                <label className="mt-3 flex cursor-pointer items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={hero.flipHorizontal === true}
+                    onChange={(event) => setContent({ ...content, hero: { ...hero, flipHorizontal: event.target.checked } })}
+                  />
+                  Mirror hero photo horizontally (for uploads)
+                </label>
               </div>
               {heroSlides.map((slide, index) => (
                 <div key={`${slide.src}-${index}`} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
@@ -192,7 +205,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   <Field label="Alt text" value={slide.alt} onChange={(value) => updateSlide(index, { alt: value })} />
                   <MediaField
                     label="Replace file"
-                    src={slide.src || hero.image || "/hero/kaya-hero-spa.png"}
+                    src={slide.src || hero.image || "/hero/kaya-hero-spa-hd.png"}
                     kind={slide.kind}
                     onUpload={(file) => upload(file, (src, kind) => updateSlide(index, { src, kind }))}
                     onLibrary={() => setPicker((src, kind) => updateSlide(index, { src, kind }))}
@@ -200,7 +213,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 </div>
               ))}
               {hero.slides.length < 10 && (
-                <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => updateSlides([...heroSlides, { src: "/hero/kaya-hero-spa.png", alt: "KAYA SPA hero", kind: "image" }])}>
+                <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => updateSlides([...heroSlides, { src: "/hero/kaya-hero-spa-hd.png", alt: "KAYA SPA hero", kind: "image" }])}>
                   Add image or video
                 </button>
               )}
