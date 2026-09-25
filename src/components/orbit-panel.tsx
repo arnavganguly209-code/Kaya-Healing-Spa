@@ -165,7 +165,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
         <div className="px-6 py-8">
           <p className="text-[11px] tracking-[0.28em] text-[#F47B20] uppercase">{site.name.toUpperCase()}</p>
           <p className="mt-2 font-serif text-4xl">Orbit</p>
-          <p className="mt-2 text-xs text-white/50">Hero · Therapies · Why Kaya · Services · Packages · Gallery · Footer — edit then Save changes</p>
+          <p className="mt-2 text-xs text-white/50">Matches the live site — edit a section, Save changes, then refresh the page.</p>
         </div>
         <nav className="flex flex-1 flex-col gap-1 px-3">
           {sections.map((item) => (
@@ -206,6 +206,9 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
         <div className="mt-8 max-w-4xl space-y-5">
           {section === "Hero" && (
             <>
+              <p className="text-sm text-[#6B6B6B]">
+                Controls the home hero only: background photo/video and the four feature boxes under the image. Other page titles live under <strong>Page covers</strong>.
+              </p>
               <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
                 <p className="text-sm font-semibold">Hero media</p>
                 <p className="mt-1 text-sm text-[#6B6B6B]">One still photo or video, or fade 1–10 files. Uploads publish immediately.</p>
@@ -273,36 +276,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   Add image or video
                 </button>
               )}
-              <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold">Hero text</p>
-                  <button
-                    type="button"
-                    className="text-xs text-[#c45e0a]"
-                    onClick={() =>
-                      publish({
-                        ...content,
-                        hero: { ...hero, eyebrow: "", titleOrange: "", titleDark: "", subtitle: "", body: "", explore: "", book: "" },
-                      })
-                    }
-                  >
-                    Clear text
-                  </button>
-                </div>
-                <Field label="Eyebrow" value={hero.eyebrow} onChange={(value) => setContent({ ...content, hero: { ...hero, eyebrow: value } })} />
-                <Field label="Title orange" value={hero.titleOrange} onChange={(value) => setContent({ ...content, hero: { ...hero, titleOrange: value } })} />
-                <Field label="Title dark" value={hero.titleDark} onChange={(value) => setContent({ ...content, hero: { ...hero, titleDark: value } })} />
-                <Field label="Subtitle" value={hero.subtitle} onChange={(value) => setContent({ ...content, hero: { ...hero, subtitle: value } })} />
-                <Area label="Intro" value={hero.body} onChange={(value) => setContent({ ...content, hero: { ...hero, body: value } })} />
-                <Field label="Explore button" value={hero.explore} onChange={(value) => setContent({ ...content, hero: { ...hero, explore: value } })} />
-                <Field label="Book button" value={hero.book} onChange={(value) => setContent({ ...content, hero: { ...hero, book: value } })} />
-              </div>
-              {hero.points.map((point, index) => (
-                <div key={index} className="grid gap-3 rounded-2xl border border-[#efe8e0] bg-white p-5 md:grid-cols-2">
-                  <Field label={`Point ${index + 1} title`} value={point.title} onChange={(value) => updatePoint(index, { title: value })} />
-                  <Field label="Line" value={point.text} onChange={(value) => updatePoint(index, { text: value })} />
-                </div>
-              ))}
+              <p className="text-sm font-semibold text-[#171717]">Feature boxes (bottom of home hero)</p>
               {hero.features.map((feature, index) => (
                 <div key={index} className="grid gap-3 rounded-2xl border border-[#efe8e0] bg-white p-5 md:grid-cols-2">
                   <Field label={`Feature ${index + 1} title`} value={feature.title} onChange={(value) => updateFeature(index, { title: value })} />
@@ -363,8 +337,16 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <MediaField
                 label="Header image (top right)"
                 src={content.therapies.image}
-                onUpload={(file) => upload(file, (image: string) => publish({ ...content, therapies: { ...content.therapies, image } }))}
-                onLibrary={() => setPicker((image: string) => publish({ ...content, therapies: { ...content.therapies, image } }))}
+                onUpload={(file) =>
+                  upload(file, (image: string) =>
+                    publish({ ...contentRef.current, therapies: { ...contentRef.current.therapies, image } }),
+                  )
+                }
+                onLibrary={() =>
+                  setPicker((image: string) =>
+                    publish({ ...contentRef.current, therapies: { ...contentRef.current.therapies, image } }),
+                  )
+                }
               />
               <Field
                 label="Header image alt"
@@ -468,8 +450,16 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <MediaField
                 label="Main photo (left)"
                 src={content.whyKaya.image}
-                onUpload={(file) => upload(file, (image: string) => publish({ ...content, whyKaya: { ...content.whyKaya, image } }))}
-                onLibrary={() => setPicker((image: string) => publish({ ...content, whyKaya: { ...content.whyKaya, image } }))}
+                onUpload={(file) =>
+                  upload(file, (image: string) =>
+                    publish({ ...contentRef.current, whyKaya: { ...contentRef.current.whyKaya, image } }),
+                  )
+                }
+                onLibrary={() =>
+                  setPicker((image: string) =>
+                    publish({ ...contentRef.current, whyKaya: { ...contentRef.current.whyKaya, image } }),
+                  )
+                }
               />
               <Field label="Photo alt" value={content.whyKaya.imageAlt} onChange={(value) => setContent({ ...content, whyKaya: { ...content.whyKaya, imageAlt: value } })} />
               <p className="text-sm font-semibold">Highlight grid (4)</p>
@@ -500,18 +490,23 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <MediaField
                 label="Photo"
                 src={content.homeAbout.image}
-                onUpload={(file) => upload(file, (image: string) => publish({ ...content, homeAbout: { ...content.homeAbout, image } }))}
-                onLibrary={() => setPicker((image: string) => publish({ ...content, homeAbout: { ...content.homeAbout, image } }))}
+                onUpload={(file) =>
+                  upload(file, (image: string) =>
+                    publish({ ...contentRef.current, homeAbout: { ...contentRef.current.homeAbout, image } }),
+                  )
+                }
+                onLibrary={() =>
+                  setPicker((image: string) =>
+                    publish({ ...contentRef.current, homeAbout: { ...contentRef.current.homeAbout, image } }),
+                  )
+                }
               />
               <Field label="Photo alt" value={content.homeAbout.imageAlt} onChange={(value) => setContent({ ...content, homeAbout: { ...content.homeAbout, imageAlt: value } })} />
             </>
           )}
           {section === "About page" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Long about copy, owner profile, and partner logos shown on /about.</p>
-              <Field label="Intro eyebrow" value={content.aboutPage.introEyebrow} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, introEyebrow: value } })} />
-              <Field label="Intro title" value={content.aboutPage.introTitle} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, introTitle: value } })} />
-              <Area label="Intro lead" value={content.aboutPage.introLead} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, introLead: value } })} />
+              <p className="text-sm text-[#6B6B6B]">Story, owner, and partners on /about. The top orange banner is edited under Page covers → About page.</p>
               <Field label="Company tagline" value={content.aboutPage.companyTagline} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, companyTagline: value } })} />
               <Field label="Google rating" value={String(content.aboutPage.googleRating)} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, googleRating: Number(value) || 0 } })} />
               <Field label="Google review count" value={String(content.aboutPage.googleReviewCount)} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, googleReviewCount: Number(value) || 0 } })} />
@@ -579,7 +574,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Therapists" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Team shown on services, packages, and booking forms. Upload a portrait, set experience and from-price.</p>
+              <p className="text-sm text-[#6B6B6B]">Team on services &amp; packages pages and “Book therapist” on contact. Choose a therapist from those pages — not as an optional field on treatment/package forms.</p>
               <button
                 type="button"
                 className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
@@ -617,7 +612,6 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   <Field label="Title" value={therapist.title} onChange={(value) => updateTherapist(index, { title: value })} />
                   <Area label="Description" value={therapist.description} onChange={(value) => updateTherapist(index, { description: value })} />
                   <Field label="Experience" value={therapist.experience} onChange={(value) => updateTherapist(index, { experience: value })} />
-                  <Field label="From price (NPR)" value={String(therapist.priceFromNpr)} onChange={(value) => updateTherapist(index, { priceFromNpr: Number(value) || 0 })} />
                   <MediaField
                     label="Photo"
                     src={therapist.photo}
@@ -648,7 +642,9 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Categories" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Service menu filters (slug labels, e.g. massage, ayurvedic).</p>
+              <p className="text-sm text-[#6B6B6B]">
+                Slugs for header menus (Services / Packages dropdowns) and catalog filters on /services and /packages. Use lowercase with hyphens (e.g. body-care).
+              </p>
               <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, categories: [...content.categories, "new-category"] })}>
                 Add service category
               </button>
@@ -720,13 +716,17 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               ))}
             </>
           )}
-          {section === "Gallery" &&
-            content.gallery.map((image, index) => (
+          {section === "Gallery" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">Photos on the home gallery strip and the full /gallery page. Upload replaces the image path.</p>
+              {content.gallery.map((image, index) => (
               <div key={image.id} className="rounded-2xl border border-[#efe8e0] bg-white p-5">
                 <Field label="Alt text" value={image.alt} onChange={(value) => updateGallery(index, { alt: value })} />
                 <MediaField label={image.category} src={image.src} onUpload={(file) => upload(file, (src: string) => updateGallery(index, { src }))} onLibrary={() => setPicker((src: string) => updateGallery(index, { src }))} />
               </div>
-            ))}
+              ))}
+            </>
+          )}
           {section === "Page covers" && (
             <>
               <p className="text-sm text-[#6B6B6B]">

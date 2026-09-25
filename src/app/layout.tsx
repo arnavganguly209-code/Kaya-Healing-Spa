@@ -64,6 +64,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const orbit = readOrbitContent();
   const business = {
     "@context": "https://schema.org",
     "@type": "HealthAndBeautyBusiness",
@@ -88,7 +89,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${sans.variable} ${serif.variable} ${display.variable} h-full antialiased`}>
       <body className="min-h-full bg-[#fffcf8] text-[#141210]">
         <JsonLd data={business} />
-        <SiteChrome phone={readOrbitContent().phone || site.phone} footer={<SiteFooter />}>
+        <SiteChrome
+          phone={orbit.phone || site.phone}
+          serviceCategories={orbit.categories}
+          packageCategories={orbit.packageCategories}
+          footer={<SiteFooter />}
+        >
           {children}
         </SiteChrome>
       </body>

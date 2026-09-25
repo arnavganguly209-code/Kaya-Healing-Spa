@@ -8,10 +8,14 @@ import Link from "next/link";
 
 export function SiteChrome({
   phone,
+  serviceCategories,
+  packageCategories,
   footer,
   children,
 }: {
   phone: string;
+  serviceCategories?: string[];
+  packageCategories?: string[];
   footer: ReactNode;
   children: ReactNode;
 }) {
@@ -19,7 +23,7 @@ export function SiteChrome({
   if (pathname.startsWith("/orbit")) return <>{children}</>;
   return (
     <>
-      <SiteHeader phone={phone} />
+      <SiteHeader phone={phone} serviceCategories={serviceCategories} packageCategories={packageCategories} />
       <main className={pathname === "/" ? "" : "pt-[72px] lg:pt-[108px]"}>{children}</main>
       {footer}
       <BackToTop />

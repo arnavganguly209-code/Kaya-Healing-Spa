@@ -1,18 +1,25 @@
 "use client";
 
-import { gallery } from "@/lib/content";
+import type { GalleryImage } from "@/lib/types";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
-const filters = ["all", "spa", "treatments", "interiors", "wellness", "details"] as const;
+function unoptimizedSrc(src: string) {
+  return src.startsWith("/uploads/") || src.startsWith("/hero/");
+}
 
-export function GalleryGrid() {
-  const [filter, setFilter] = useState<(typeof filters)[number]>("all");
+export function GalleryGrid({ items }: { items: GalleryImage[] }) {
+  const categories = useMemo(() => {
+    const set = new Set(items.map((image) => image.category));
+    return ["all", ...Array.from(set)] as const;
+  }, [items]);
+
+  const [filter, setFilter] = useState<string>("all");
   const [active, setActive] = useState<number | null>(null);
   const images = useMemo(
-    () => gallery.filter((image) => filter === "all" || image.category === filter),
-    [filter],
+    () => items.filter((image) => filter === "all" || image.category === filter),
+    [filter, items],
   );
 
   useEffect(() => {
@@ -29,16 +36,16 @@ export function GalleryGrid() {
   return (
     <div className="mx-auto max-w-[1440px] px-5 py-14 md:px-8">
       <div className="flex flex-wrap gap-2">
-        {filters.map((item) => (
+        {categories.map((item) => (
           <button
             key={item}
             type="button"
             onClick={() => setFilter(item)}
-            className={`px-3 py-2 text-xs tracking-[0.14em] uppercase ${
-              filter === item ? "bg-[#141210] text-white" : "bg-[#f6f1e8]"
+            className={`rounded-full px-4 py-2 text-xs font-bold tracking-[0.14em] uppercase ${
+              filter === item ? "bg-[#F47B20] text-white" : "border border-[#e6dfd4] bg-white"
             }`}
           >
-            {item}
+            {item === "all" ? "All" : item.replace(/-/g, " ")}
           </button>
         ))}
       </div>
@@ -53,7 +60,14 @@ export function GalleryGrid() {
               className="img-zoom mb-4 block w-full break-inside-avoid text-left"
               onClick={() => setActive(index)}
             >
-              <Image src={image.src} alt={image.alt} width={image.width} height={image.height} className="h-auto w-full" />
+              <Image
+                src={image.src}
+                alt={image.alt}
+                width={image.width}
+                height={image.height}
+                className="h-auto w-full"
+                unoptimized={unoptimizedSrc(image.src)}
+              />
             </button>
           ))}
         </div>
@@ -81,7 +95,14 @@ export function GalleryGrid() {
           <button type="button" className="absolute left-4 text-white" aria-label="Previous" onClick={() => setActive((i) => (i === null ? i : (i - 1 + images.length) % images.length))}>
             <ChevronLeft />
           </button>
-          <Image src={images[active].src} alt={images[active].alt} width={1400} height={900} className="max-h-[80svh] w-auto object-contain" />
+          <Image
+            src={images[active].src}
+            alt={images[active].alt}
+            width={1400}
+            height={900}
+            className="max-h-[80svh] w-auto object-contain"
+            unoptimized={unoptimizedSrc(images[active].src)}
+          />
           <button type="button" className="absolute right-4 text-white" aria-label="Next" onClick={() => setActive((i) => (i === null ? i : (i + 1) % images.length))}>
             <ChevronRight />
           </button>

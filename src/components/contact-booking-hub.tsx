@@ -68,7 +68,6 @@ export function ContactBookingHub({ services, packages, therapists, initial }: P
           packages={packages}
           therapists={therapists}
           initialService={initial?.service}
-          initialTherapist={initial?.therapist}
         />
       )}
       {mode === "package" && (
@@ -79,7 +78,6 @@ export function ContactBookingHub({ services, packages, therapists, initial }: P
           packages={packages}
           therapists={therapists}
           initialPackage={initial?.package}
-          initialTherapist={initial?.therapist}
         />
       )}
       {mode === "therapist" && (
@@ -181,6 +179,7 @@ function BookingPanel({
     } else {
       outPackage = packageSlug || undefined;
     }
+    const therapistForBooking = kind === "therapist" ? therapist || undefined : undefined;
     try {
       const response = await fetch(endpoint("/appointments"), {
         method: "POST",
@@ -194,7 +193,7 @@ function BookingPanel({
           preferredTime: data.preferredTime,
           serviceSlug: outService,
           packageSlug: outPackage,
-          therapistSlug: therapist || undefined,
+          therapistSlug: therapistForBooking,
           guests: Number(data.guests || 1),
           notes: data.notes || undefined,
         }),
@@ -347,14 +346,6 @@ function BookingPanel({
         <Field name="preferredTime" label="Preferred time" type="time" required />
       </div>
       <Field name="guests" label="Number of guests" type="number" defaultValue="1" required />
-
-      {(kind === "service" || kind === "package") && therapists.length > 0 && (
-        <>
-          <p className="text-sm font-semibold text-[#171717]">Preferred therapist (optional)</p>
-          <TherapistPicker therapists={therapists} value={therapistSlug} onChange={setTherapistSlug} />
-          <input type="hidden" name="therapistSlug" value={therapistSlug} />
-        </>
-      )}
 
       <label className="text-sm">
         Notes for the spa

@@ -1,7 +1,7 @@
 "use client";
 
 import { Logo } from "@/components/logo";
-import { categoryLabels, packageCategoryLabels, packageMenuCategories, serviceMenuCategories, site } from "@/lib/content";
+import { categoryLabels, labelForCategory, packageCategoryLabels, packageMenuCategories, serviceMenuCategories, site } from "@/lib/content";
 import { Calendar, ChevronDown, Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,7 +17,17 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function SiteHeader({ phone = site.phone }: { phone?: string }) {
+export function SiteHeader({
+  phone = site.phone,
+  serviceCategories,
+  packageCategories,
+}: {
+  phone?: string;
+  serviceCategories?: string[];
+  packageCategories?: string[];
+}) {
+  const serviceMenu = serviceCategories?.length ? serviceCategories : [...serviceMenuCategories];
+  const packageMenu = packageCategories?.length ? packageCategories : [...packageMenuCategories];
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -90,14 +100,14 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
                       role="menu"
                       aria-label="Service categories"
                     >
-                      {serviceMenuCategories.map((slug) => (
+                      {serviceMenu.map((slug) => (
                         <li key={slug} role="none">
                           <Link
                             href={`/services?category=${slug}`}
                             role="menuitem"
                             className="block px-4 py-2.5 text-[13px] font-semibold tracking-wide text-[#141210] transition hover:bg-[#f6f1e8] hover:text-[#F47B20]"
                           >
-                            {categoryLabels[slug]}
+                            {categoryLabels[slug as keyof typeof categoryLabels] ?? labelForCategory(slug)}
                           </Link>
                         </li>
                       ))}
@@ -126,14 +136,14 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
                       role="menu"
                       aria-label="Package categories"
                     >
-                      {packageMenuCategories.map((slug) => (
+                      {packageMenu.map((slug) => (
                         <li key={slug} role="none">
                           <Link
                             href={`/packages?category=${slug}`}
                             role="menuitem"
                             className="block px-4 py-2.5 text-[13px] font-semibold tracking-wide text-[#141210] transition hover:bg-[#f6f1e8] hover:text-[#F47B20]"
                           >
-                            {packageCategoryLabels[slug]}
+                            {packageCategoryLabels[slug] ?? labelForCategory(slug)}
                           </Link>
                         </li>
                       ))}
@@ -208,14 +218,14 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
                       Services
                     </Link>
                     <div className="mt-3 flex flex-col gap-2 border-l-2 border-[#F47B20]/35 pl-4">
-                      {serviceMenuCategories.map((slug) => (
+                      {serviceMenu.map((slug) => (
                         <Link
                           key={slug}
                           href={`/services?category=${slug}`}
                           onClick={() => setOpen(false)}
                           className="text-sm font-semibold text-[#5c5c5c] hover:text-[#F47B20]"
                         >
-                          {categoryLabels[slug]}
+                          {categoryLabels[slug as keyof typeof categoryLabels] ?? labelForCategory(slug)}
                         </Link>
                       ))}
                     </div>
@@ -229,14 +239,14 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
                       Packages
                     </Link>
                     <div className="mt-3 flex flex-col gap-2 border-l-2 border-[#F47B20]/35 pl-4">
-                      {packageMenuCategories.map((slug) => (
+                      {packageMenu.map((slug) => (
                         <Link
                           key={slug}
                           href={`/packages?category=${slug}`}
                           onClick={() => setOpen(false)}
                           className="text-sm font-semibold text-[#5c5c5c] hover:text-[#F47B20]"
                         >
-                          {packageCategoryLabels[slug]}
+                          {packageCategoryLabels[slug] ?? labelForCategory(slug)}
                         </Link>
                       ))}
                     </div>

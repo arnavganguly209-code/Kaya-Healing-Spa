@@ -1,6 +1,6 @@
 import { GalleryGrid } from "@/components/gallery-grid";
 import { PageHero } from "@/components/page-hero";
-import { site } from "@/lib/content";
+import { gallery as fallbackGallery, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 
@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 export default function GalleryPage() {
   const orbit = readOrbitContent();
   const cover = orbit.pageCovers.gallery;
+  const images = orbit.gallery.length ? orbit.gallery : fallbackGallery;
   return (
     <>
       <PageHero
@@ -23,7 +24,7 @@ export default function GalleryPage() {
         text={cover.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Gallery" }]}
       />
-      <GalleryGrid />
+      <GalleryGrid items={images} />
     </>
   );
 }
