@@ -1,5 +1,5 @@
 import { isAdminAuthed } from "@/lib/admin-auth";
-import { readOrbitContent, writeOrbitContent } from "@/lib/orbit-store";
+import { readOrbitContent, writeOrbitContent, type OrbitContent } from "@/lib/orbit-store";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
@@ -23,6 +23,7 @@ export async function GET() {
       packageCategories: c.packageCategories,
       adminSectionFlags: c.adminSectionFlags,
       homePage: c.homePage,
+      gallery: c.gallery,
     },
   });
 }
@@ -33,6 +34,7 @@ export async function PUT(request: Request) {
   if (!body) return NextResponse.json({ message: "Invalid body." }, { status: 400 });
   const current = readOrbitContent();
   const bodyHome = body.homePage as typeof current.homePage | undefined;
+  const bodyGallery = body.gallery as OrbitContent["gallery"] | undefined;
   writeOrbitContent({
     ...current,
     hero: (body.hero as typeof current.hero) || current.hero,
@@ -55,10 +57,12 @@ export async function PUT(request: Request) {
           reviews: Array.isArray(bodyHome.reviews) ? bodyHome.reviews : current.homePage.reviews,
         }
       : current.homePage,
+    gallery: Array.isArray(bodyGallery) ? bodyGallery : current.gallery,
   });
   revalidatePath("/", "layout");
   revalidatePath("/services");
   revalidatePath("/packages");
+  revalidatePath("/gallery");
   revalidatePath("/contact");
   return NextResponse.json({ success: true });
 }

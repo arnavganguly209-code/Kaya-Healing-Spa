@@ -3,8 +3,13 @@
 import type { BlogPost } from "@/lib/blog-store";
 import type { AdminInquiry } from "@/lib/admin-store";
 import type { OrbitContent, OrbitAdminSectionFlags } from "@/lib/orbit-store";
-import { defaultServices } from "@/lib/default-services";
-import { site } from "@/lib/content";
+import {
+  AdminCategoriesEditor,
+  AdminGalleryEditor,
+  AdminPackagesEditor,
+  AdminServicesEditor,
+  type CatalogAdminSlice,
+} from "@/components/admin-catalog-sections";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -23,24 +28,37 @@ type AdminData = {
   therapists: OrbitContent["therapists"];
   categories: string[];
   packageCategories: string[];
+  gallery: OrbitContent["gallery"];
   adminSectionFlags: OrbitAdminSectionFlags;
   homePage: OrbitContent["homePage"];
 };
 
-const allSections = ["Dashboard", "Hero", "Footer", "Services", "Packages", "Therapists", "Blog", "Inquiries", "Reviews", "Account"] as const;
+const allSections = ["Dashboard", "Hero", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Blog", "Inquiries", "Reviews", "Account"] as const;
 
 const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSectionFlags | null> = {
   Dashboard: null,
   Hero: "hero",
   Footer: "footer",
+  Categories: "categories",
   Services: "services",
   Packages: "packages",
+  Gallery: "gallery",
   Therapists: "therapists",
   Blog: "blog",
   Inquiries: "inquiries",
   Reviews: "reviews",
   Account: null,
 };
+
+function catalogSlice(c: AdminData): CatalogAdminSlice {
+  return {
+    services: c.services,
+    packages: c.packages,
+    categories: c.categories,
+    packageCategories: c.packageCategories,
+    gallery: c.gallery,
+  };
+}
 
 function navSections(flags: OrbitAdminSectionFlags) {
   return allSections.filter((name) => {
@@ -115,6 +133,23 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
     void persist(next);
   }
 
+  function mergeCatalog(next: CatalogAdminSlice) {
+    const merged = { ...contentRef.current, ...next };
+    setContent(merged);
+    contentRef.current = merged;
+    return merged;
+  }
+
+  function setCatalog(next: CatalogAdminSlice) {
+    mergeCatalog(next);
+  }
+
+  function publishCatalog(next: CatalogAdminSlice) {
+    publish(mergeCatalog(next));
+  }
+
+  const catalog = catalogSlice(content);
+
   async function upload(file: File, apply: (path: string) => void) {
     const form = new FormData();
     form.set("file", file);
@@ -151,36 +186,40 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
   const hero = content.hero;
 
   return (
-    <div className="min-h-[100svh] bg-[#fffdf9] text-[#171717]">
-      <header className="sticky top-0 z-40 border-b border-[#efe8e0] bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 py-4 md:px-8">
+    <div className="min-h-[100svh] bg-gradient-to-b from-[#f8f4ee] to-[#fffdf9] text-[#171717]">
+      <header className="sticky top-0 z-40 border-b border-[#e8dfd4] bg-[#1a1512]/95 text-white backdrop-blur-md">
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.22em] text-[#F47B20] uppercase">Kaya Admin</p>
-            <p className="font-serif text-xl">Content dashboard</p>
+            <p className="text-[11px] font-semibold tracking-[0.28em] text-[#ffb366] uppercase">Kaya Healing Spa</p>
+            <p className="font-serif text-2xl md:text-3xl">Admin dashboard</p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <Link href="/" className="text-sm text-[#6B6B6B] hover:text-[#F47B20]">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <Link href="/" className="rounded-full border border-white/20 px-4 py-2 text-sm text-white/90 hover:bg-white/10">
               View site
             </Link>
-            <button type="button" onClick={() => void persist()} disabled={saving} className="rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">
-              {saving ? "Saving…" : "Publish"}
+            <button type="button" onClick={() => void persist()} disabled={saving} className="rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#F47B20]/25 disabled:opacity-60">
+              {saving ? "Publishing…" : "Publish all changes"}
             </button>
-            <button type="button" onClick={logout} className="rounded-full border border-[#efe8e0] px-4 py-2 text-sm">
+            <button type="button" onClick={logout} className="rounded-full border border-white/25 px-4 py-2 text-sm text-white/90 hover:bg-white/10">
               Sign out
             </button>
           </div>
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1440px] gap-8 px-5 py-8 md:grid-cols-[220px_1fr] md:px-8">
-        <nav className="flex flex-row flex-wrap gap-2 md:flex-col md:gap-1">
+      <div className="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 lg:grid-cols-[240px_1fr] lg:gap-8 lg:px-8 lg:py-10">
+        <nav className="flex flex-row flex-wrap gap-2 lg:sticky lg:top-28 lg:max-h-[calc(100svh-8rem)] lg:flex-col lg:gap-1 lg:overflow-y-auto lg:pr-1">
           {navSections(content.adminSectionFlags).map((item) => (
             <button
               key={item}
               type="button"
-              onClick={() => setSection(item)}
-              className={`rounded-full px-4 py-2 text-left text-sm font-semibold md:rounded-xl ${
-                section === item ? "bg-[#F47B20] text-white" : "bg-white text-[#171717] hover:bg-[#f6f1e8]"
+              onClick={() => {
+                setSection(item);
+                setMessage("");
+                setError("");
+              }}
+              className={`rounded-full px-4 py-2.5 text-left text-sm font-semibold transition lg:w-full lg:rounded-xl ${
+                section === item ? "bg-[#F47B20] text-white shadow-md" : "bg-white text-[#171717] shadow-sm hover:bg-[#fff7f0]"
               }`}
             >
               {item}
@@ -189,32 +228,45 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
           ))}
         </nav>
 
-        <section className="min-w-0 rounded-[24px] border border-[#efe8e0] bg-white p-6 md:p-8">
+        <section className="min-w-0 rounded-[28px] border border-[#efe8e0] bg-white/95 p-5 shadow-[0_24px_80px_-40px_rgba(26,21,18,0.35)] md:p-8 lg:p-10">
           {message && <p className="mb-4 text-sm text-[#2f7a3d]">{message}</p>}
           {error && <p className="mb-4 text-sm text-[#c45e0a]">{error}</p>}
 
           {section === "Dashboard" && (
             <>
-              <h2 className="font-serif text-3xl">Welcome, {site.name}</h2>
-              <p className="mt-2 text-sm text-[#6B6B6B]">Manage hero, footer, services, packages, therapists, blog, and booking requests. Full Orbit access is separate at /orbit.</p>
-              <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-                <li className="rounded-2xl bg-[#fff7f0] p-5">
+              <h2 className="font-serif text-3xl md:text-4xl">Welcome back</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#6B6B6B]">
+                Edit services, packages, categories, gallery, hero, footer, therapists, blog, reviews, and booking inquiries. Full site design lives in Orbit at /orbit.
+              </p>
+              <ul className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <li className="rounded-2xl bg-gradient-to-br from-[#fff7f0] to-white p-5 ring-1 ring-[#efe8e0]">
                   <p className="text-3xl font-bold text-[#F47B20]">{content.services.length}</p>
-                  <p className="text-sm">Services</p>
+                  <p className="text-sm font-medium">Treatments</p>
                 </li>
-                <li className="rounded-2xl bg-[#fff7f0] p-5">
+                <li className="rounded-2xl bg-gradient-to-br from-[#fff7f0] to-white p-5 ring-1 ring-[#efe8e0]">
                   <p className="text-3xl font-bold text-[#F47B20]">{content.packages.length}</p>
-                  <p className="text-sm">Packages</p>
+                  <p className="text-sm font-medium">Packages</p>
                 </li>
-                <li className="rounded-2xl bg-[#fff7f0] p-5">
+                <li className="rounded-2xl bg-gradient-to-br from-[#fff7f0] to-white p-5 ring-1 ring-[#efe8e0]">
+                  <p className="text-3xl font-bold text-[#F47B20]">{content.gallery.length}</p>
+                  <p className="text-sm font-medium">Gallery photos</p>
+                </li>
+                <li className="rounded-2xl bg-gradient-to-br from-[#fff7f0] to-white p-5 ring-1 ring-[#efe8e0]">
                   <p className="text-3xl font-bold text-[#F47B20]">{posts.length || "—"}</p>
-                  <p className="text-sm">Blog posts (open Blog tab to load)</p>
+                  <p className="text-sm font-medium">Blog posts (open Blog to load)</p>
                 </li>
-                <li className="rounded-2xl bg-[#fff7f0] p-5">
+                <li className="rounded-2xl bg-gradient-to-br from-[#fff7f0] to-white p-5 ring-1 ring-[#efe8e0]">
                   <p className="text-3xl font-bold text-[#F47B20]">{unread || "0"}</p>
-                  <p className="text-sm">Unread inquiries</p>
+                  <p className="text-sm font-medium">Unread inquiries</p>
                 </li>
               </ul>
+              <div className="mt-8 rounded-2xl border border-dashed border-[#c4b8a8] bg-[#faf6f0] p-6">
+                <p className="text-xs font-semibold tracking-wide text-[#8a8175] uppercase">Coming soon</p>
+                <p className="mt-2 font-serif text-xl">Global IME Bank — online booking payments</p>
+                <p className="mt-2 text-sm text-[#6B6B6B]">
+                  A payment card will appear here for paid bookings once the gateway is connected. Inquiries and manual booking stay available until then.
+                </p>
+              </div>
             </>
           )}
 
@@ -251,6 +303,9 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                   }} />
                 </div>
               ))}
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
+                {saving ? "Saving…" : "Save hero to live site"}
+              </button>
             </>
           )}
 
@@ -314,80 +369,43 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                   </button>
                 </div>
               ))}
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
+                {saving ? "Saving…" : "Save footer to live site"}
+              </button>
+            </>
+          )}
+
+          {section === "Categories" && (
+            <>
+              <h2 className="font-serif text-2xl">Categories</h2>
+              <AdminCategoriesEditor slice={catalog} setSlice={setCatalog} publish={publishCatalog} upload={upload} />
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publishCatalog(catalogSlice(contentRef.current))}>
+                {saving ? "Saving…" : "Save categories to live site"}
+              </button>
             </>
           )}
 
           {section === "Services" && (
             <>
-              <button type="button" className="rounded-full border px-4 py-2 text-sm" onClick={() => publish({
-                ...content,
-                services: [...content.services, { ...defaultServices[0], slug: `treatment-${Date.now()}`, name: "New treatment" }],
-              })}>
-                Add service
-              </button>
-              {content.services.map((s, index) => (
-                <div key={`${s.slug}-${index}`} className="mt-4 space-y-2 rounded-2xl border p-4">
-                  <Field label="Slug" value={s.slug} onChange={(v) => {
-                    const services = content.services.map((x, i) => (i === index ? { ...x, slug: v } : x));
-                    setContent({ ...content, services });
-                  }} />
-                  <Field label="Name" value={s.name} onChange={(v) => {
-                    const services = content.services.map((x, i) => (i === index ? { ...x, name: v } : x));
-                    setContent({ ...content, services });
-                  }} />
-                  <Area label="Summary" value={s.summary} onChange={(v) => {
-                    const services = content.services.map((x, i) => (i === index ? { ...x, summary: v } : x));
-                    setContent({ ...content, services });
-                  }} />
-                  <Area label="Overview" value={s.overview} onChange={(v) => {
-                    const services = content.services.map((x, i) => (i === index ? { ...x, overview: v } : x));
-                    setContent({ ...content, services });
-                  }} />
-                  <Field label="Price from NPR" value={String(s.priceFromNpr)} onChange={(v) => {
-                    const services = content.services.map((x, i) => (i === index ? { ...x, priceFromNpr: Number(v) || 0 } : x));
-                    setContent({ ...content, services });
-                  }} />
-                  <MediaField label="Image" src={s.image} onUpload={(f) => upload(f, (path) => {
-                    const services = content.services.map((x, i) => (i === index ? { ...x, image: path } : x));
-                    publish({ ...content, services });
-                  })} />
-                </div>
-              ))}
+              <h2 className="font-serif text-2xl">Services menu</h2>
+              <AdminServicesEditor slice={catalog} setSlice={setCatalog} publish={publishCatalog} upload={upload} />
             </>
           )}
 
           {section === "Packages" && (
             <>
-              <button type="button" className="rounded-full border px-4 py-2 text-sm" onClick={() => publish({
-                ...content,
-                packages: [...content.packages, { ...content.packages[0], slug: `package-${Date.now()}`, name: "New package" }],
-              })}>
-                Add package
+              <h2 className="font-serif text-2xl">Packages</h2>
+              <AdminPackagesEditor slice={catalog} setSlice={setCatalog} publish={publishCatalog} upload={upload} />
+            </>
+          )}
+
+          {section === "Gallery" && (
+            <>
+              <h2 className="font-serif text-2xl">Gallery</h2>
+              <AdminGalleryEditor slice={catalog} setSlice={setCatalog} publish={publishCatalog} upload={upload} />
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publishCatalog(catalogSlice(contentRef.current))}>
+                {saving ? "Saving…" : "Save gallery to live site"}
               </button>
-              {content.packages.map((p, index) => (
-                <div key={`${p.slug}-${index}`} className="mt-4 space-y-2 rounded-2xl border p-4">
-                  <Field label="Slug" value={p.slug} onChange={(v) => {
-                    const packages = content.packages.map((x, i) => (i === index ? { ...x, slug: v } : x));
-                    setContent({ ...content, packages });
-                  }} />
-                  <Field label="Name" value={p.name} onChange={(v) => {
-                    const packages = content.packages.map((x, i) => (i === index ? { ...x, name: v } : x));
-                    setContent({ ...content, packages });
-                  }} />
-                  <Area label="Summary" value={p.summary} onChange={(v) => {
-                    const packages = content.packages.map((x, i) => (i === index ? { ...x, summary: v } : x));
-                    setContent({ ...content, packages });
-                  }} />
-                  <Field label="Price NPR" value={String(p.priceNpr)} onChange={(v) => {
-                    const packages = content.packages.map((x, i) => (i === index ? { ...x, priceNpr: Number(v) || 0 } : x));
-                    setContent({ ...content, packages });
-                  }} />
-                  <MediaField label="Image" src={p.image} onUpload={(f) => upload(f, (path) => {
-                    const packages = content.packages.map((x, i) => (i === index ? { ...x, image: path } : x));
-                    publish({ ...content, packages });
-                  })} />
-                </div>
-              ))}
             </>
           )}
 

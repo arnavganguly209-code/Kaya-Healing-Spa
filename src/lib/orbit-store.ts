@@ -130,6 +130,8 @@ export type OrbitAdminSectionFlags = {
   footer: boolean;
   services: boolean;
   packages: boolean;
+  categories: boolean;
+  gallery: boolean;
   therapists: boolean;
   blog: boolean;
   inquiries: boolean;
@@ -260,6 +262,8 @@ function defaultAdminSectionFlags(): OrbitAdminSectionFlags {
     footer: true,
     services: true,
     packages: true,
+    categories: true,
+    gallery: true,
     therapists: true,
     blog: true,
     inquiries: true,
@@ -370,6 +374,8 @@ function normalizeAdminSectionFlags(raw: Partial<OrbitAdminSectionFlags> | undef
     footer: raw.footer !== false,
     services: raw.services !== false,
     packages: raw.packages !== false,
+    categories: raw.categories !== false,
+    gallery: raw.gallery !== false,
     therapists: raw.therapists !== false,
     blog: raw.blog !== false,
     inquiries: raw.inquiries !== false,

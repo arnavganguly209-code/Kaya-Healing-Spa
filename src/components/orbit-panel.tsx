@@ -5,6 +5,7 @@ import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
 import { site } from "@/lib/content";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
+import { CategoryManager } from "@/components/category-manager";
 import { useEffect, useRef, useState } from "react";
 
 const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home page", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Admin portal", "Footer"] as const;
@@ -930,39 +931,24 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           {section === "Categories" && (
             <>
               <p className="text-sm text-[#6B6B6B]">
-                Slugs for header menus (Services / Packages dropdowns) and catalog filters on /services and /packages. Use lowercase with hyphens (e.g. body-care).
+                Create, rename, or remove categories. When you remove one, choose where to move its treatments or packages.
               </p>
-              <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, categories: [...content.categories, "new-category"] })}>
-                Add service category
-              </button>
-              {content.categories.map((category, index) => (
-                <Field
-                  key={index}
-                  label={`Category ${index + 1}`}
-                  value={category}
-                  onChange={(value) => {
-                    const categories = [...content.categories];
-                    categories[index] = value;
-                    setContent({ ...content, categories });
-                  }}
-                />
-              ))}
-              <p className="mt-8 text-sm font-semibold">Package categories</p>
-              <button type="button" className="mt-2 rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, packageCategories: [...content.packageCategories, "new-package-category"] })}>
-                Add package category
-              </button>
-              {content.packageCategories.map((category, index) => (
-                <Field
-                  key={`pkg-${index}`}
-                  label={`Package category ${index + 1}`}
-                  value={category}
-                  onChange={(value) => {
-                    const packageCategories = [...content.packageCategories];
-                    packageCategories[index] = value;
-                    setContent({ ...content, packageCategories });
-                  }}
-                />
-              ))}
+              <CategoryManager
+                categories={content.categories}
+                packageCategories={content.packageCategories}
+                services={content.services}
+                packages={content.packages}
+                onChange={(next) => setContent({ ...content, ...next })}
+                onPublish={(next) =>
+                  publish({
+                    ...content,
+                    categories: next.categories,
+                    packageCategories: next.packageCategories,
+                    services: next.services,
+                    packages: next.packages,
+                  })
+                }
+              />
             </>
           )}
           {section === "Packages" && (
@@ -1145,8 +1131,10 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 [
                   ["hero", "Hero"],
                   ["footer", "Footer"],
+                  ["categories", "Categories"],
                   ["services", "Services"],
                   ["packages", "Packages"],
+                  ["gallery", "Gallery"],
                   ["therapists", "Therapists"],
                   ["blog", "Blog"],
                   ["inquiries", "Inquiries"],
