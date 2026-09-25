@@ -1,6 +1,5 @@
 import type { Service, ServiceCategory } from "./types";
-
-const img = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
+import { serviceImagePath } from "./catalog-images";
 
 function menuService(
   slug: string,
@@ -10,7 +9,7 @@ function menuService(
   overview: string,
   durationOptions: string[],
   priceFromNpr: number,
-  image = img("photo-1544161515-4ab6ce6db874"),
+  image = serviceImagePath(slug),
   imageAlt?: string,
 ): Service {
   const match = durationOptions[0]?.match(/(\d+)\s*min/i);
@@ -44,7 +43,6 @@ export const defaultServices: Service[] = [
     "A 30-minute de-stressing back and shoulder massage precedes a 10-minute detox foot soak followed by 30 minutes of relaxing foot massage. Scents of essential oils and exotic Himalayan salt come together to fill your senses and leave you with a feeling of renewal.",
     ["60 min — NPR 4,500", "90 min — NPR 5,500"],
     4500,
-    img("photo-1519824145371-296894a0daa9"),
   ),
   menuService(
     "lymphatic-drainage-massage",
@@ -81,7 +79,6 @@ export const defaultServices: Service[] = [
     "Sometimes tight muscles press on nerves, causing tingling, numbness, or more pain. Medium pressure on specific points on the feet stimulates the nervous system, relaxes muscle tension and supports the immune system.",
     ["30 min — NPR 2,500", "60 min — NPR 4,000"],
     2500,
-    img("photo-1600334129128-685c5582fd35"),
   ),
   menuService(
     "himalayan-trekkers-massage",
@@ -109,7 +106,6 @@ export const defaultServices: Service[] = [
     "This holistic ritual uses warm stones to encourage balance, comfort and well-being. The heat penetrates deep into the body for a calming and relaxing experience.",
     ["60 min — NPR 4,000", "90 min — NPR 5,500"],
     4000,
-    img("photo-1540555700478-4be289fbecef"),
   ),
   menuService(
     "thai-stretch-massage",
@@ -147,7 +143,6 @@ export const defaultServices: Service[] = [
     "Combining vigorous and soothing massage movements with medium to firm pressure using warm aromatic oil, this massage melts away muscular aches and tension as well as relaxes the whole body and mind.",
     ["60 min — NPR 4,000", "90 min — NPR 5,500"],
     4000,
-    img("photo-1515377905703-c4788e51af15"),
   ),
   menuService(
     "shirodhara-massage",
@@ -167,7 +162,6 @@ export const defaultServices: Service[] = [
     "Facial cleansing, tone, scrub, massage and mask. A facial treatment that encourages the skin to reveal its luminosity by reducing fatigue signs. Active ingredients smooth and moisturize the skin, leaving it looking and feeling younger.",
     ["60 min — NPR 5,000"],
     5000,
-    img("photo-1570172619644-dfd03ed5d881"),
   ),
   menuService(
     "collagen-facial",
@@ -205,7 +199,6 @@ export const defaultServices: Service[] = [
     "This stimulating scrub combines nutrient-rich salts from the shores of the Himalayas with essential oils. Together they eliminate dead surface cells and impurities. This full body exfoliation seals in natural oils, keeping your skin hydrated, supple and tingling with a healthy glow.",
     ["45 min — NPR 4,000"],
     4000,
-    img("photo-1519823551278-64ac92734fb1"),
   ),
   menuService(
     "coffee-aroma-scrub",
@@ -324,7 +317,6 @@ export const defaultServices: Service[] = [
     "Our sauna and steam rooms are available daily from 9am–10pm. Please advise our spa receptionist 20 minutes prior to arriving. For health and safety, drink plenty of water and do not consume alcohol before using the sauna or steam rooms.",
     ["30 min — NPR 1,500"],
     1500,
-    img("photo-1507652313519-d4e9174996dd"),
   ),
 ];
 

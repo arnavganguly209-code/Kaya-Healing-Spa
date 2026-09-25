@@ -21,7 +21,7 @@ export function SiteChrome({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  if (pathname.startsWith("/orbit")) return <>{children}</>;
+  if (pathname.startsWith("/orbit") || pathname.startsWith("/admin")) return <>{children}</>;
   return (
     <>
       <SiteHeader

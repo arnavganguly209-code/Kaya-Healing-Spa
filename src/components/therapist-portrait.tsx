@@ -21,7 +21,7 @@ export function TherapistPortrait({
         fill
         className="object-cover object-[50%_22%]"
         sizes={sizes}
-        unoptimized={src.startsWith("/uploads/") || src.startsWith("/hero/")}
+        unoptimized={src.startsWith("/uploads/") || src.startsWith("/hero/") || src.startsWith("/therapists/") || src.startsWith("/catalog/")}
       />
     </div>
   );

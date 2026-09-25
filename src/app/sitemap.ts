@@ -1,3 +1,4 @@
+import { getPublishedPosts } from "@/lib/blog-store";
 import { packages, services, site } from "@/lib/content";
 import type { MetadataRoute } from "next";
 
@@ -15,5 +16,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
-  return [...staticRoutes, ...serviceRoutes, ...packageRoutes];
+  const blogRoutes = getPublishedPosts().map((post) => ({
+    url: `${site.url}/blog/${post.slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.55,
+  }));
+  return [...staticRoutes, ...serviceRoutes, ...packageRoutes, ...blogRoutes];
 }

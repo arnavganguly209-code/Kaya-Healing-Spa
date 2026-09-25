@@ -510,7 +510,12 @@ export function readOrbitContent(): OrbitContent {
     const menuCurrent =
       saved.servicesMenuVersion === SERVICES_MENU_VERSION && merged.services?.length
         ? { services: merged.services, categories: merged.categories?.length ? merged.categories : defaults.categories }
-        : { services: defaults.services, categories: defaults.categories };
+        : {
+            services: defaults.services,
+            categories: defaults.categories,
+            packages: defaults.packages,
+            therapists: defaults.therapists,
+          };
     return {
       ...merged,
       ...menuCurrent,

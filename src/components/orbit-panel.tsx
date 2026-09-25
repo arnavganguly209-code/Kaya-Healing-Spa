@@ -7,7 +7,7 @@ import { site } from "@/lib/content";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import { useEffect, useRef, useState } from "react";
 
-const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Footer"] as const;
+const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Admin portal", "Footer"] as const;
 
 type MediaItem = { path: string; name: string; kind: "image" | "video"; size: number };
 
@@ -20,12 +20,22 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   const [library, setLibrary] = useState<MediaItem[]>([]);
   const [picker, setPicker] = useState<((path: string, kind: "image" | "video") => void) | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [adminLogin, setAdminLogin] = useState({ username: "kaya", password: "" });
   const contentRef = useRef(content);
   contentRef.current = content;
 
   useEffect(() => {
     loadLibrary();
   }, []);
+
+  useEffect(() => {
+    if (section !== "Admin portal") return;
+    void fetch("/api/admin/credentials", { credentials: "same-origin" })
+      .then((r) => r.json().then((body) => ({ ok: r.ok, body })))
+      .then(({ ok, body }) => {
+        if (ok && body.data?.username) setAdminLogin((prev) => ({ ...prev, username: body.data.username }));
+      });
+  }, [section]);
 
   async function loadLibrary() {
     setError("");
@@ -644,7 +654,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                     })
                   }
                 >
-                  Reset to latest menu (32 treatments)
+                  Reset to latest menu (32 treatments, HD catalog photos)
                 </button>
                 <button
                   type="button"
@@ -862,6 +872,51 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   )}
                 </div>
               ))}
+            </>
+          )}
+          {section === "Admin portal" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">
+                Staff sign in at <strong>/admin</strong> with the credentials below. Orbit can view and reset them; Admin cannot open Orbit.
+              </p>
+              <a href="/admin" target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-full border border-[#efe8e0] px-4 py-2 text-sm font-semibold hover:border-[#F47B20]">
+                Open /admin dashboard
+              </a>
+              <Field
+                label="Admin user ID"
+                value={adminLogin.username}
+                onChange={(value) => setAdminLogin({ ...adminLogin, username: value })}
+              />
+              <Field
+                label="New admin password (leave blank to keep current)"
+                value={adminLogin.password}
+                onChange={(value) => setAdminLogin({ ...adminLogin, password: value })}
+              />
+              <button
+                type="button"
+                className="mt-4 rounded-full bg-[#171717] px-5 py-2.5 text-sm font-medium text-white"
+                onClick={async () => {
+                  setError("");
+                  const response = await fetch("/api/admin/credentials", {
+                    method: "PUT",
+                    credentials: "same-origin",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      username: adminLogin.username,
+                      password: adminLogin.password || undefined,
+                    }),
+                  });
+                  const body = await response.json().catch(() => ({}));
+                  if (!response.ok) {
+                    setError(body.message || "Could not update admin login.");
+                    return;
+                  }
+                  setMessage("Admin login updated.");
+                  setAdminLogin((prev) => ({ ...prev, password: "" }));
+                }}
+              >
+                Save admin login
+              </button>
             </>
           )}
           {section === "Footer" && (

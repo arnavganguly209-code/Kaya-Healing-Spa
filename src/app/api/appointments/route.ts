@@ -1,3 +1,5 @@
+import { appendInquiry } from "@/lib/admin-store";
+import { readOrbitContent } from "@/lib/orbit-store";
 import { NextResponse } from "next/server";
 
 type Body = {
@@ -43,6 +45,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Choose a treatment or a package." }, { status: 400 });
   }
   if (!Number.isInteger(guests) || guests < 1 || guests > 8) return NextResponse.json({ message: "Guests must be between 1 and 8." }, { status: 400 });
+
+  const orbit = readOrbitContent();
+  const serviceName = body.serviceSlug ? orbit.services.find((s) => s.slug === body.serviceSlug)?.name : "";
+  const packageName = body.packageSlug ? orbit.packages.find((p) => p.slug === body.packageSlug)?.name : "";
+
+  appendInquiry({
+    type: "booking",
+    name: body.name.trim(),
+    email: body.email!.trim(),
+    phone: body.phone.trim(),
+    summary: `${bookingType} · ${serviceName || packageName || body.serviceSlug || body.packageSlug || "General"}`,
+    payload: { ...body, guests },
+  });
 
   return NextResponse.json({ success: true, message: "Appointment request received", data: { received: true } });
 }

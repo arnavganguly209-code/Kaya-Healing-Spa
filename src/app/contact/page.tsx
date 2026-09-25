@@ -1,4 +1,5 @@
 import { ContactBookingHub } from "@/components/contact-booking-hub";
+import { ContactInquiryForm } from "@/components/contact-inquiry-form";
 import { CompanyContactCard } from "@/components/company-contact-card";
 import { NewsletterForm } from "@/components/booking-form";
 import { JsonLd } from "@/components/json-ld";
@@ -55,6 +56,11 @@ export default async function ContactPage({
         />
         <div className="space-y-8">
           <CompanyContactCard phone={orbit.phone || site.phone} />
+          <div className="rounded-2xl border border-[#e6dfd4] bg-white p-6">
+            <h3 className="font-serif text-2xl">Send a message</h3>
+            <p className="prose-quiet mt-2 text-sm">Questions that are not a booking request.</p>
+            <ContactInquiryForm />
+          </div>
           <div className="rounded-2xl border border-[#e6dfd4] bg-white p-6">
             <h3 className="font-serif text-2xl">Wellness notes</h3>
             <p className="prose-quiet mt-2 text-sm">Occasional updates from the spa.</p>

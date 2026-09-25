@@ -1,5 +1,8 @@
 import type { Faq, GalleryImage, Review, ServiceCategory, SpaPackage } from "./types";
+import { packageImagePath } from "./catalog-images";
 import { defaultServices } from "./default-services";
+
+export { defaultServices as services } from "./default-services";
 
 export const site = {
   name: "Kaya Healing Spa",
@@ -83,8 +86,6 @@ export function labelForCategory(value: string) {
 const img = (id: string, altQuery = "") =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80${altQuery}`;
 
-export { defaultServices as services } from "./default-services";
-
 export const packages: SpaPackage[] = [
   {
     slug: "kaya-signature-ritual",
@@ -103,8 +104,8 @@ export const packages: SpaPackage[] = [
       { name: "Signature massage", detail: "75 minutes" },
       { name: "Tea and rest", detail: "30 minutes" },
     ],
-    image: img("photo-1540555700478-4be289fbecef"),
-    imageAlt: "Stones and linen prepared for a spa ritual",
+    image: packageImagePath("kaya-signature-ritual"),
+    imageAlt: "Hot stones and oils for the signature ritual",
   },
   {
     slug: "himalayan-recovery",
@@ -122,8 +123,8 @@ export const packages: SpaPackage[] = [
       { name: "Reflexology", detail: "45 minutes" },
       { name: "Trekker recovery massage", detail: "75 minutes" },
     ],
-    image: img("photo-1507652313519-d4e9174996dd"),
-    imageAlt: "Warm spa water and stone",
+    image: packageImagePath("himalayan-recovery"),
+    imageAlt: "Himalayan salt scrub and recovery body care",
   },
   {
     slug: "couple-wellness-escape",
@@ -139,8 +140,8 @@ export const packages: SpaPackage[] = [
       { name: "Signature massage for two", detail: "75 minutes" },
       { name: "Shared lounge time", detail: "30 minutes" },
     ],
-    image: img("photo-1600334129128-685c5582fd35"),
-    imageAlt: "Two massage settings in warm light",
+    image: packageImagePath("couple-wellness-escape"),
+    imageAlt: "Side-by-side massage oils and towels for two guests",
   },
   {
     slug: "ultimate-relaxation",
@@ -157,8 +158,8 @@ export const packages: SpaPackage[] = [
       { name: "Calm facial", detail: "60 minutes" },
       { name: "Lounge rest", detail: "30 minutes" },
     ],
-    image: img("photo-1570172619644-dfd03ed5d881"),
-    imageAlt: "Facial care in a bright treatment room",
+    image: packageImagePath("ultimate-relaxation"),
+    imageAlt: "Skincare serums for aromatherapy and facial sequence",
   },
   {
     slug: "half-day-journey",
@@ -176,8 +177,8 @@ export const packages: SpaPackage[] = [
       { name: "Head & shoulder", detail: "40 minutes" },
       { name: "Rest", detail: "40 minutes" },
     ],
-    image: img("photo-1515377905703-c4788e51af15"),
-    imageAlt: "Oils arranged for a longer spa day",
+    image: packageImagePath("half-day-journey"),
+    imageAlt: "Massage oils for a half-day wellness journey",
   },
   {
     slug: "full-day-escape",
@@ -197,8 +198,8 @@ export const packages: SpaPackage[] = [
       { name: "Calm facial", detail: "60 minutes" },
       { name: "Lunch pause and rest", detail: "Included in the day" },
     ],
-    image: img("photo-1544161515-4ab6ce6db874"),
-    imageAlt: "Treatment room prepared for a long spa day",
+    image: packageImagePath("full-day-escape"),
+    imageAlt: "Singing bowl and oils for a full-day spa escape",
   },
 ];
 

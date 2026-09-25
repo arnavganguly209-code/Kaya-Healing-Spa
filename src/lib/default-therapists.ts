@@ -1,9 +1,12 @@
 import type { OrbitTherapist } from "@/lib/orbit-types";
-
-const portrait = (id: string) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&h=1000&q=85`;
+import { therapistPlaceholderPath } from "@/lib/catalog-images";
 
 export function defaultTherapists(): OrbitTherapist[] {
+  const placeholder = (slug: string, name: string) => ({
+    photo: therapistPlaceholderPath(slug),
+    photoAlt: `${name} — photo placeholder, upload in Orbit`,
+  });
+
   return [
     {
       slug: "anita-shrestha",
@@ -12,8 +15,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Specialises in deep tissue and post-travel recovery with a calm, measured pace.",
       experience: "12 years experience",
       priceFromNpr: 4200,
-      photo: portrait("photo-1559837294-2b711db19563"),
-      photoAlt: "Anita Shrestha, massage therapist at Kaya Healing Spa",
+      ...placeholder("anita-shrestha", "Anita Shrestha"),
     },
     {
       slug: "priya-gurung",
@@ -22,8 +24,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Warm oil rituals, shirodhara, and traditional Ayurvedic body work.",
       experience: "10 years experience",
       priceFromNpr: 4800,
-      photo: portrait("photo-1573496359142-b8d87734a5a2"),
-      photoAlt: "Priya Gurung, Ayurvedic therapist",
+      ...placeholder("priya-gurung", "Priya Gurung"),
     },
     {
       slug: "sunita-rai",
@@ -32,8 +33,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Gentle full-body massage for guests who want quiet, steady pressure.",
       experience: "9 years experience",
       priceFromNpr: 4000,
-      photo: portrait("photo-1580489944761-15a19d654956"),
-      photoAlt: "Sunita Rai, relaxation massage therapist",
+      ...placeholder("sunita-rai", "Sunita Rai"),
     },
     {
       slug: "maya-tamang",
@@ -42,8 +42,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Hot stone placement, body scrubs, and circulation-focused sessions.",
       experience: "8 years experience",
       priceFromNpr: 4500,
-      photo: portrait("photo-1594744803329-e58b31de8bf5"),
-      photoAlt: "Maya Tamang, hot stone therapist",
+      ...placeholder("maya-tamang", "Maya Tamang"),
     },
     {
       slug: "rebecca-limbu",
@@ -52,8 +51,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Natural facials, gentle extractions, and restorative skin rituals.",
       experience: "7 years experience",
       priceFromNpr: 3800,
-      photo: portrait("photo-1438761681033-6461ffad8d80"),
-      photoAlt: "Rebecca Limbu, facial therapist",
+      ...placeholder("rebecca-limbu", "Rebecca Limbu"),
     },
     {
       slug: "karuna-bhandari",
@@ -62,8 +60,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Thai-inspired stretching, joint mobilisation, and floor mat work.",
       experience: "11 years experience",
       priceFromNpr: 4400,
-      photo: portrait("photo-1544005313-94ddf0286df2"),
-      photoAlt: "Karuna Bhandari, Thai therapy specialist",
+      ...placeholder("karuna-bhandari", "Karuna Bhandari"),
     },
     {
       slug: "elina-magar",
@@ -72,8 +69,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Coordinates couple rooms, synchronized massage, and unhurried packages.",
       experience: "6 years experience",
       priceFromNpr: 5200,
-      photo: portrait("photo-1534528741775-53994a69daeb"),
-      photoAlt: "Elina Magar, couples wellness therapist",
+      ...placeholder("elina-magar", "Elina Magar"),
     },
     {
       slug: "sangita-kc",
@@ -82,8 +78,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Side-lying massage and lighter pressure for guests who need extra care.",
       experience: "8 years experience",
       priceFromNpr: 4100,
-      photo: portrait("photo-1489424731084-a5d8b219a5bb"),
-      photoAlt: "Sangita KC, prenatal massage therapist",
+      ...placeholder("sangita-kc", "Sangita KC"),
     },
     {
       slug: "nisha-pradhan",
@@ -92,8 +87,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Custom blends, inhalation, and slow Swedish work with essential oils.",
       experience: "9 years experience",
       priceFromNpr: 4300,
-      photo: portrait("photo-1508214751193-bcfd4ca60f91"),
-      photoAlt: "Nisha Pradhan, aromatherapy therapist",
+      ...placeholder("nisha-pradhan", "Nisha Pradhan"),
     },
     {
       slug: "devika-thapa",
@@ -102,8 +96,7 @@ export function defaultTherapists(): OrbitTherapist[] {
       description: "Focused work for shoulders, neck, scalp, and tension from long travel or desk days.",
       experience: "10 years experience",
       priceFromNpr: 3900,
-      photo: portrait("photo-1494790108377-be9c29b29330"),
-      photoAlt: "Devika Thapa, neck and shoulder specialist",
+      ...placeholder("devika-thapa", "Devika Thapa"),
     },
   ];
 }

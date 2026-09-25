@@ -38,6 +38,9 @@ backend/node_modules
 backend/dist
 public/hero/reference-hero.jpg
 /data/orbit-content.json
+/data/admin-auth.json
+/data/admin-inquiries.json
+/data/blog-posts.json
 /public/uploads
 
 # vercel
