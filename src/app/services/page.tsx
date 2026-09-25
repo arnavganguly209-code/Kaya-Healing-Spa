@@ -1,6 +1,7 @@
 import { JsonLd } from "@/components/json-ld";
 import { PageHero } from "@/components/page-hero";
 import { ServiceCatalog } from "@/components/service-catalog";
+import { TherapistStrip } from "@/components/therapist-strip";
 import { services as fallbackServices, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
@@ -44,7 +45,8 @@ export default async function ServicesPage({
         image="https://images.unsplash.com/photo-1519824145371-296894a0daa9?auto=format&fit=crop&w=2000&q=80"
         crumbs={[{ label: "Home", href: "/" }, { label: "Services" }]}
       />
-      <ServiceCatalog initialCategory={params.category ?? "all"} items={services} />
+      <ServiceCatalog initialCategory={params.category ?? "all"} items={services} categories={live.categories} />
+      <TherapistStrip therapists={live.therapists} intro="Book a treatment and pick your therapist on the contact form." />
     </>
   );
 }

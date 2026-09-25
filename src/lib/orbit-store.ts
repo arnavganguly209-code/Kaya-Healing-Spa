@@ -1,4 +1,6 @@
 import { gallery, packages, services, site } from "@/lib/content";
+import { defaultTherapists } from "@/lib/default-therapists";
+import type { OrbitAboutPage, OrbitTherapist } from "@/lib/orbit-types";
 import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
@@ -75,6 +77,9 @@ export type OrbitContent = {
   };
   whyKaya: OrbitWhyKaya;
   homeAbout: OrbitHomeAbout;
+  aboutPage: OrbitAboutPage;
+  therapists: OrbitTherapist[];
+  packageCategories: string[];
   services: Service[];
   categories: string[];
   packages: SpaPackage[];
@@ -82,6 +87,59 @@ export type OrbitContent = {
 };
 
 const filePath = path.join(process.cwd(), "data", "orbit-content.json");
+
+function defaultAboutPage(): OrbitAboutPage {
+  return {
+    introEyebrow: "About us",
+    introTitle: "Kaya Healing Spa at Hotel Northfield",
+    introLead:
+      "A massage spa in Kathmandu trusted by hundreds of guests — skilled therapists, quiet rooms, and treatments paced so you leave rested, not rushed.",
+    story: [
+      `${site.name} sits in Chaksibari, inside Hotel Northfield, a short ride from Thamel and the city’s main travel hubs. Guests find us when they want professional massage, Ayurvedic oil work, and half-day rituals without the noise of a mall or a rushed turnover.`,
+      "We built the house around hospitality first: greet, listen, adjust pressure and scent, then finish with time to dress and drink tea before stepping back into Kathmandu. That rhythm is the same whether you book a single treatment or a full package.",
+      "Our team combines therapists trained in Swedish and deep tissue work with specialists in hot stone, Thai stretching, facials, and couple rituals. Each session is draped, hygienic, and matched to what you asked for in your booking notes.",
+      "On Google, guests rate us highly for consistency, cleanliness, and the feeling that the hour belongs to them. We keep pricing clear at the desk and confirm every appointment request before it is final.",
+    ],
+    companyTagline: site.placeType,
+    googleRating: site.googleRating,
+    googleReviewCount: site.googleReviewCount,
+    owner: {
+      name: "Kaya Healing Spa Leadership",
+      role: "Founder & spa director",
+      description:
+        "Oversees therapist training, room standards, and the guest journey from booking to checkout. Focused on calm pacing and honest communication.",
+      experience: "15+ years in Kathmandu hospitality and wellness",
+      photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=900&h=1100&q=85",
+      photoAlt: "Spa director at Kaya Healing Spa",
+    },
+    logos: [
+      {
+        name: "Hotel Northfield",
+        description: "Hosted inside Hotel Northfield, Chaksibari — easy access for travellers and residents.",
+        image: "/brand/kaya-logo-hd.webp",
+        imageAlt: "Hotel Northfield partner mark",
+      },
+      {
+        name: "Ayurvedic care",
+        description: "Traditional oil and shirodhara rituals offered with trained therapists.",
+        image: "/brand/kaya-logo-hd.webp",
+        imageAlt: "Ayurvedic wellness mark",
+      },
+      {
+        name: "Couples wellness",
+        description: "Side-by-side rooms and synchronized treatments for pairs.",
+        image: "/brand/kaya-logo-hd.webp",
+        imageAlt: "Couples spa mark",
+      },
+      {
+        name: "Guest safety",
+        description: "Fresh linens, cleaned tools, and draping standards on every visit.",
+        image: "/brand/kaya-logo-hd.webp",
+        imageAlt: "Hygiene and safety mark",
+      },
+    ],
+  };
+}
 
 export function defaultOrbitContent(): OrbitContent {
   return {
@@ -224,8 +282,11 @@ export function defaultOrbitContent(): OrbitContent {
     },
     services,
     categories: ["massage", "ayurvedic", "holistic", "body-care", "facial", "wellness", "recovery"],
+    packageCategories: ["signature", "couples", "half-day", "full-day", "recovery", "wellness"],
     packages,
     gallery,
+    aboutPage: defaultAboutPage(),
+    therapists: defaultTherapists(),
   };
 }
 
@@ -333,6 +394,9 @@ export function readOrbitContent(): OrbitContent {
       therapies: normalizeTherapies(merged.therapies),
       whyKaya: normalizeWhyKaya(merged.whyKaya ?? defaults.whyKaya),
       homeAbout: { ...defaults.homeAbout, ...merged.homeAbout },
+      aboutPage: { ...defaults.aboutPage, ...merged.aboutPage, owner: { ...defaults.aboutPage.owner, ...merged.aboutPage?.owner }, logos: merged.aboutPage?.logos?.length ? merged.aboutPage.logos : defaults.aboutPage.logos },
+      therapists: merged.therapists?.length ? merged.therapists : defaults.therapists,
+      packageCategories: merged.packageCategories?.length ? merged.packageCategories : defaults.packageCategories,
       footerBrand: merged.footerBrand || defaults.footerBrand,
     };
   } catch {
@@ -350,6 +414,8 @@ export function writeOrbitContent(content: OrbitContent) {
         hero: normalizeHero(content.hero),
         therapies: normalizeTherapies(content.therapies),
         whyKaya: normalizeWhyKaya(content.whyKaya),
+        aboutPage: { ...defaultAboutPage(), ...content.aboutPage },
+        therapists: content.therapists?.length ? content.therapists : defaultTherapists(),
       },
       null,
       2,

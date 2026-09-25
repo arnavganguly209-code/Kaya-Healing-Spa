@@ -73,9 +73,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     image: `${site.url}/brand/kaya-logo-hd.png`,
     address: {
       "@type": "PostalAddress",
+      streetAddress: "Hotel Northfield, Chaksibari",
       addressLocality: "Kathmandu",
+      addressRegion: "Bagmati Province",
+      postalCode: "44600",
       addressCountry: "NP",
     },
+    telephone: site.phoneTel,
     areaServed: "Kathmandu",
     url: site.url,
   };

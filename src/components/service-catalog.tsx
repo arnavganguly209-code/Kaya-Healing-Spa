@@ -1,12 +1,12 @@
 "use client";
 
-import { categoryLabels, formatNpr, services } from "@/lib/content";
+import { formatNpr, labelForCategory, services } from "@/lib/content";
 import type { ServiceCategory } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-const filters: (ServiceCategory | "all")[] = [
+const filtersDefault: (ServiceCategory | "all")[] = [
   "all",
   "massage",
   "ayurvedic",
@@ -20,12 +20,19 @@ const filters: (ServiceCategory | "all")[] = [
 export function ServiceCatalog({
   initialCategory = "all",
   items = services,
+  categories,
 }: {
   initialCategory?: string;
   items?: typeof services;
+  categories?: string[];
 }) {
   const [category, setCategory] = useState(initialCategory);
   const [query, setQuery] = useState("");
+
+  const filters = useMemo(() => {
+    const list = categories?.length ? categories : filtersDefault.slice(1);
+    return ["all", ...list] as const;
+  }, [categories]);
 
   const list = useMemo(() => {
     return items.filter((service) => {
@@ -51,7 +58,7 @@ export function ServiceCatalog({
                 category === filter ? "bg-[#141210] text-white" : "bg-[#f6f1e8] text-[#141210]"
               }`}
             >
-              {categoryLabels[filter as ServiceCategory | "all"]}
+              {labelForCategory(filter === "all" ? "all" : filter)}
             </button>
           ))}
         </div>
@@ -77,7 +84,7 @@ export function ServiceCatalog({
               </div>
               <div className="flex flex-1 flex-col p-6">
                 <p className="text-xs tracking-[0.16em] uppercase text-[#2f8f45]">
-                  {categoryLabels[service.category]} · {service.durationMinutes} min
+                  {labelForCategory(service.category)} · {service.durationMinutes} min
                 </p>
                 <h2 className="mt-2 font-serif text-3xl">{service.name}</h2>
                 <p className="prose-quiet mt-3 flex-1 text-sm">{service.summary}</p>

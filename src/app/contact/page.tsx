@@ -1,12 +1,15 @@
-import { BookingForm, NewsletterForm } from "@/components/booking-form";
+import { ContactBookingHub } from "@/components/contact-booking-hub";
+import { CompanyContactCard } from "@/components/company-contact-card";
+import { NewsletterForm } from "@/components/booking-form";
 import { JsonLd } from "@/components/json-ld";
 import { PageHero } from "@/components/page-hero";
 import { faqs, reviews, site } from "@/lib/content";
+import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Contact & Booking",
-  description: `Request a spa appointment at ${site.name} in Kathmandu. Share a preferred treatment, package, date, and time.`,
+  description: `Book massage and spa packages at ${site.name}, Hotel Northfield, Chaksibari, Kathmandu. Call ${site.phone}.`,
   alternates: { canonical: "/contact" },
   openGraph: { title: `Book ${site.name}`, description: "Request a wellness appointment in Kathmandu." },
 };
@@ -14,9 +17,10 @@ export const metadata: Metadata = {
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams: Promise<{ service?: string; package?: string }>;
+  searchParams: Promise<{ service?: string; package?: string; therapist?: string; mode?: string }>;
 }) {
   const params = await searchParams;
+  const orbit = readOrbitContent();
   return (
     <>
       <JsonLd
@@ -32,51 +36,31 @@ export default async function ContactPage({
       />
       <PageHero
         eyebrow="Contact"
-        title="Your wellness appointment"
-        text="Send a request with a preferred time. The spa confirms availability directly. Online requests are not instant bookings and are not medical consultations."
+        title="Book your visit"
+        text={`${site.name} · ${site.addressLine}. Call ${orbit.phone || site.phone} or send a request below.`}
         image="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=2000&q=80"
         crumbs={[{ label: "Home", href: "/" }, { label: "Contact" }]}
       />
-      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 md:px-8 lg:grid-cols-[1.1fr_0.9fr]">
-        <BookingForm service={params.service} packageSlug={params.package} />
-        <aside>
-          <h2 className="font-serif text-3xl">{site.name}</h2>
-          <p className="mt-3">{site.city}</p>
-          <p className="prose-quiet mt-2 text-sm">Street address, phone, and email will appear here when the spa publishes them.</p>
-          <ul className="mt-6 space-y-2 text-sm">
-            {site.hours.map((row) => (
-              <li key={row.day}>{row.day}: {row.hours}</li>
-            ))}
-          </ul>
-          <p className="mt-2 text-xs text-[#8a8175]">{site.hoursNote}</p>
-          <div className="mt-6 min-h-[240px]">
-            <iframe
-              title="Map of Kathmandu"
-              className="h-64 w-full"
-              loading="lazy"
-              src="https://maps.google.com/maps?q=Kathmandu%20Nepal&z=12&output=embed"
-            />
+      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 md:px-8 lg:grid-cols-[1.15fr_0.85fr]">
+        <ContactBookingHub
+          services={orbit.services}
+          packages={orbit.packages}
+          therapists={orbit.therapists}
+          initial={{
+            service: params.service,
+            package: params.package,
+            therapist: params.therapist,
+            mode: params.mode,
+          }}
+        />
+        <div className="space-y-8">
+          <CompanyContactCard phone={orbit.phone || site.phone} />
+          <div className="rounded-2xl border border-[#e6dfd4] bg-white p-6">
+            <h3 className="font-serif text-2xl">Wellness notes</h3>
+            <p className="prose-quiet mt-2 text-sm">Occasional updates from the spa.</p>
+            <NewsletterForm />
           </div>
-          <div className="mt-6 flex flex-wrap gap-4 text-xs tracking-[0.14em] uppercase">
-            {(
-              [
-                ["Instagram", site.social.instagram],
-                ["Facebook", site.social.facebook],
-                ["Google", site.social.google],
-                ["Tripadvisor", site.social.tripadvisor],
-              ] as const
-            )
-              .filter(([, href]) => href.startsWith("https://"))
-              .map(([label, href]) => (
-                <a key={label} href={href} target="_blank" rel="noreferrer">
-                  {label}
-                </a>
-              ))}
-          </div>
-          <h3 className="mt-10 font-serif text-2xl">Wellness notes</h3>
-          <p className="prose-quiet mt-2 text-sm">Receive wellness updates & exclusive offers.</p>
-          <NewsletterForm />
-        </aside>
+        </div>
       </section>
       <section className="bg-[#f6f1e8]">
         <div className="mx-auto max-w-[900px] px-5 py-16 md:px-8">
@@ -92,9 +76,9 @@ export default async function ContactPage({
         </div>
       </section>
       <section id="reviews" className="mx-auto max-w-[900px] px-5 py-16">
-        <h2 className="font-serif text-3xl">Reviews</h2>
-        <p className="mt-3 text-sm text-[#8a8175]">
-          Verified guest reviews are not published yet. The notes below are layout samples only.
+        <h2 className="font-serif text-3xl">Google reviews</h2>
+        <p className="mt-3 text-sm text-[#2f8f45]">
+          {site.googleRating} average from {site.googleReviewCount.toLocaleString()} reviews on Google.
         </p>
         <ul className="mt-6 space-y-4">
           {reviews.map((review) => (

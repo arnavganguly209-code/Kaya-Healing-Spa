@@ -48,11 +48,18 @@ export async function PUT(request: Request) {
     therapies: body.therapies,
     whyKaya: body.whyKaya,
     homeAbout: body.homeAbout ? { ...current.homeAbout, ...body.homeAbout } : current.homeAbout,
+    aboutPage: body.aboutPage ? { ...current.aboutPage, ...body.aboutPage, owner: { ...current.aboutPage.owner, ...body.aboutPage.owner }, logos: body.aboutPage.logos?.length ? body.aboutPage.logos : current.aboutPage.logos } : current.aboutPage,
+    therapists: body.therapists?.length ? body.therapists : current.therapists,
+    packageCategories: body.packageCategories?.length ? body.packageCategories : current.packageCategories,
+    packages: body.packages?.length ? body.packages : current.packages,
     services: body.services,
     footerBrand: body.footerBrand ?? current.footerBrand,
   });
   revalidatePath("/", "layout");
-  revalidatePath("/orbit");
+  revalidatePath("/about");
+  revalidatePath("/contact");
+  revalidatePath("/services");
+  revalidatePath("/packages");
   return NextResponse.json({ success: true });
 }
 

@@ -4,7 +4,7 @@ import type { OrbitContent } from "@/lib/orbit-store";
 import { site } from "@/lib/content";
 import { useEffect, useRef, useState } from "react";
 
-const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home about", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
+const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
 
 type MediaItem = { path: string; name: string; kind: "image" | "video"; size: number };
 
@@ -484,13 +484,137 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <Field label="Photo alt" value={content.homeAbout.imageAlt} onChange={(value) => setContent({ ...content, homeAbout: { ...content.homeAbout, imageAlt: value } })} />
             </>
           )}
+          {section === "About page" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">Long about copy, owner profile, and partner logos shown on /about.</p>
+              <Field label="Intro eyebrow" value={content.aboutPage.introEyebrow} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, introEyebrow: value } })} />
+              <Field label="Intro title" value={content.aboutPage.introTitle} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, introTitle: value } })} />
+              <Area label="Intro lead" value={content.aboutPage.introLead} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, introLead: value } })} />
+              <Field label="Company tagline" value={content.aboutPage.companyTagline} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, companyTagline: value } })} />
+              <Field label="Google rating" value={String(content.aboutPage.googleRating)} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, googleRating: Number(value) || 0 } })} />
+              <Field label="Google review count" value={String(content.aboutPage.googleReviewCount)} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, googleReviewCount: Number(value) || 0 } })} />
+              {content.aboutPage.story.map((paragraph, index) => (
+                <Area
+                  key={index}
+                  label={`Story paragraph ${index + 1}`}
+                  value={paragraph}
+                  onChange={(value) => {
+                    const story = [...content.aboutPage.story];
+                    story[index] = value;
+                    setContent({ ...content, aboutPage: { ...content.aboutPage, story } });
+                  }}
+                />
+              ))}
+              <button
+                type="button"
+                className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
+                onClick={() => setContent({ ...content, aboutPage: { ...content.aboutPage, story: [...content.aboutPage.story, ""] } })}
+              >
+                Add story paragraph
+              </button>
+              <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
+                <p className="text-sm font-semibold">Owner / director</p>
+                <Field label="Name" value={content.aboutPage.owner.name} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, name: value } } })} />
+                <Field label="Role" value={content.aboutPage.owner.role} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, role: value } } })} />
+                <Field label="Experience" value={content.aboutPage.owner.experience} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, experience: value } } })} />
+                <Area label="Description" value={content.aboutPage.owner.description} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, description: value } } })} />
+                <MediaField
+                  label="Photo"
+                  src={content.aboutPage.owner.photo}
+                  onUpload={(file) => upload(file, (photo: string) => publish({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, photo } } }))}
+                  onLibrary={() => setPicker((photo: string) => publish({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, photo } } }))}
+                />
+              </div>
+              {content.aboutPage.logos.map((logo, index) => (
+                <div key={index} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <p className="text-sm font-semibold">Logo / partner {index + 1}</p>
+                  <Field label="Name" value={logo.name} onChange={(value) => {
+                    const logos = content.aboutPage.logos.map((item, i) => (i === index ? { ...item, name: value } : item));
+                    setContent({ ...content, aboutPage: { ...content.aboutPage, logos } });
+                  }} />
+                  <Area label="Description" value={logo.description} onChange={(value) => {
+                    const logos = content.aboutPage.logos.map((item, i) => (i === index ? { ...item, description: value } : item));
+                    setContent({ ...content, aboutPage: { ...content.aboutPage, logos } });
+                  }} />
+                  <MediaField
+                    label="Image"
+                    src={logo.image}
+                    onUpload={(file) => upload(file, (image: string) => {
+                      const logos = content.aboutPage.logos.map((item, i) => (i === index ? { ...item, image } : item));
+                      publish({ ...content, aboutPage: { ...content.aboutPage, logos } });
+                    })}
+                    onLibrary={() => setPicker((image: string) => {
+                      const logos = content.aboutPage.logos.map((item, i) => (i === index ? { ...item, image } : item));
+                      publish({ ...content, aboutPage: { ...content.aboutPage, logos } });
+                    })}
+                  />
+                </div>
+              ))}
+              <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, aboutPage: { ...content.aboutPage, logos: [...content.aboutPage.logos, { name: "Partner", description: "", image: "/brand/kaya-logo-hd.webp", imageAlt: "" }] } })}>
+                Add logo
+              </button>
+            </>
+          )}
+          {section === "Therapists" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">Team shown on services, packages, and booking forms. Upload a portrait, set experience and from-price.</p>
+              <button
+                type="button"
+                className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
+                onClick={() =>
+                  publish({
+                    ...content,
+                    therapists: [
+                      ...content.therapists,
+                      {
+                        slug: `therapist-${Date.now()}`,
+                        name: "New therapist",
+                        title: "Massage therapist",
+                        description: "Describe specialties and style.",
+                        experience: "5 years experience",
+                        priceFromNpr: 4000,
+                        photo: content.therapists[0]?.photo || "/brand/kaya-logo-hd.webp",
+                        photoAlt: "Therapist portrait",
+                      },
+                    ],
+                  })
+                }
+              >
+                Add therapist
+              </button>
+              {content.therapists.map((therapist, index) => (
+                <div key={therapist.slug} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">{therapist.name}</p>
+                    <button type="button" className="text-xs text-[#c45e0a]" onClick={() => publish({ ...content, therapists: content.therapists.filter((_, i) => i !== index) })}>
+                      Remove
+                    </button>
+                  </div>
+                  <Field label="Slug" value={therapist.slug} onChange={(value) => updateTherapist(index, { slug: value })} />
+                  <Field label="Name" value={therapist.name} onChange={(value) => updateTherapist(index, { name: value })} />
+                  <Field label="Title" value={therapist.title} onChange={(value) => updateTherapist(index, { title: value })} />
+                  <Area label="Description" value={therapist.description} onChange={(value) => updateTherapist(index, { description: value })} />
+                  <Field label="Experience" value={therapist.experience} onChange={(value) => updateTherapist(index, { experience: value })} />
+                  <Field label="From price (NPR)" value={String(therapist.priceFromNpr)} onChange={(value) => updateTherapist(index, { priceFromNpr: Number(value) || 0 })} />
+                  <MediaField
+                    label="Photo"
+                    src={therapist.photo}
+                    onUpload={(file) => upload(file, (photo: string) => updateTherapist(index, { photo }))}
+                    onLibrary={() => setPicker((photo: string) => updateTherapist(index, { photo }))}
+                  />
+                  <Field label="Photo alt" value={therapist.photoAlt} onChange={(value) => updateTherapist(index, { photoAlt: value })} />
+                </div>
+              ))}
+            </>
+          )}
           {section === "Services" && (
             <>
-              <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, services: [...content.services, { ...content.services[0], slug: `service-${Date.now()}`, name: "New treatment", summary: "Describe this treatment." }] })}>
+              <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => publish({ ...content, services: [...content.services, { ...content.services[0], slug: `service-${Date.now()}`, name: "New treatment", summary: "Describe this treatment." }] })}>
                 Add treatment
               </button>
               {content.services.map((service, index) => (
-                <div key={service.slug} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                <div key={`${service.slug}-${index}`} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <Field label="Slug" value={service.slug} onChange={(value) => updateService(index, { slug: value })} />
                   <Field label="Name" value={service.name} onChange={(value) => updateService(index, { name: value })} />
                   <Field label="Category" value={service.category} onChange={(value) => updateService(index, { category: value as typeof service.category })} />
                   <Area label="Summary" value={service.summary} onChange={(value) => updateService(index, { summary: value })} />
@@ -502,8 +626,9 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Categories" && (
             <>
+              <p className="text-sm text-[#6B6B6B]">Service menu filters (slug labels, e.g. massage, ayurvedic).</p>
               <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, categories: [...content.categories, "new-category"] })}>
-                Add category
+                Add service category
               </button>
               {content.categories.map((category, index) => (
                 <Field
@@ -517,17 +642,62 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   }}
                 />
               ))}
+              <p className="mt-8 text-sm font-semibold">Package categories</p>
+              <button type="button" className="mt-2 rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, packageCategories: [...content.packageCategories, "new-package-category"] })}>
+                Add package category
+              </button>
+              {content.packageCategories.map((category, index) => (
+                <Field
+                  key={`pkg-${index}`}
+                  label={`Package category ${index + 1}`}
+                  value={category}
+                  onChange={(value) => {
+                    const packageCategories = [...content.packageCategories];
+                    packageCategories[index] = value;
+                    setContent({ ...content, packageCategories });
+                  }}
+                />
+              ))}
             </>
           )}
-          {section === "Packages" &&
-            content.packages.map((item, index) => (
-              <div key={item.slug} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+          {section === "Packages" && (
+            <>
+              <button
+                type="button"
+                className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
+                onClick={() =>
+                  publish({
+                    ...content,
+                    packages: [
+                      ...content.packages,
+                      {
+                        ...content.packages[0],
+                        slug: `package-${Date.now()}`,
+                        name: "New package",
+                        category: content.packageCategories[0] || "wellness",
+                        summary: "Short summary",
+                        description: "Describe the package sequence.",
+                      },
+                    ],
+                  })
+                }
+              >
+                Add package
+              </button>
+              {content.packages.map((item, index) => (
+              <div key={`${item.slug}-${index}`} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                <Field label="Slug" value={item.slug} onChange={(value) => updatePackage(index, { slug: value })} />
+                <Field label="Category" value={item.category || "wellness"} onChange={(value) => updatePackage(index, { category: value })} />
                 <Field label="Name" value={item.name} onChange={(value) => updatePackage(index, { name: value })} />
                 <Area label="Summary" value={item.summary} onChange={(value) => updatePackage(index, { summary: value })} />
+                <Area label="Description" value={item.description} onChange={(value) => updatePackage(index, { description: value })} />
+                <Field label="Duration label" value={item.durationLabel} onChange={(value) => updatePackage(index, { durationLabel: value })} />
                 <Field label="Price NPR" value={String(item.priceNpr)} onChange={(value) => updatePackage(index, { priceNpr: Number(value) || 0 })} />
                 <MediaField label="Image" src={item.image} onUpload={(file) => upload(file, (image: string) => updatePackage(index, { image }))} onLibrary={() => setPicker((image: string) => updatePackage(index, { image }))} />
               </div>
-            ))}
+              ))}
+            </>
+          )}
           {section === "Gallery" &&
             content.gallery.map((image, index) => (
               <div key={image.id} className="rounded-2xl border border-[#efe8e0] bg-white p-5">
@@ -619,6 +789,13 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   function updateWhyPillar(index: number, patch: Partial<OrbitContent["whyKaya"]["pillars"][number]>) {
     const pillars = contentRef.current.whyKaya.pillars.map((item, i) => (i === index ? { ...item, ...patch } : item));
     setContent({ ...contentRef.current, whyKaya: { ...contentRef.current.whyKaya, pillars } });
+  }
+  function updateTherapist(index: number, patch: Partial<OrbitContent["therapists"][number]>) {
+    const therapists = contentRef.current.therapists.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    const next = { ...contentRef.current, therapists };
+    setContent(next);
+    contentRef.current = next;
+    if (patch.photo) return publish(next);
   }
   function updateService(index: number, patch: Partial<OrbitContent["services"][number]>) {
     const next = { ...contentRef.current, services: contentRef.current.services.map((item, i) => (i === index ? { ...item, ...patch } : item)) };

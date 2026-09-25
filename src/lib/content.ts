@@ -3,16 +3,18 @@ import type { Faq, GalleryImage, Review, Service, ServiceCategory, SpaPackage } 
 export const site = {
   name: "Kaya Healing Spa",
   tagline: "A Complete Wellness Experience",
+  placeType: "Massage spa in Kathmandu",
   city: "Kathmandu, Nepal",
-  addressLine: "Kathmandu, Nepal",
-  addressIsPlaceholder: true,
-  phone: "+977 9801234567",
+  addressLine: "Hotel Northfield, Chaksibari, Kathmandu, Bagmati Province 44600",
+  addressIsPlaceholder: false,
+  phone: "01-5355882",
+  phoneTel: "+97715355882",
   email: "",
-  hours: [
-    { day: "Sunday – Friday", hours: "10:00 – 20:00" },
-    { day: "Saturday", hours: "10:00 – 21:00" },
-  ],
-  hoursNote: "Hours shown are a working schedule and can be confirmed when you book.",
+  googleRating: 4.8,
+  googleReviewCount: 499,
+  mapEmbedQuery: "Kaya+Healing+Spa+Hotel+Northfield+Chaksibari+Kathmandu",
+  hours: [{ day: "Every day", hours: "Open until 12:00 AM (midnight)" }],
+  hoursNote: "Hours follow our Google Business listing. Call ahead on public holidays.",
   url:
     process.env.NEXT_PUBLIC_SITE_URL &&
     !process.env.NEXT_PUBLIC_SITE_URL.includes("localhost") &&
@@ -25,7 +27,7 @@ export const site = {
     instagram: "",
     facebook: "",
     tiktok: "",
-    google: "",
+    google: "https://www.google.com/maps/search/Kaya+Healing+Spa+Hotel+Northfield+Chaksibari+Kathmandu",
     tripadvisor: "",
   },
 };
@@ -40,6 +42,21 @@ export const categoryLabels: Record<ServiceCategory | "all", string> = {
   wellness: "Wellness",
   recovery: "Recovery",
 };
+
+export const packageCategoryLabels: Record<string, string> = {
+  signature: "Signature",
+  couples: "Couples",
+  "half-day": "Half day",
+  "full-day": "Full day",
+  recovery: "Recovery",
+  wellness: "Wellness",
+};
+
+export function labelForCategory(value: string) {
+  if (value in categoryLabels) return categoryLabels[value as ServiceCategory | "all"];
+  if (value in packageCategoryLabels) return packageCategoryLabels[value];
+  return value.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 const img = (id: string, altQuery = "") =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80${altQuery}`;
@@ -303,6 +320,7 @@ export const packages: SpaPackage[] = [
   {
     slug: "kaya-signature-ritual",
     name: "KAYA Signature Ritual",
+    category: "signature",
     summary: "Scrub, signature massage, and quiet time — the visit we suggest when you want the house sequence.",
     description:
       "The signature ritual is the clearest expression of a KAYA visit: skin is polished, the body is massaged at your pace, and you are left with time in the lounge before you return to the street.",
@@ -322,6 +340,7 @@ export const packages: SpaPackage[] = [
   {
     slug: "himalayan-recovery",
     name: "Himalayan Recovery",
+    category: "recovery",
     summary: "A longer recovery sequence for legs and back after trekking or a full valley itinerary.",
     description:
       "Heat, foot work, and a firm recovery massage are set in an order that makes sense after days on the trail. Stretching is offered, never pushed.",

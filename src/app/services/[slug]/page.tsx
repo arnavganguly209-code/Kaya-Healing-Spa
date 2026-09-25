@@ -1,4 +1,5 @@
 import { JsonLd } from "@/components/json-ld";
+import { TherapistStrip } from "@/components/therapist-strip";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { categoryLabels, formatNpr, getService as fallbackService, services, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
@@ -33,6 +34,7 @@ export default async function ServiceDetail({ params }: Props) {
   const { slug } = await params;
   const service = getService(slug);
   if (!service) notFound();
+  const orbit = readOrbitContent();
 
   return (
     <article className="pb-20">
@@ -100,11 +102,12 @@ export default async function ServiceDetail({ params }: Props) {
           <p className="mt-6 text-xs tracking-[0.16em] uppercase text-[#8a8175]">From</p>
           <p className="mt-1 font-serif text-4xl">{formatNpr(service.priceFromNpr)}</p>
           <p className="mt-2 text-xs text-[#8a8175]">Indicative placeholder pricing. This is not a medical treatment.</p>
-          <Link href={`/contact?service=${service.slug}`} className="btn-primary mt-6 w-full">
+          <Link href={`/contact?service=${service.slug}&mode=service`} className="btn-primary mt-6 w-full">
             Book appointment
           </Link>
         </aside>
       </div>
+      <TherapistStrip therapists={orbit.therapists} serviceSlug={service.slug} />
     </article>
   );
 }

@@ -30,6 +30,7 @@ export type PackageItem = { name: string; detail: string };
 export type SpaPackage = {
   slug: string;
   name: string;
+  category?: string;
   summary: string;
   description: string;
   durationLabel: string;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 type Body = {
+  bookingType?: string;
   name?: string;
   email?: string;
   phone?: string;
@@ -8,6 +9,7 @@ type Body = {
   preferredTime?: string;
   serviceSlug?: string;
   packageSlug?: string;
+  therapistSlug?: string;
   guests?: number;
   notes?: string;
 };
@@ -22,7 +24,19 @@ export async function POST(request: Request) {
   if (!emailOk) return NextResponse.json({ message: "Enter a valid email." }, { status: 400 });
   if (!body.phone || body.phone.trim().length < 6) return NextResponse.json({ message: "Enter a phone number." }, { status: 400 });
   if (!body.preferredDate || !body.preferredTime) return NextResponse.json({ message: "Choose a date and time." }, { status: 400 });
-  if (!body.serviceSlug && !body.packageSlug) return NextResponse.json({ message: "Choose a treatment or a package." }, { status: 400 });
+  const bookingType = body.bookingType || "service";
+  if (bookingType === "package" && !body.packageSlug) {
+    return NextResponse.json({ message: "Choose a package." }, { status: 400 });
+  }
+  if (bookingType === "service" && !body.serviceSlug) {
+    return NextResponse.json({ message: "Choose a treatment." }, { status: 400 });
+  }
+  if (bookingType === "therapist" && (!body.therapistSlug || !body.serviceSlug)) {
+    return NextResponse.json({ message: "Choose a therapist and treatment." }, { status: 400 });
+  }
+  if (!body.serviceSlug && !body.packageSlug) {
+    return NextResponse.json({ message: "Choose a treatment or a package." }, { status: 400 });
+  }
   if (!Number.isInteger(guests) || guests < 1 || guests > 8) return NextResponse.json({ message: "Guests must be between 1 and 8." }, { status: 400 });
 
   return NextResponse.json({ success: true, message: "Appointment request received", data: { received: true } });

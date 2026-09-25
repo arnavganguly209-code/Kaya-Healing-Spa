@@ -367,11 +367,14 @@ export function HomePage() {
         <div>
           <p className="eyebrow">Visit</p>
           <h2 className="display mt-3 text-5xl">{site.name}</h2>
-          <p className="mt-4 text-lg">{site.city}</p>
-          <p className="prose-quiet mt-2 text-sm">A street address will be published when the spa confirms it. Until then, use the booking form and we will share directions.</p>
+          <p className="mt-4 text-lg leading-relaxed">{site.addressLine}</p>
+          <p className="mt-2 text-sm">
+            <a href={`tel:${site.phoneTel}`} className="font-semibold hover:text-[#F47B20]">
+              {orbit.phone || site.phone}
+            </a>
+          </p>
+          <p className="prose-quiet mt-2 text-sm">{site.placeType} · {site.googleRating}★ on Google</p>
           <ul className="mt-6 space-y-2 text-sm">
-            <li>Phone: {site.phone || "Shared with your confirmation"}</li>
-            <li>Email: {site.email || "Shared with your confirmation"}</li>
             {site.hours.map((row) => (
               <li key={row.day}>{row.day}: {row.hours}</li>
             ))}
@@ -381,11 +384,11 @@ export function HomePage() {
         </div>
         <div className="min-h-[320px] bg-[#f6f1e8]">
           <iframe
-            title="Map of Kathmandu"
+            title={`Map — ${site.name}`}
             className="h-full min-h-[320px] w-full grayscale"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            src="https://maps.google.com/maps?q=Kathmandu%20Nepal&z=12&output=embed"
+            src={`https://maps.google.com/maps?q=${site.mapEmbedQuery}&z=15&output=embed`}
           />
         </div>
       </section>

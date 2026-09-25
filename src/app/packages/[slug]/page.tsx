@@ -1,5 +1,7 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { formatNpr, getPackage, packages } from "@/lib/content";
+import { TherapistStrip } from "@/components/therapist-strip";
+import { formatNpr, getPackage, packages as fallbackPackages } from "@/lib/content";
+import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,13 +9,17 @@ import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ slug: string }> };
 
+function getPackageFromOrbit(slug: string) {
+  return readOrbitContent().packages.find((item) => item.slug === slug) ?? getPackage(slug);
+}
+
 export function generateStaticParams() {
-  return packages.map((item) => ({ slug: item.slug }));
+  return fallbackPackages.map((item) => ({ slug: item.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const item = getPackage(slug);
+  const item = getPackageFromOrbit(slug);
   if (!item) return { title: "Package" };
   return {
     title: item.name,
@@ -24,8 +30,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PackageDetail({ params }: Props) {
   const { slug } = await params;
-  const item = getPackage(slug);
+  const item = getPackageFromOrbit(slug);
   if (!item) notFound();
+  const orbit = readOrbitContent();
 
   return (
     <article>
@@ -50,8 +57,11 @@ export default async function PackageDetail({ params }: Props) {
         </ul>
         <p className="mt-8 font-serif text-4xl">{formatNpr(item.priceNpr)}</p>
         <p className="text-xs text-[#8a8175]">Indicative placeholder price.</p>
-        <Link href={`/contact?package=${item.slug}`} className="btn-primary mt-6">Book package</Link>
+        <Link href={`/contact?package=${item.slug}&mode=package`} className="btn-primary mt-6">
+          Book package
+        </Link>
       </div>
+      <TherapistStrip therapists={orbit.therapists} packageSlug={item.slug} />
     </article>
   );
 }
