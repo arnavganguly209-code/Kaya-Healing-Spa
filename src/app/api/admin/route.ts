@@ -21,6 +21,7 @@ export async function GET() {
       therapists: c.therapists,
       categories: c.categories,
       packageCategories: c.packageCategories,
+      adminSectionFlags: c.adminSectionFlags,
     },
   });
 }

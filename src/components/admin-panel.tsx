@@ -2,7 +2,7 @@
 
 import type { BlogPost } from "@/lib/blog-store";
 import type { AdminInquiry } from "@/lib/admin-store";
-import type { OrbitContent } from "@/lib/orbit-store";
+import type { OrbitContent, OrbitAdminSectionFlags } from "@/lib/orbit-store";
 import { defaultServices } from "@/lib/default-services";
 import { site } from "@/lib/content";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
@@ -23,13 +23,33 @@ type AdminData = {
   therapists: OrbitContent["therapists"];
   categories: string[];
   packageCategories: string[];
+  adminSectionFlags: OrbitAdminSectionFlags;
 };
 
-const sections = ["Dashboard", "Hero", "Footer", "Services", "Packages", "Therapists", "Blog", "Inquiries", "Account"] as const;
+const allSections = ["Dashboard", "Hero", "Footer", "Services", "Packages", "Therapists", "Blog", "Inquiries", "Account"] as const;
+
+const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSectionFlags | null> = {
+  Dashboard: null,
+  Hero: "hero",
+  Footer: "footer",
+  Services: "services",
+  Packages: "packages",
+  Therapists: "therapists",
+  Blog: "blog",
+  Inquiries: "inquiries",
+  Account: null,
+};
+
+function navSections(flags: OrbitAdminSectionFlags) {
+  return allSections.filter((name) => {
+    const key = sectionFlagKey[name];
+    return key === null || flags[key] !== false;
+  });
+}
 
 export function AdminPanel({ initial }: { initial: AdminData }) {
   const [content, setContent] = useState(initial);
-  const [section, setSection] = useState<(typeof sections)[number]>("Dashboard");
+  const [section, setSection] = useState<(typeof allSections)[number]>("Dashboard");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -39,6 +59,10 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
   const [account, setAccount] = useState({ username: "kaya", currentPassword: "", password: "", password2: "" });
   const contentRef = useRef(content);
   contentRef.current = content;
+
+  useEffect(() => {
+    if (!navSections(content.adminSectionFlags).includes(section)) setSection("Dashboard");
+  }, [content.adminSectionFlags, section]);
 
   useEffect(() => {
     if (section === "Inquiries") void loadInquiries();
@@ -148,7 +172,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
 
       <div className="mx-auto grid max-w-[1440px] gap-8 px-5 py-8 md:grid-cols-[220px_1fr] md:px-8">
         <nav className="flex flex-row flex-wrap gap-2 md:flex-col md:gap-1">
-          {sections.map((item) => (
+          {navSections(content.adminSectionFlags).map((item) => (
             <button
               key={item}
               type="button"

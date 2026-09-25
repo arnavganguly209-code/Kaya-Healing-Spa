@@ -7,7 +7,7 @@ import { site } from "@/lib/content";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import { useEffect, useRef, useState } from "react";
 
-const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Admin portal", "Footer"] as const;
+const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home page", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Admin portal", "Footer"] as const;
 
 type MediaItem = { path: string; name: string; kind: "image" | "video"; size: number };
 
@@ -490,6 +490,112 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               ))}
             </>
           )}
+          {section === "Home page" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">
+                Orange lotus band (“More than a massage”), home headings, journey steps, benefits strip, and closing CTA — all wired to the live home page.
+              </p>
+              <p className="mt-6 text-sm font-semibold">Visit experience (orange section)</p>
+              <Field
+                label="Title"
+                value={content.homePage.visit.title}
+                onChange={(value) =>
+                  setContent({ ...content, homePage: { ...content.homePage, visit: { ...content.homePage.visit, title: value } } })
+                }
+              />
+              <Area
+                label="Intro"
+                value={content.homePage.visit.intro}
+                onChange={(value) =>
+                  setContent({ ...content, homePage: { ...content.homePage, visit: { ...content.homePage.visit, intro: value } } })
+                }
+              />
+              <MediaField
+                label="Photo"
+                src={content.homePage.visit.image}
+                onUpload={(file) =>
+                  upload(file, (path) => {
+                    const homePage = {
+                      ...contentRef.current.homePage,
+                      visit: { ...contentRef.current.homePage.visit, image: path },
+                    };
+                    publish({ ...contentRef.current, homePage });
+                  })
+                }
+                onLibrary={() =>
+                  setPicker((path: string) => {
+                    const homePage = {
+                      ...contentRef.current.homePage,
+                      visit: { ...contentRef.current.homePage.visit, image: path },
+                    };
+                    publish({ ...contentRef.current, homePage });
+                  })
+                }
+              />
+              <Field
+                label="Photo alt"
+                value={content.homePage.visit.imageAlt}
+                onChange={(value) =>
+                  setContent({ ...content, homePage: { ...content.homePage, visit: { ...content.homePage.visit, imageAlt: value } } })
+                }
+              />
+              {content.homePage.visit.pillars.map((item, index) => (
+                <div key={index} className="mt-4 rounded-2xl border border-[#efe8e0] p-4">
+                  <Field
+                    label={`Pillar ${index + 1} title`}
+                    value={item.title}
+                    onChange={(value) => {
+                      const pillars = content.homePage.visit.pillars.map((p, i) => (i === index ? { ...p, title: value } : p));
+                      setContent({ ...content, homePage: { ...content.homePage, visit: { ...content.homePage.visit, pillars } } });
+                    }}
+                  />
+                  <Area
+                    label="Text"
+                    value={item.text}
+                    onChange={(value) => {
+                      const pillars = content.homePage.visit.pillars.map((p, i) => (i === index ? { ...p, text: value } : p));
+                      setContent({ ...content, homePage: { ...content.homePage, visit: { ...content.homePage.visit, pillars } } });
+                    }}
+                  />
+                </div>
+              ))}
+              <p className="mt-8 text-sm font-semibold">Section headings</p>
+              <Field label="Services eyebrow" value={content.homePage.servicesEyebrow} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, servicesEyebrow: v } })} />
+              <Field label="Services title" value={content.homePage.servicesTitle} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, servicesTitle: v } })} />
+              <Field label="Packages eyebrow" value={content.homePage.packagesEyebrow} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, packagesEyebrow: v } })} />
+              <Field label="Packages title" value={content.homePage.packagesTitle} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, packagesTitle: v } })} />
+              <Field label="Gallery title" value={content.homePage.galleryTitle} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, galleryTitle: v } })} />
+              <Field label="Reviews eyebrow" value={content.homePage.reviewsEyebrow} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsEyebrow: v } })} />
+              <Field label="Reviews title" value={content.homePage.reviewsTitle} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsTitle: v } })} />
+              <p className="mt-8 text-sm font-semibold">Closing CTA band</p>
+              <Field label="Title" value={content.homePage.cta.title} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, cta: { ...content.homePage.cta, title: v } } })} />
+              <Area label="Text" value={content.homePage.cta.text} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, cta: { ...content.homePage.cta, text: v } } })} />
+              <Field label="Primary button" value={content.homePage.cta.primaryLabel} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, cta: { ...content.homePage.cta, primaryLabel: v } } })} />
+              <Field label="Primary link" value={content.homePage.cta.primaryHref} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, cta: { ...content.homePage.cta, primaryHref: v } } })} />
+              <Field label="Secondary button" value={content.homePage.cta.secondaryLabel} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, cta: { ...content.homePage.cta, secondaryLabel: v } } })} />
+              <Field label="Secondary link" value={content.homePage.cta.secondaryHref} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, cta: { ...content.homePage.cta, secondaryHref: v } } })} />
+              <MediaField
+                label="Background image"
+                src={content.homePage.cta.backgroundImage}
+                onUpload={(file) =>
+                  upload(file, (path) => {
+                    publish({
+                      ...contentRef.current,
+                      homePage: { ...contentRef.current.homePage, cta: { ...contentRef.current.homePage.cta, backgroundImage: path } },
+                    });
+                  })
+                }
+                onLibrary={() =>
+                  setPicker((path: string) => {
+                    publish({
+                      ...contentRef.current,
+                      homePage: { ...contentRef.current.homePage, cta: { ...contentRef.current.homePage.cta, backgroundImage: path } },
+                    });
+                  })
+                }
+              />
+            </>
+          )}
           {section === "Home about" && (
             <>
               <p className="text-sm text-[#6B6B6B]">About block on the homepage (below Why Kaya).</p>
@@ -917,6 +1023,33 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               >
                 Save admin login
               </button>
+              <p className="mt-10 text-sm font-semibold">Admin dashboard sections</p>
+              <p className="text-sm text-[#6B6B6B]">Turn off sections staff should not edit in /admin. Dashboard and Account stay available.</p>
+              {(
+                [
+                  ["hero", "Hero"],
+                  ["footer", "Footer"],
+                  ["services", "Services"],
+                  ["packages", "Packages"],
+                  ["therapists", "Therapists"],
+                  ["blog", "Blog"],
+                  ["inquiries", "Inquiries"],
+                ] as const
+              ).map(([key, label]) => (
+                <label key={key} className="mt-3 flex cursor-pointer items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={content.adminSectionFlags[key]}
+                    onChange={(event) =>
+                      setContent({
+                        ...content,
+                        adminSectionFlags: { ...content.adminSectionFlags, [key]: event.target.checked },
+                      })
+                    }
+                  />
+                  Allow /admin → {label}
+                </label>
+              ))}
             </>
           )}
           {section === "Footer" && (

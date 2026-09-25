@@ -24,6 +24,7 @@ export default async function AdminPage() {
         therapists: c.therapists,
         categories: c.categories,
         packageCategories: c.packageCategories,
+        adminSectionFlags: c.adminSectionFlags,
       }}
     />
   );

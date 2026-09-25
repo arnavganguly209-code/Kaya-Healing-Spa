@@ -1,5 +1,5 @@
 import { HeroMedia } from "@/components/hero-media";
-import { OrangeLotusBackground } from "@/components/orange-lotus-background";
+import { HomeVisitSection } from "@/components/home-visit-section";
 import { Reveal } from "@/components/reveal";
 import { TherapiesSection } from "@/components/therapies-section";
 import { WhyKayaSection } from "@/components/why-kaya-section";
@@ -8,26 +8,6 @@ import { readOrbitContent } from "@/lib/orbit-store";
 import { Flower2, Leaf, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
-const journey = [
-  ["01", "Arrive", "You are greeted, offered water, and given a few quiet minutes before the room."],
-  ["02", "Relax", "The consultation is short. You set pressure, scent, and anything to avoid."],
-  ["03", "Restore", "The treatment follows the plan you agreed — unhurried, and draped throughout."],
-  ["04", "Renew", "You dress in your own time and sit with tea before stepping back outside."],
-];
-
-const benefits = [
-  ["Relaxation", "An hour with nowhere else to be, paced slowly enough to feel it."],
-  ["Mental clarity", "Less noise, a closed door, and time that is not split across a screen."],
-  ["Body recovery", "Practical work for legs, back, and shoulders after travel or trekking."],
-  ["Natural renewal", "Warm oil, simple scrubs, and heat used with a light hand."],
-];
-
-const pillars = [
-  ["Restore", "Bring the body back from the day it has had."],
-  ["Release", "Let held shoulders, jaws, and pace soften."],
-  ["Renew", "Leave with more room in the afternoon than you arrived with."],
-];
 
 function StonesIcon({ className = "text-[#F47B20]", size = 22 }: { className?: string; size?: number; strokeWidth?: number }) {
   return (
@@ -53,6 +33,7 @@ const featureIcons = [Flower2, Leaf, StonesIcon, CareIcon];
 
 export function HomePage() {
   const orbit = readOrbitContent();
+  const homePage = orbit.homePage;
   const services = orbit.services;
   const gallery = orbit.gallery;
   const hero = orbit.hero;
@@ -150,8 +131,8 @@ export function HomePage() {
       <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="eyebrow">Signature services</p>
-            <h2 className="display mt-3 text-5xl md:text-6xl">Selected treatments</h2>
+            <p className="eyebrow">{homePage.servicesEyebrow}</p>
+            <h2 className="display mt-3 text-5xl md:text-6xl">{homePage.servicesTitle}</h2>
           </div>
           <Link href="/services" className="btn-line">View all services</Link>
         </div>
@@ -173,41 +154,11 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden bg-[#c45e0a]">
-        <OrangeLotusBackground idSuffix="home-massage" intensity={1} />
-        <div className="relative z-[1] mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:px-8 lg:grid-cols-12 lg:py-32">
-          <div className="relative min-h-[460px] lg:col-span-7">
-            <Image
-              src="https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=1600&q=80"
-              alt="Guest resting during a massage"
-              fill
-              className="object-cover shadow-[0_20px_50px_rgba(0,0,0,0.25)]"
-              sizes="(min-width: 1024px) 55vw, 100vw"
-            />
-          </div>
-          <div className="lg:col-span-5 lg:-ml-16 lg:mt-24">
-            <div className="rounded-2xl border border-white/30 bg-[#fffcf8]/95 p-8 shadow-[0_24px_60px_rgba(0,0,0,0.22)] backdrop-blur-sm md:p-10">
-              <Flower2 className="text-[#F47B20]" strokeWidth={1.25} />
-              <h2 className="display mt-4 text-5xl text-[#141210]">More than a massage</h2>
-              <p className="mt-5 text-[15px] leading-7 text-[#4a453e]">
-                A single treatment can be wonderful. KAYA is arranged for the whole visit — arrival, the work itself, and the quiet that follows — so relaxation is not squeezed into the last ten minutes.
-              </p>
-              <ul className="mt-8 space-y-6">
-                {pillars.map(([title, text]) => (
-                  <li key={title}>
-                    <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#c45e0a]">{title}</p>
-                    <p className="mt-1 text-[#2a2520]">{text}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HomeVisitSection visit={homePage.visit} />
 
       <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
-        <p className="eyebrow">Packages</p>
-        <h2 className="display mt-3 text-5xl md:text-6xl">Featured sequences</h2>
+        <p className="eyebrow">{homePage.packagesEyebrow}</p>
+        <h2 className="display mt-3 text-5xl md:text-6xl">{homePage.packagesTitle}</h2>
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           {orbit.packages.slice(0, 4).map((item) => (
             <article key={item.slug} className="grid overflow-hidden border border-[#e6dfd4] bg-white md:grid-cols-5">
@@ -237,11 +188,11 @@ export function HomePage() {
         <p className="eyebrow">The visit</p>
         <h2 className="display mt-3 text-5xl">A wellness journey</h2>
         <ol className="mt-12 grid gap-8 md:grid-cols-4">
-          {journey.map(([n, title, text]) => (
-            <li key={n} className="border-t border-[#e6dfd4] pt-6">
-              <p className="font-serif text-4xl text-[#e8771a]">{n}</p>
-              <h3 className="mt-3 font-serif text-2xl">{title}</h3>
-              <p className="prose-quiet mt-2 text-sm">{text}</p>
+          {homePage.journey.map((step) => (
+            <li key={step.step} className="border-t border-[#e6dfd4] pt-6">
+              <p className="font-serif text-4xl text-[#e8771a]">{step.step}</p>
+              <h3 className="mt-3 font-serif text-2xl">{step.title}</h3>
+              <p className="prose-quiet mt-2 text-sm">{step.text}</p>
             </li>
           ))}
         </ol>
@@ -251,8 +202,8 @@ export function HomePage() {
         <div className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="eyebrow">Reviews</p>
-              <h2 className="display mt-3 text-5xl">Stories of relaxation</h2>
+              <p className="eyebrow">{homePage.reviewsEyebrow}</p>
+              <h2 className="display mt-3 text-5xl">{homePage.reviewsTitle}</h2>
             </div>
             <Link href="/contact#reviews" className="btn-line">Read more reviews</Link>
           </div>
@@ -285,7 +236,7 @@ export function HomePage() {
 
       <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
         <div className="flex items-end justify-between gap-4">
-          <h2 className="display text-5xl">Gallery</h2>
+          <h2 className="display text-5xl">{homePage.galleryTitle}</h2>
           <Link href="/gallery" className="btn-line">Explore our gallery</Link>
         </div>
         <div className="mt-10 columns-1 gap-4 sm:columns-2 lg:columns-3">
@@ -299,10 +250,10 @@ export function HomePage() {
 
       <section className="border-y border-[#e6dfd4]">
         <div className="mx-auto grid max-w-[1440px] md:grid-cols-4">
-          {benefits.map(([title, text]) => (
-            <article key={title} className="border-[#e6dfd4] px-6 py-12 md:border-r md:last:border-r-0">
-              <h3 className="text-xs tracking-[0.2em] uppercase text-[#2f8f45]">{title}</h3>
-              <p className="prose-quiet mt-4 text-sm">{text}</p>
+          {homePage.benefits.map((item) => (
+            <article key={item.title} className="border-[#e6dfd4] px-6 py-12 md:border-r md:last:border-r-0">
+              <h3 className="text-xs tracking-[0.2em] uppercase text-[#2f8f45]">{item.title}</h3>
+              <p className="prose-quiet mt-4 text-sm">{item.text}</p>
             </article>
           ))}
         </div>
@@ -310,17 +261,22 @@ export function HomePage() {
 
       <section className="relative overflow-hidden bg-[#141210] text-white">
         <Image
-          src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=1800&q=80"
+          src={homePage.cta.backgroundImage}
           alt=""
           fill
           className="object-cover opacity-30"
+          unoptimized={homePage.cta.backgroundImage.startsWith("/uploads/")}
         />
         <div className="relative mx-auto max-w-3xl px-5 py-28 text-center md:py-36">
-          <h2 className="display text-5xl md:text-6xl">Your time to unwind starts here.</h2>
-          <p className="mt-6 text-white/75">Step away from the pace of everyday life and give yourself time to restore.</p>
+          <h2 className="display text-5xl md:text-6xl">{homePage.cta.title}</h2>
+          <p className="mt-6 text-white/75">{homePage.cta.text}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href="/contact" className="btn-primary">Book an Appointment</Link>
-            <Link href="/services" className="btn-ghost">Explore Treatments</Link>
+            <Link href={homePage.cta.primaryHref} className="btn-primary">
+              {homePage.cta.primaryLabel}
+            </Link>
+            <Link href={homePage.cta.secondaryHref} className="btn-ghost">
+              {homePage.cta.secondaryLabel}
+            </Link>
           </div>
         </div>
       </section>

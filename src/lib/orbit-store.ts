@@ -63,6 +63,46 @@ export type OrbitHomeAbout = {
   imageAlt: string;
 };
 
+export type OrbitHomeJourneyStep = { step: string; title: string; text: string };
+
+export type OrbitHomePage = {
+  visit: {
+    title: string;
+    intro: string;
+    image: string;
+    imageAlt: string;
+    pillars: OrbitWhyItem[];
+  };
+  cta: {
+    title: string;
+    text: string;
+    primaryLabel: string;
+    primaryHref: string;
+    secondaryLabel: string;
+    secondaryHref: string;
+    backgroundImage: string;
+  };
+  servicesEyebrow: string;
+  servicesTitle: string;
+  packagesEyebrow: string;
+  packagesTitle: string;
+  galleryTitle: string;
+  reviewsEyebrow: string;
+  reviewsTitle: string;
+  benefits: OrbitWhyItem[];
+  journey: OrbitHomeJourneyStep[];
+};
+
+export type OrbitAdminSectionFlags = {
+  hero: boolean;
+  footer: boolean;
+  services: boolean;
+  packages: boolean;
+  therapists: boolean;
+  blog: boolean;
+  inquiries: boolean;
+};
+
 export type OrbitPageCover = {
   eyebrow: string;
   title: string;
@@ -104,6 +144,8 @@ export type OrbitContent = {
   };
   whyKaya: OrbitWhyKaya;
   homeAbout: OrbitHomeAbout;
+  homePage: OrbitHomePage;
+  adminSectionFlags: OrbitAdminSectionFlags;
   pageCovers: OrbitPageCovers;
   aboutPage: OrbitAboutPage;
   therapists: OrbitTherapist[];
@@ -171,6 +213,94 @@ function normalizeExtraSocialLinks(list: OrbitExtraSocialLink[] | undefined): Or
       enabled: item.enabled !== false,
     }))
     .filter((item) => item.label);
+}
+
+function defaultAdminSectionFlags(): OrbitAdminSectionFlags {
+  return {
+    hero: true,
+    footer: true,
+    services: true,
+    packages: true,
+    therapists: true,
+    blog: true,
+    inquiries: true,
+  };
+}
+
+function defaultHomePage(): OrbitHomePage {
+  return {
+    visit: {
+      title: "More than a massage",
+      intro:
+        "A single treatment can be wonderful. KAYA is arranged for the whole visit — arrival, the work itself, and the quiet that follows — so relaxation is not squeezed into the last ten minutes.",
+      image: "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=1600&q=80",
+      imageAlt: "Hot stone massage at Kaya Healing Spa",
+      pillars: [
+        { title: "Restore", text: "Bring the body back from the day it has had." },
+        { title: "Release", text: "Let held shoulders, jaws, and pace soften." },
+        { title: "Renew", text: "Leave with more room in the afternoon than you arrived with." },
+      ],
+    },
+    cta: {
+      title: "Your time to unwind starts here.",
+      text: "Step away from the pace of everyday life and give yourself time to restore.",
+      primaryLabel: "Book an Appointment",
+      primaryHref: "/contact",
+      secondaryLabel: "Explore Treatments",
+      secondaryHref: "/services",
+      backgroundImage: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=1800&q=80",
+    },
+    servicesEyebrow: "Signature services",
+    servicesTitle: "Selected treatments",
+    packagesEyebrow: "Packages",
+    packagesTitle: "Featured sequences",
+    galleryTitle: "Gallery",
+    reviewsEyebrow: "Reviews",
+    reviewsTitle: "Stories of relaxation",
+    benefits: [
+      { title: "Relaxation", text: "An hour with nowhere else to be, paced slowly enough to feel it." },
+      { title: "Mental clarity", text: "Less noise, a closed door, and time that is not split across a screen." },
+      { title: "Body recovery", text: "Practical work for legs, back, and shoulders after travel or trekking." },
+      { title: "Natural renewal", text: "Warm oil, simple scrubs, and heat used with a light hand." },
+    ],
+    journey: [
+      { step: "01", title: "Arrive", text: "You are greeted, offered water, and given a few quiet minutes before the room." },
+      { step: "02", title: "Relax", text: "The consultation is short. You set pressure, scent, and anything to avoid." },
+      { step: "03", title: "Restore", text: "The treatment follows the plan you agreed — unhurried, and draped throughout." },
+      { step: "04", title: "Renew", text: "You dress in your own time and sit with tea before stepping back outside." },
+    ],
+  };
+}
+
+function normalizeHomePage(raw: Partial<OrbitHomePage> | undefined): OrbitHomePage {
+  const d = defaultHomePage();
+  if (!raw) return d;
+  return {
+    ...d,
+    ...raw,
+    visit: {
+      ...d.visit,
+      ...raw.visit,
+      pillars: raw.visit?.pillars?.length ? raw.visit.pillars : d.visit.pillars,
+    },
+    cta: { ...d.cta, ...raw.cta },
+    benefits: raw.benefits?.length ? raw.benefits : d.benefits,
+    journey: raw.journey?.length ? raw.journey : d.journey,
+  };
+}
+
+function normalizeAdminSectionFlags(raw: Partial<OrbitAdminSectionFlags> | undefined): OrbitAdminSectionFlags {
+  const d = defaultAdminSectionFlags();
+  if (!raw) return d;
+  return {
+    hero: raw.hero !== false,
+    footer: raw.footer !== false,
+    services: raw.services !== false,
+    packages: raw.packages !== false,
+    therapists: raw.therapists !== false,
+    blog: raw.blog !== false,
+    inquiries: raw.inquiries !== false,
+  };
 }
 
 function defaultPageCovers(): OrbitPageCovers {
@@ -426,6 +556,8 @@ export function defaultOrbitContent(): OrbitContent {
       image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=80",
       imageAlt: "Spa stones and folded towels",
     },
+    homePage: defaultHomePage(),
+    adminSectionFlags: defaultAdminSectionFlags(),
     pageCovers: defaultPageCovers(),
     services: defaultServices,
     categories: [...defaultServiceCategories],
@@ -553,6 +685,8 @@ export function readOrbitContent(): OrbitContent {
       therapies: normalizeTherapies(merged.therapies),
       whyKaya: normalizeWhyKaya(merged.whyKaya ?? defaults.whyKaya),
       homeAbout: { ...defaults.homeAbout, ...merged.homeAbout },
+      homePage: normalizeHomePage(merged.homePage),
+      adminSectionFlags: normalizeAdminSectionFlags(merged.adminSectionFlags),
       pageCovers: normalizePageCovers(merged.pageCovers),
       aboutPage: { ...defaults.aboutPage, ...merged.aboutPage, owner: { ...defaults.aboutPage.owner, ...merged.aboutPage?.owner }, logos: merged.aboutPage?.logos?.length ? merged.aboutPage.logos : defaults.aboutPage.logos },
       therapists: normalizeTherapists(
@@ -581,6 +715,8 @@ export function writeOrbitContent(content: OrbitContent) {
         therapies: normalizeTherapies(content.therapies),
         whyKaya: normalizeWhyKaya(content.whyKaya),
         aboutPage: { ...defaultAboutPage(), ...content.aboutPage },
+        homePage: normalizeHomePage(content.homePage),
+        adminSectionFlags: normalizeAdminSectionFlags(content.adminSectionFlags),
         therapists: content.therapists?.length ? content.therapists : defaultTherapists(),
         servicesMenuVersion: SERVICES_MENU_VERSION,
         socialLinks: normalizeSocialLinks(content.socialLinks),
