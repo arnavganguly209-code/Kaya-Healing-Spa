@@ -1,21 +1,13 @@
 "use client";
 
-import { formatNpr, labelForCategory, services } from "@/lib/content";
+import { formatNpr, labelForCategory, serviceMenuCategories, services } from "@/lib/content";
 import type { ServiceCategory } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-const filtersDefault: (ServiceCategory | "all")[] = [
-  "all",
-  "massage",
-  "ayurvedic",
-  "holistic",
-  "body-care",
-  "facial",
-  "wellness",
-  "recovery",
-];
+const filtersDefault: (ServiceCategory | "all")[] = ["all", ...serviceMenuCategories];
 
 export function ServiceCatalog({
   initialCategory = "all",
@@ -26,8 +18,23 @@ export function ServiceCatalog({
   items?: typeof services;
   categories?: string[];
 }) {
-  const [category, setCategory] = useState(initialCategory);
+  const [category, setCategory] = useState(initialCategory || "all");
   const [query, setQuery] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setCategory(initialCategory && initialCategory !== "" ? initialCategory : "all");
+  }, [initialCategory]);
+
+  const selectCategory = (filter: (typeof filtersDefault)[number]) => {
+    setCategory(filter);
+    if (filter === "all") {
+      router.replace(pathname, { scroll: false });
+      return;
+    }
+    router.replace(`${pathname}?category=${filter}`, { scroll: false });
+  };
 
   const filters = useMemo(() => {
     const list = categories?.length ? categories : filtersDefault.slice(1);
@@ -53,7 +60,7 @@ export function ServiceCatalog({
               type="button"
               role="tab"
               aria-selected={category === filter}
-              onClick={() => setCategory(filter)}
+              onClick={() => selectCategory(filter)}
               className={`px-3 py-2 text-xs tracking-[0.14em] uppercase ${
                 category === filter ? "bg-[#141210] text-white" : "bg-[#f6f1e8] text-[#141210]"
               }`}

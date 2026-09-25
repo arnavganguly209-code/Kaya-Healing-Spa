@@ -43,6 +43,17 @@ export const categoryLabels: Record<ServiceCategory | "all", string> = {
   recovery: "Recovery",
 };
 
+/** Header dropdown + default service filters (same page, `?category=`). */
+export const serviceMenuCategories: ServiceCategory[] = [
+  "massage",
+  "ayurvedic",
+  "holistic",
+  "body-care",
+  "facial",
+  "wellness",
+  "recovery",
+];
+
 export const packageCategoryLabels: Record<string, string> = {
   signature: "Signature",
   couples: "Couples",
