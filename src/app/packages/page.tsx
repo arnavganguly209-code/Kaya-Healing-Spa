@@ -12,7 +12,12 @@ export const metadata: Metadata = {
   openGraph: { title: `${site.name} packages`, description: "Complete wellness experiences in Kathmandu." },
 };
 
-export default function PackagesPage() {
+export default async function PackagesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const params = await searchParams;
   const orbit = readOrbitContent();
   const items = orbit.packages.length ? orbit.packages : fallbackPackages;
 
@@ -25,7 +30,11 @@ export default function PackagesPage() {
         image="https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=2000&q=80"
         crumbs={[{ label: "Home", href: "/" }, { label: "Packages" }]}
       />
-      <PackageCatalog items={items} categories={orbit.packageCategories} />
+      <PackageCatalog
+        initialCategory={params.category ?? "all"}
+        items={items}
+        categories={orbit.packageCategories}
+      />
       <TherapistStrip therapists={orbit.therapists} intro="Prefer someone specific? Book a package and choose your therapist on the contact form." />
     </>
   );

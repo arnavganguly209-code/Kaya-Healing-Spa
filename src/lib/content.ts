@@ -63,6 +63,16 @@ export const packageCategoryLabels: Record<string, string> = {
   wellness: "Wellness",
 };
 
+/** Header dropdown + default package filters (same page, `?category=`). */
+export const packageMenuCategories = [
+  "signature",
+  "couples",
+  "half-day",
+  "full-day",
+  "recovery",
+  "wellness",
+] as const;
+
 export function labelForCategory(value: string) {
   if (value in categoryLabels) return categoryLabels[value as ServiceCategory | "all"];
   if (value in packageCategoryLabels) return packageCategoryLabels[value];

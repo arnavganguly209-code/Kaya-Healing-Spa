@@ -1,7 +1,7 @@
 "use client";
 
 import { Logo } from "@/components/logo";
-import { categoryLabels, serviceMenuCategories, site } from "@/lib/content";
+import { categoryLabels, packageCategoryLabels, packageMenuCategories, serviceMenuCategories, site } from "@/lib/content";
 import { Calendar, ChevronDown, Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -107,6 +107,42 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
               );
             }
 
+            if (link.href === "/packages") {
+              return (
+                <div key={link.href} className="group/packages relative px-1.5 xl:px-2">
+                  <Link href="/packages" className={`inline-flex items-center gap-1 ${navLinkClass(active)}`}>
+                    {link.label}
+                    <ChevronDown
+                      size={14}
+                      strokeWidth={2.5}
+                      className="opacity-70 transition-transform duration-200 group-hover/packages:rotate-180"
+                      aria-hidden
+                    />
+                    {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}
+                  </Link>
+                  <div className="pointer-events-none absolute top-full left-1/2 z-[60] w-52 -translate-x-1/2 pt-3 opacity-0 transition duration-200 group-hover/packages:pointer-events-auto group-hover/packages:opacity-100">
+                    <ul
+                      className="overflow-hidden rounded-2xl border border-[#efe8e0] bg-white py-1.5 shadow-[0_18px_44px_rgba(20,18,16,0.14)]"
+                      role="menu"
+                      aria-label="Package categories"
+                    >
+                      {packageMenuCategories.map((slug) => (
+                        <li key={slug} role="none">
+                          <Link
+                            href={`/packages?category=${slug}`}
+                            role="menuitem"
+                            className="block px-4 py-2.5 text-[13px] font-semibold tracking-wide text-[#141210] transition hover:bg-[#f6f1e8] hover:text-[#F47B20]"
+                          >
+                            {packageCategoryLabels[slug]}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <Link key={link.href} href={link.href} className={`px-1.5 xl:px-2 ${navLinkClass(active)}`}>
                 {link.label}
@@ -164,31 +200,55 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
       {open && (
         <div className="fixed inset-0 top-[72px] z-40 flex flex-col bg-white px-6 py-8 xl:hidden">
           <nav className="flex flex-col gap-4" aria-label="Mobile">
-            {links.map((link) =>
-              link.href === "/services" ? (
-                <div key={link.href}>
-                  <Link href="/services" onClick={() => setOpen(false)} className="text-lg font-bold text-[#171717]">
-                    Services
-                  </Link>
-                  <div className="mt-3 flex flex-col gap-2 border-l-2 border-[#F47B20]/35 pl-4">
-                    {serviceMenuCategories.map((slug) => (
-                      <Link
-                        key={slug}
-                        href={`/services?category=${slug}`}
-                        onClick={() => setOpen(false)}
-                        className="text-sm font-semibold text-[#5c5c5c] hover:text-[#F47B20]"
-                      >
-                        {categoryLabels[slug]}
-                      </Link>
-                    ))}
+            {links.map((link) => {
+              if (link.href === "/services") {
+                return (
+                  <div key={link.href}>
+                    <Link href="/services" onClick={() => setOpen(false)} className="text-lg font-bold text-[#171717]">
+                      Services
+                    </Link>
+                    <div className="mt-3 flex flex-col gap-2 border-l-2 border-[#F47B20]/35 pl-4">
+                      {serviceMenuCategories.map((slug) => (
+                        <Link
+                          key={slug}
+                          href={`/services?category=${slug}`}
+                          onClick={() => setOpen(false)}
+                          className="text-sm font-semibold text-[#5c5c5c] hover:text-[#F47B20]"
+                        >
+                          {categoryLabels[slug]}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ) : (
+                );
+              }
+              if (link.href === "/packages") {
+                return (
+                  <div key={link.href}>
+                    <Link href="/packages" onClick={() => setOpen(false)} className="text-lg font-bold text-[#171717]">
+                      Packages
+                    </Link>
+                    <div className="mt-3 flex flex-col gap-2 border-l-2 border-[#F47B20]/35 pl-4">
+                      {packageMenuCategories.map((slug) => (
+                        <Link
+                          key={slug}
+                          href={`/packages?category=${slug}`}
+                          onClick={() => setOpen(false)}
+                          className="text-sm font-semibold text-[#5c5c5c] hover:text-[#F47B20]"
+                        >
+                          {packageCategoryLabels[slug]}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+              return (
                 <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="text-lg font-bold text-[#171717]">
                   {link.label}
                 </Link>
-              ),
-            )}
+              );
+            })}
           </nav>
           <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="mt-8 text-sm font-semibold">
             Call Us {site.phone}

@@ -1,20 +1,43 @@
 "use client";
 
-import { formatNpr, labelForCategory, packages as fallbackPackages } from "@/lib/content";
+import { formatNpr, labelForCategory, packageMenuCategories, packages as fallbackPackages } from "@/lib/content";
 import type { SpaPackage } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 export function PackageCatalog({
+  initialCategory = "all",
   items = fallbackPackages,
   categories,
 }: {
+  initialCategory?: string;
   items?: SpaPackage[];
   categories?: string[];
 }) {
-  const [category, setCategory] = useState<string>("all");
-  const filters = useMemo(() => ["all", ...(categories?.length ? categories : ["signature", "couples", "wellness"])], [categories]);
+  const [category, setCategory] = useState(initialCategory || "all");
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setCategory(initialCategory && initialCategory !== "" ? initialCategory : "all");
+  }, [initialCategory]);
+
+  const selectCategory = (filter: string) => {
+    const next = filter === "all" ? "all" : filter;
+    setCategory(next);
+    if (next === "all") {
+      router.replace(pathname, { scroll: false });
+      return;
+    }
+    router.replace(`${pathname}?category=${next}`, { scroll: false });
+  };
+
+  const filters = useMemo(
+    () => ["all", ...(categories?.length ? categories : [...packageMenuCategories])],
+    [categories],
+  );
 
   const list = useMemo(() => {
     return items.filter((item) => {
@@ -39,7 +62,7 @@ export function PackageCatalog({
             type="button"
             role="tab"
             aria-selected={category === filter}
-            onClick={() => setCategory(filter)}
+            onClick={() => selectCategory(filter)}
             className={`px-3 py-2 text-xs tracking-[0.14em] uppercase ${
               category === filter ? "bg-[#141210] text-white" : "bg-[#f6f1e8] text-[#141210]"
             }`}
