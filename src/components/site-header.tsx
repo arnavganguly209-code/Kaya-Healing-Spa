@@ -25,8 +25,8 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   const glass = !isHome || scrolled;
   const onHero = isHome && !scrolled;
   const navReadable = onHero
-    ? "[text-shadow:0_0_18px_rgba(255,255,255,0.95),0_1px_2px_rgba(255,255,255,0.9)] antialiased"
-    : "antialiased";
+    ? "[text-shadow:0_0_20px_rgba(255,255,255,1),0_1px_2px_rgba(255,255,255,1)] subpixel-antialiased"
+    : "subpixel-antialiased";
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -66,7 +66,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-[15px] font-extrabold tracking-[0.02em] ${navReadable} ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
+                className={`relative text-[15px] font-extrabold tracking-[0.03em] ${navReadable} ${active ? "text-[#F47B20]" : "text-[#121212] hover:text-[#F47B20]"}`}
               >
                 {link.label}
                 {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}
@@ -80,8 +80,8 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
               <Phone size={18} className="call-pulse text-[#F47B20]" strokeWidth={1.8} />
             </span>
             <span className="leading-tight">
-              <span className="block text-[11px] text-[#8a8a8a]">Call Us</span>
-              <span className="text-sm font-semibold">{phone}</span>
+              <span className={`block text-[11px] font-semibold text-[#5c5c5c] ${navReadable}`}>Call Us</span>
+              <span className={`text-sm font-bold text-[#121212] ${navReadable}`}>{phone}</span>
             </span>
           </a>
           <Link href="/contact" className="hidden items-center gap-2 rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white shadow-[0_8px_20px_rgba(244,123,32,0.25)] transition hover:bg-[#e06d12] sm:inline-flex">

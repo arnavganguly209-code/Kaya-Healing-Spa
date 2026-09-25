@@ -77,26 +77,33 @@ export function HomePage() {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.78)_0%,rgba(255,255,255,0.42)_22%,rgba(255,255,255,0.12)_38%,transparent_52%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.88)_0%,rgba(255,255,255,0.55)_26%,rgba(255,255,255,0.2)_42%,transparent_58%)]" />
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#fafafa]/90 to-transparent" />
         </div>
 
         <div className="relative z-10 mx-auto flex h-full max-h-[100svh] w-full max-w-[1440px] flex-col px-5 pt-[72px] sm:px-8 md:px-10 lg:px-12 lg:pt-[108px] xl:px-14">
           <div className="flex min-h-0 flex-1 items-center py-2 max-[900px]:h-auto max-[900px]:items-start max-[900px]:py-3">
-            <div className="w-full max-w-[min(100%,520px)] lg:max-w-[480px] xl:max-w-[540px]">
-              <p className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.26em] text-[#5c5c5c] uppercase">
+            <div className="relative w-full max-w-[min(100%,540px)] rounded-[24px] border border-white/50 bg-white/65 px-6 py-7 shadow-[0_16px_48px_rgba(255,255,255,0.45)] backdrop-blur-md sm:rounded-[28px] sm:px-8 sm:py-8 lg:max-w-[520px] xl:max-w-[560px]">
+              <p className="flex items-center gap-3 text-[11px] font-bold tracking-[0.28em] text-[#404040] uppercase subpixel-antialiased [text-shadow:0_1px_0_rgba(255,255,255,0.9)]">
                 {hero.eyebrow}
                 <span className="h-px w-10 bg-[#F47B20]" />
               </p>
               <h1
-                className="mt-3 text-[clamp(2.35rem,4.2vw+1rem,5.75rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-[#171717] antialiased sm:mt-4"
-                style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+                className="mt-3 text-[clamp(2.25rem,4vw+0.85rem,5.5rem)] leading-[0.92] font-semibold tracking-[-0.035em] subpixel-antialiased sm:mt-4"
+                style={{ fontFamily: "var(--font-playfair), Georgia, serif", textShadow: "0 1px 0 rgba(255,255,255,1), 0 0 32px rgba(255,255,255,0.85)" }}
               >
-                <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
+                <span className="block text-[#F47B20]">{hero.titleOrange}</span>
+                <span className="block text-[#121212]">{hero.titleDark}</span>
               </h1>
-              <p className="mt-2 font-serif text-[clamp(1.15rem,1.5vw+0.75rem,2.15rem)] leading-tight font-medium text-[#171717] antialiased">
+              <p
+                className="mt-3 font-serif text-[clamp(1.125rem,1.4vw+0.65rem,2rem)] leading-[1.15] font-medium text-[#1a1a1a] subpixel-antialiased sm:mt-4"
+                style={{ textShadow: "0 1px 0 rgba(255,255,255,0.95), 0 0 20px rgba(255,255,255,0.7)" }}
+              >
                 {hero.subtitle}
               </p>
+              {hero.body ? (
+                <p className="prose-quiet mt-4 max-w-md text-[15px] leading-relaxed text-[#333] subpixel-antialiased">{hero.body}</p>
+              ) : null}
               <div className="mt-5 flex flex-wrap gap-3 max-[900px]:mt-4 sm:mt-6 sm:gap-4">
                 <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[#F47B20] px-7 py-4 text-[15px] font-medium text-white shadow-[0_10px_24px_rgba(244,123,32,0.28)] transition hover:-translate-y-0.5 hover:bg-[#e06d12]">
                   {hero.explore} <span aria-hidden>→</span>
@@ -110,11 +117,11 @@ export function HomePage() {
                 {hero.points.map((point, index) => {
                   const Icon = pointIcons[index % pointIcons.length];
                   return (
-                    <li key={point.title} className="flex items-center gap-3 text-[13px] leading-tight text-[#171717]">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#fff1e6] text-[#F47B20]">
+                    <li key={point.title} className="flex items-center gap-3 text-[13px] font-medium leading-snug text-[#1a1a1a]">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#fff1e6] text-[#F47B20] ring-1 ring-[#F47B20]/15">
                         <Icon size={19} strokeWidth={1.5} />
                       </span>
-                      <span>
+                      <span className="[text-shadow:0_1px_0_rgba(255,255,255,0.9)]">
                         {point.title}
                         <br />
                         {point.text}
@@ -127,7 +134,7 @@ export function HomePage() {
           </div>
 
           <div className="relative z-20 shrink-0 pb-3 pt-1 sm:pb-4">
-            <div className="rounded-[20px] border border-white/70 bg-white/75 shadow-[0_12px_32px_rgba(23,23,23,0.07)] backdrop-blur-md sm:rounded-[24px]">
+            <div className="rounded-[20px] border border-white/80 bg-white/85 shadow-[0_12px_32px_rgba(23,23,23,0.08)] backdrop-blur-lg sm:rounded-[24px]">
             <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];
@@ -138,8 +145,8 @@ export function HomePage() {
                   >
                     <Icon className="shrink-0 text-[#F47B20]" size={32} strokeWidth={1.3} />
                     <span>
-                      <span className="block text-[15px] font-semibold text-[#171717]">{feature.title}</span>
-                      <span className="text-[13px] text-[#8a8a8a]">{feature.text}</span>
+                      <span className="block text-[15px] font-bold text-[#121212]">{feature.title}</span>
+                      <span className="text-[13px] font-medium text-[#5c5c5c]">{feature.text}</span>
                     </span>
                   </li>
                 );
