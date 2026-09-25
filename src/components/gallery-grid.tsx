@@ -1,6 +1,7 @@
 "use client";
 
 import type { GalleryImage } from "@/lib/types";
+import { galleryCategoryLabel } from "@/lib/gallery-categories";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
@@ -45,7 +46,7 @@ export function GalleryGrid({ items }: { items: GalleryImage[] }) {
               filter === item ? "bg-[#F47B20] text-white" : "border border-[#e6dfd4] bg-white"
             }`}
           >
-            {item === "all" ? "All" : item.replace(/-/g, " ")}
+            {item === "all" ? "All" : galleryCategoryLabel(item)}
           </button>
         ))}
       </div>

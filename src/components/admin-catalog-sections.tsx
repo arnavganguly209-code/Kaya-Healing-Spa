@@ -1,10 +1,11 @@
 "use client";
 
 import { CategoryManager } from "@/components/category-manager";
+import { GalleryCategoryBank } from "@/components/gallery-category-bank";
 import { CATALOG_COMING_SOON_IMAGE } from "@/lib/catalog-images";
 import { defaultServices } from "@/lib/default-services";
 import type { OrbitContent } from "@/lib/orbit-store";
-import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
+import type { Service, SpaPackage } from "@/lib/types";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -85,60 +86,12 @@ export function AdminCategoriesEditor({ slice, setSlice, publish }: EditorProps)
 
 export function AdminGalleryEditor({ slice, setSlice, publish, upload }: EditorProps) {
   return (
-    <>
-      <p className="text-sm text-[#6B6B6B]">Uploads appear on /gallery and the home gallery strip.</p>
-      <button
-        type="button"
-        className="mt-4 rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm font-semibold"
-        onClick={() =>
-          setSlice({
-            ...slice,
-            gallery: [
-              ...slice.gallery,
-              { id: `g-${Date.now()}`, src: "", alt: "Kaya Healing Spa", category: "spa", width: 1200, height: 1600 },
-            ],
-          })
-        }
-      >
-        Add gallery photo
-      </button>
-      {!slice.gallery.length && <p className="mt-4 text-sm text-[#8a8175]">No photos yet. Add a slot, upload, then Publish.</p>}
-      {slice.gallery.map((image, index) => (
-        <div key={image.id} className="mt-4 rounded-2xl border border-[#efe8e0] p-5">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase text-[#8a8175]">Photo {index + 1}</p>
-            <button type="button" className="text-xs text-red-700 underline" onClick={() => publish({ ...slice, gallery: slice.gallery.filter((_, i) => i !== index) })}>
-              Remove
-            </button>
-          </div>
-          <Field label="Alt text" value={image.alt} onChange={(v) => {
-            const gallery = slice.gallery.map((item, i) => (i === index ? { ...item, alt: v } : item));
-            setSlice({ ...slice, gallery });
-          }} />
-          <label className="mt-3 block text-sm">
-            Category
-            <select
-              value={image.category}
-              onChange={(e) => {
-                const gallery = slice.gallery.map((item, i) =>
-                  i === index ? { ...item, category: e.target.value as GalleryImage["category"] } : item,
-                );
-                setSlice({ ...slice, gallery });
-              }}
-              className="mt-1 w-full rounded-xl border border-[#efe8e0] px-3 py-3"
-            >
-              {(["spa", "treatments", "interiors", "wellness", "details"] as const).map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </label>
-          <MediaField label="Image" src={image.src} onUpload={(file) => upload(file, (src) => {
-            const gallery = slice.gallery.map((item, i) => (i === index ? { ...item, src } : item));
-            publish({ ...slice, gallery });
-          })} />
-        </div>
-      ))}
-    </>
+    <GalleryCategoryBank
+      gallery={slice.gallery}
+      setGallery={(gallery) => setSlice({ ...slice, gallery })}
+      publishGallery={(gallery) => publish({ ...slice, gallery })}
+      upload={upload}
+    />
   );
 }
 

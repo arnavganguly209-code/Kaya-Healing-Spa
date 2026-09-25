@@ -6,6 +6,7 @@ import { defaultServiceCategories, defaultServices } from "@/lib/default-service
 import { site } from "@/lib/content";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import { CategoryManager } from "@/components/category-manager";
+import { GalleryCategoryBank } from "@/components/gallery-category-bank";
 import { useEffect, useRef, useState } from "react";
 
 const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home page", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Admin portal", "Footer"] as const;
@@ -991,56 +992,13 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Gallery" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">
-                Upload photos here — only Orbit uploads appear on /gallery and the home gallery strip (no stock placeholders).
-              </p>
-              <button
-                type="button"
-                className="mt-4 rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
-                onClick={() =>
-                  setContent({
-                    ...content,
-                    gallery: [
-                      ...content.gallery,
-                      {
-                        id: `g-${Date.now()}`,
-                        src: "",
-                        alt: "Kaya Healing Spa",
-                        category: "spa",
-                        width: 1200,
-                        height: 1600,
-                      },
-                    ],
-                  })
-                }
-              >
-                Add gallery photo
-              </button>
-              {!content.gallery.length && (
-                <p className="mt-4 text-sm text-[#8a8175]">No uploads yet. Add a photo slot, then upload an image.</p>
-              )}
-              {content.gallery.map((image, index) => (
-              <div key={image.id} className="rounded-2xl border border-[#efe8e0] bg-white p-5">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#8a8175]">Photo {index + 1}</p>
-                  <button
-                    type="button"
-                    className="text-xs text-[#c45e0a] underline"
-                    onClick={() =>
-                      publish({
-                        ...contentRef.current,
-                        gallery: contentRef.current.gallery.filter((_, i) => i !== index),
-                      })
-                    }
-                  >
-                    Remove
-                  </button>
-                </div>
-                <Field label="Alt text" value={image.alt} onChange={(value) => updateGallery(index, { alt: value })} />
-                <Field label="Category" value={image.category} onChange={(value) => updateGallery(index, { category: value as typeof image.category })} />
-                <MediaField label={image.category || "Gallery"} src={image.src} onUpload={(file) => upload(file, (src: string) => updateGallery(index, { src }))} onLibrary={() => setPicker((src: string) => updateGallery(index, { src }))} />
-              </div>
-              ))}
+              <GalleryCategoryBank
+                gallery={content.gallery}
+                setGallery={(gallery) => setContent({ ...content, gallery })}
+                publishGallery={(gallery) => publish({ ...contentRef.current, gallery })}
+                upload={upload}
+                onPickLibrary={(apply) => setPicker((src: string) => apply(src))}
+              />
             </>
           )}
           {section === "Page covers" && (
@@ -1408,13 +1366,6 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
     const next = { ...contentRef.current, packages: contentRef.current.packages.map((item, i) => (i === index ? { ...item, ...patch } : item)) };
     if (patch.image) publish(next);
     else setContent(next);
-  }
-  function updateGallery(index: number, patch: Partial<OrbitContent["gallery"][number]>) {
-    const gallery = contentRef.current.gallery.map((item, i) => (i === index ? { ...item, ...patch } : item));
-    const next = { ...contentRef.current, gallery };
-    setContent(next);
-    contentRef.current = next;
-    if (patch.src?.startsWith("/uploads/")) void publish(next);
   }
 }
 
