@@ -2,6 +2,7 @@
 
 import { Logo } from "@/components/logo";
 import { categoryLabels, labelForCategory, packageCategoryLabels, packageMenuCategories, serviceMenuCategories, site, whatsAppUrl } from "@/lib/content";
+import { NAV_MENU_TYPE } from "@/lib/nav-menu-type";
 import { Calendar, ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -52,7 +53,7 @@ export function SiteHeader({
   if (pathname.startsWith("/orbit")) return null;
 
   const navLinkClass = (active: boolean) =>
-    `relative whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.08em] xl:text-[12px] 2xl:text-[13px] 2xl:tracking-[0.1em] ${
+    `relative whitespace-nowrap ${NAV_MENU_TYPE} ${
       onHero
         ? active
           ? "text-white"
@@ -99,9 +100,9 @@ export function SiteHeader({
                     />
                     {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}
                   </Link>
-                  <div className="pointer-events-none absolute top-full left-1/2 z-[60] w-52 -translate-x-1/2 pt-3 opacity-0 transition duration-200 group-hover/services:pointer-events-auto group-hover/services:opacity-100">
+                  <div className="pointer-events-none absolute top-full left-1/2 z-[60] min-w-[11rem] -translate-x-1/2 pt-3 opacity-0 transition duration-200 group-hover/services:pointer-events-auto group-hover/services:opacity-100 xl:min-w-[12.5rem]">
                     <ul
-                      className="overflow-hidden rounded-2xl border border-[#efe8e0] bg-white py-1.5 shadow-[0_18px_44px_rgba(20,18,16,0.14)]"
+                      className="overflow-hidden rounded-2xl border border-[#efe8e0] bg-white py-2 shadow-[0_18px_44px_rgba(20,18,16,0.14)]"
                       role="menu"
                       aria-label="Service categories"
                     >
@@ -110,7 +111,7 @@ export function SiteHeader({
                           <Link
                             href={`/services?category=${slug}`}
                             role="menuitem"
-                            className="block px-4 py-2.5 text-[13px] font-semibold tracking-wide text-[#141210] transition hover:bg-[#f6f1e8] hover:text-[#F47B20]"
+                            className={`block px-5 py-3 ${NAV_MENU_TYPE} text-[#141210] transition hover:bg-[#f6f1e8] hover:text-[#F47B20]`}
                           >
                             {categoryLabels[slug as keyof typeof categoryLabels] ?? labelForCategory(slug)}
                           </Link>
@@ -135,9 +136,9 @@ export function SiteHeader({
                     />
                     {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}
                   </Link>
-                  <div className="pointer-events-none absolute top-full left-1/2 z-[60] w-52 -translate-x-1/2 pt-3 opacity-0 transition duration-200 group-hover/packages:pointer-events-auto group-hover/packages:opacity-100">
+                  <div className="pointer-events-none absolute top-full left-1/2 z-[60] min-w-[11rem] -translate-x-1/2 pt-3 opacity-0 transition duration-200 group-hover/packages:pointer-events-auto group-hover/packages:opacity-100 xl:min-w-[12.5rem]">
                     <ul
-                      className="overflow-hidden rounded-2xl border border-[#efe8e0] bg-white py-1.5 shadow-[0_18px_44px_rgba(20,18,16,0.14)]"
+                      className="overflow-hidden rounded-2xl border border-[#efe8e0] bg-white py-2 shadow-[0_18px_44px_rgba(20,18,16,0.14)]"
                       role="menu"
                       aria-label="Package categories"
                     >
@@ -146,7 +147,7 @@ export function SiteHeader({
                           <Link
                             href={`/packages?category=${slug}`}
                             role="menuitem"
-                            className="block px-4 py-2.5 text-[13px] font-semibold tracking-wide text-[#141210] transition hover:bg-[#f6f1e8] hover:text-[#F47B20]"
+                            className={`block px-5 py-3 ${NAV_MENU_TYPE} text-[#141210] transition hover:bg-[#f6f1e8] hover:text-[#F47B20]`}
                           >
                             {packageCategoryLabels[slug] ?? labelForCategory(slug)}
                           </Link>
@@ -202,13 +203,13 @@ export function SiteHeader({
                     <Link href="/services" onClick={() => setOpen(false)} className="text-base font-bold text-[#171717]">
                       Services
                     </Link>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 pl-1">
+                    <div className="mt-3 flex flex-col gap-2 pl-1">
                       {serviceMenu.map((slug) => (
                         <Link
                           key={slug}
                           href={`/services?category=${slug}`}
                           onClick={() => setOpen(false)}
-                          className="text-sm font-semibold text-[#5c5c5c] hover:text-[#F47B20]"
+                          className={`${NAV_MENU_TYPE} text-[#141210] hover:text-[#F47B20]`}
                         >
                           {categoryLabels[slug as keyof typeof categoryLabels] ?? labelForCategory(slug)}
                         </Link>
@@ -223,13 +224,13 @@ export function SiteHeader({
                     <Link href="/packages" onClick={() => setOpen(false)} className="text-base font-bold text-[#171717]">
                       Packages
                     </Link>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 pl-1">
+                    <div className="mt-3 flex flex-col gap-2 pl-1">
                       {packageMenu.map((slug) => (
                         <Link
                           key={slug}
                           href={`/packages?category=${slug}`}
                           onClick={() => setOpen(false)}
-                          className="text-sm font-semibold text-[#5c5c5c] hover:text-[#F47B20]"
+                          className={`${NAV_MENU_TYPE} text-[#141210] hover:text-[#F47B20]`}
                         >
                           {packageCategoryLabels[slug] ?? labelForCategory(slug)}
                         </Link>

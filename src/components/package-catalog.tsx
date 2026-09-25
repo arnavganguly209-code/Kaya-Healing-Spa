@@ -2,6 +2,7 @@
 
 import { CatalogPageIntro } from "@/components/page-hero";
 import { formatNpr, labelForCategory, packageMenuCategories, packages as fallbackPackages } from "@/lib/content";
+import { NAV_MENU_TYPE } from "@/lib/nav-menu-type";
 import type { SpaPackage } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -75,7 +76,7 @@ export function PackageCatalog({
               role="tab"
               aria-selected={category === filter}
               onClick={() => selectCategory(filter)}
-              className={`rounded-full px-4 py-2.5 text-[11px] font-bold tracking-[0.14em] uppercase transition ${
+              className={`rounded-full px-5 py-3 ${NAV_MENU_TYPE} transition ${
                 category === filter
                   ? "bg-[#F47B20] text-white shadow-[0_8px_24px_rgba(244,123,32,0.28)]"
                   : "border border-[#e6dfd4] bg-white text-[#141210] hover:border-[#F47B20]/40 hover:text-[#F47B20]"
