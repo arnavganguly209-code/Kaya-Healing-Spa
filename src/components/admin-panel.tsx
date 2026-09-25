@@ -17,6 +17,7 @@ type AdminData = {
   whatsapp: string;
   email: string;
   socialLinks: OrbitContent["socialLinks"];
+  extraSocialLinks: OrbitContent["extraSocialLinks"];
   services: OrbitContent["services"];
   packages: OrbitContent["packages"];
   therapists: OrbitContent["therapists"];
@@ -234,17 +235,57 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
               <Field label="Phone" value={content.phone} onChange={(v) => setContent({ ...content, phone: v })} />
               <Field label="WhatsApp" value={content.whatsapp} onChange={(v) => setContent({ ...content, whatsapp: v })} />
               <Field label="Email" value={content.email} onChange={(v) => setContent({ ...content, email: v })} />
-              <p className="mt-6 font-semibold">Social links</p>
+              <p className="mt-6 font-semibold">Social & review icons</p>
+              <p className="text-sm text-[#6B6B6B]">Upload a custom icon per platform or add extra footer links.</p>
               {content.socialLinks.map((link, index) => (
-                <div key={link.id} className="mt-3 flex items-start gap-3 rounded-xl border border-[#efe8e0] p-4">
-                  <SocialIcon id={link.id} />
-                  <div className="flex-1">
+                <div key={link.id} className="mt-3 rounded-xl border border-[#efe8e0] p-4">
+                  <div className="flex items-center gap-3">
+                    <SocialIcon id={link.id} iconSrc={link.iconSrc} />
                     <p className="text-sm font-semibold">{socialPlatformLabels[link.id]}</p>
-                    <Field label="URL" value={link.url} onChange={(v) => {
-                      const socialLinks = content.socialLinks.map((item, i) => (i === index ? { ...item, url: v } : item));
+                  </div>
+                  <Field label="URL" value={link.url} onChange={(v) => {
+                    const socialLinks = content.socialLinks.map((item, i) => (i === index ? { ...item, url: v } : item));
+                    setContent({ ...content, socialLinks });
+                  }} />
+                  <MediaField label="Custom icon" src={link.iconSrc || ""} onUpload={(f) => upload(f, (path) => {
+                    const socialLinks = content.socialLinks.map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
+                    publish({ ...content, socialLinks });
+                  })} />
+                  <label className="mt-2 flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={link.enabled} onChange={(e) => {
+                      const socialLinks = content.socialLinks.map((item, i) => (i === index ? { ...item, enabled: e.target.checked } : item));
                       setContent({ ...content, socialLinks });
                     }} />
-                  </div>
+                    Show in footer
+                  </label>
+                </div>
+              ))}
+              <button type="button" className="mt-4 rounded-full border px-4 py-2 text-sm" onClick={() => setContent({
+                ...content,
+                extraSocialLinks: [...(content.extraSocialLinks || []), { id: `extra-${Date.now()}`, label: "New link", url: "", iconSrc: "", enabled: true }],
+              })}>
+                Add footer icon
+              </button>
+              {(content.extraSocialLinks || []).map((link, index) => (
+                <div key={link.id} className="mt-3 rounded-xl border p-4">
+                  <Field label="Label" value={link.label} onChange={(v) => {
+                    const extraSocialLinks = content.extraSocialLinks.map((item, i) => (i === index ? { ...item, label: v } : item));
+                    setContent({ ...content, extraSocialLinks });
+                  }} />
+                  <Field label="URL" value={link.url} onChange={(v) => {
+                    const extraSocialLinks = content.extraSocialLinks.map((item, i) => (i === index ? { ...item, url: v } : item));
+                    setContent({ ...content, extraSocialLinks });
+                  }} />
+                  <MediaField label="Icon" src={link.iconSrc} onUpload={(f) => upload(f, (path) => {
+                    const extraSocialLinks = content.extraSocialLinks.map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
+                    publish({ ...content, extraSocialLinks });
+                  })} />
+                  <button type="button" className="mt-2 text-xs text-[#c45e0a] underline" onClick={() => setContent({
+                    ...content,
+                    extraSocialLinks: content.extraSocialLinks.filter((_, i) => i !== index),
+                  })}>
+                    Remove
+                  </button>
                 </div>
               ))}
             </>

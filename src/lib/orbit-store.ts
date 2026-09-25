@@ -3,7 +3,7 @@ import { defaultServiceCategories, defaultServices } from "@/lib/default-service
 import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 import { defaultTherapists } from "@/lib/default-therapists";
 import { therapistPlaceholderPath } from "@/lib/catalog-images";
-import type { OrbitAboutPage, OrbitSocialLink, OrbitTherapist } from "@/lib/orbit-types";
+import type { OrbitAboutPage, OrbitExtraSocialLink, OrbitSocialLink, OrbitTherapist } from "@/lib/orbit-types";
 import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
@@ -91,6 +91,7 @@ export type OrbitContent = {
   footerText: string;
   footerBrand: string;
   socialLinks: OrbitSocialLink[];
+  extraSocialLinks: OrbitExtraSocialLink[];
   hero: OrbitHero;
   therapies: {
     eyebrow: string;
@@ -154,8 +155,22 @@ function normalizeSocialLinks(links: OrbitSocialLink[] | undefined): OrbitSocial
       id: base.id,
       url,
       enabled: legacyAutoOff ? true : saved.enabled !== false,
+      iconSrc: saved.iconSrc?.trim() || "",
     };
   });
+}
+
+function normalizeExtraSocialLinks(list: OrbitExtraSocialLink[] | undefined): OrbitExtraSocialLink[] {
+  if (!list?.length) return [];
+  return list
+    .map((item) => ({
+      id: item.id?.trim() || `extra-${(item.label || "link").toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}`,
+      label: item.label?.trim() || "Link",
+      url: item.url?.trim() || "",
+      iconSrc: item.iconSrc?.trim() || "",
+      enabled: item.enabled !== false,
+    }))
+    .filter((item) => item.label);
 }
 
 function defaultPageCovers(): OrbitPageCovers {
@@ -278,6 +293,7 @@ export function defaultOrbitContent(): OrbitContent {
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
     footerBrand: "Kaya Healing Spa",
     socialLinks: defaultSocialLinks(),
+    extraSocialLinks: [],
     hero: {
       image: "/hero/kaya-hero-spa-hd.png",
       alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
@@ -547,6 +563,7 @@ export function readOrbitContent(): OrbitContent {
       footerBrand: merged.footerBrand || defaults.footerBrand,
       whatsapp: merged.whatsapp?.trim() || defaults.whatsapp,
       socialLinks: normalizeSocialLinks(merged.socialLinks),
+      extraSocialLinks: normalizeExtraSocialLinks(merged.extraSocialLinks),
     };
   } catch {
     return defaults;
@@ -567,6 +584,7 @@ export function writeOrbitContent(content: OrbitContent) {
         therapists: content.therapists?.length ? content.therapists : defaultTherapists(),
         servicesMenuVersion: SERVICES_MENU_VERSION,
         socialLinks: normalizeSocialLinks(content.socialLinks),
+        extraSocialLinks: normalizeExtraSocialLinks(content.extraSocialLinks),
       },
       null,
       2,

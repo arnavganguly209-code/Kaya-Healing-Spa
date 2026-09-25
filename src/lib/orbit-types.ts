@@ -20,6 +20,16 @@ export type OrbitSocialLink = {
   id: "google" | "tripadvisor" | "instagram" | "facebook" | "tiktok";
   url: string;
   enabled: boolean;
+  /** Optional custom icon (PNG/SVG path). Empty = built-in brand icon. */
+  iconSrc?: string;
+};
+
+export type OrbitExtraSocialLink = {
+  id: string;
+  label: string;
+  url: string;
+  iconSrc: string;
+  enabled: boolean;
 };
 
 export type OrbitAboutPage = {

@@ -87,7 +87,7 @@ export function SiteFooter() {
           >
             Join the list
           </Link>
-          <FooterSocialLinks links={orbit.socialLinks} />
+          <FooterSocialLinks links={orbit.socialLinks} extra={orbit.extraSocialLinks} />
         </div>
       </div>
       <div className="border-t border-white/10 bg-black/20">

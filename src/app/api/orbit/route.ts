@@ -55,6 +55,7 @@ export async function PUT(request: Request) {
     packages: body.packages?.length ? body.packages : current.packages,
     services: body.services,
     socialLinks: body.socialLinks?.length ? body.socialLinks : current.socialLinks,
+    extraSocialLinks: Array.isArray(body.extraSocialLinks) ? body.extraSocialLinks : current.extraSocialLinks ?? [],
     footerBrand: body.footerBrand ?? current.footerBrand,
     phone: body.phone ?? current.phone,
     whatsapp: body.whatsapp?.trim() ?? current.whatsapp,

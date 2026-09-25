@@ -18,6 +18,7 @@ export default async function AdminPage() {
         whatsapp: c.whatsapp,
         email: c.email,
         socialLinks: c.socialLinks,
+        extraSocialLinks: c.extraSocialLinks,
         services: c.services,
         packages: c.packages,
         therapists: c.therapists,

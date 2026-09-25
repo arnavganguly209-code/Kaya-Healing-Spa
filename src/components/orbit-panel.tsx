@@ -933,16 +933,44 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <Area label="Footer description" value={content.footerText} onChange={(value) => setContent({ ...content, footerText: value })} />
               <p className="mt-6 text-sm font-semibold">Social & review icons (footer)</p>
               <p className="text-sm text-[#6B6B6B]">
-                All five platforms show in the footer when enabled. Paste a full https link to make an icon clickable; without a link the icon still appears (dimmed) until you add a URL.
+                Replace any icon with your own PNG/SVG upload, paste links, toggle visibility, or add extra footer icons below.
               </p>
               {content.socialLinks.map((link, index) => (
                 <div key={link.id} className="mt-4 space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                   <div className="flex items-center gap-3">
                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f6f1e8]">
-                      <SocialIcon id={link.id} />
+                      <SocialIcon id={link.id} iconSrc={link.iconSrc} />
                     </span>
                     <p className="text-sm font-semibold">{socialPlatformLabels[link.id]}</p>
                   </div>
+                  <MediaField
+                    label="Custom icon (optional — replaces default logo)"
+                    src={link.iconSrc || ""}
+                    onUpload={(file) =>
+                      upload(file, (path) => {
+                        const socialLinks = content.socialLinks.map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
+                        publish({ ...contentRef.current, socialLinks });
+                      })
+                    }
+                    onLibrary={() =>
+                      setPicker((path: string) => {
+                        const socialLinks = content.socialLinks.map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
+                        publish({ ...contentRef.current, socialLinks });
+                      })
+                    }
+                  />
+                  {link.iconSrc ? (
+                    <button
+                      type="button"
+                      className="text-xs text-[#c45e0a] underline"
+                      onClick={() => {
+                        const socialLinks = content.socialLinks.map((item, i) => (i === index ? { ...item, iconSrc: "" } : item));
+                        setContent({ ...content, socialLinks });
+                      }}
+                    >
+                      Use built-in {socialPlatformLabels[link.id]} icon
+                    </button>
+                  ) : null}
                   <Field
                     label="Link URL"
                     value={link.url}
@@ -964,6 +992,87 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                     />
                     Show in footer
                   </label>
+                </div>
+              ))}
+              <p className="mt-8 text-sm font-semibold">Extra footer icons</p>
+              <button
+                type="button"
+                className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
+                onClick={() =>
+                  setContent({
+                    ...content,
+                    extraSocialLinks: [
+                      ...(content.extraSocialLinks ?? []),
+                      {
+                        id: `extra-${Date.now()}`,
+                        label: "New link",
+                        url: "",
+                        iconSrc: "",
+                        enabled: true,
+                      },
+                    ],
+                  })
+                }
+              >
+                Add footer icon
+              </button>
+              {(content.extraSocialLinks ?? []).map((link, index) => (
+                <div key={link.id} className="mt-4 space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <Field
+                    label="Label (screen readers & tooltip)"
+                    value={link.label}
+                    onChange={(value) => {
+                      const extraSocialLinks = (content.extraSocialLinks ?? []).map((item, i) => (i === index ? { ...item, label: value } : item));
+                      setContent({ ...content, extraSocialLinks });
+                    }}
+                  />
+                  <Field
+                    label="Link URL"
+                    value={link.url}
+                    onChange={(value) => {
+                      const extraSocialLinks = (content.extraSocialLinks ?? []).map((item, i) => (i === index ? { ...item, url: value } : item));
+                      setContent({ ...content, extraSocialLinks });
+                    }}
+                  />
+                  <MediaField
+                    label="Icon image"
+                    src={link.iconSrc}
+                    onUpload={(file) =>
+                      upload(file, (path) => {
+                        const extraSocialLinks = (content.extraSocialLinks ?? []).map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
+                        publish({ ...contentRef.current, extraSocialLinks });
+                      })
+                    }
+                    onLibrary={() =>
+                      setPicker((path: string) => {
+                        const extraSocialLinks = (content.extraSocialLinks ?? []).map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
+                        publish({ ...contentRef.current, extraSocialLinks });
+                      })
+                    }
+                  />
+                  <label className="flex cursor-pointer items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={link.enabled}
+                      onChange={(event) => {
+                        const extraSocialLinks = (content.extraSocialLinks ?? []).map((item, i) =>
+                          i === index ? { ...item, enabled: event.target.checked } : item,
+                        );
+                        setContent({ ...content, extraSocialLinks });
+                      }}
+                    />
+                    Show in footer
+                  </label>
+                  <button
+                    type="button"
+                    className="text-xs text-[#c45e0a] underline"
+                    onClick={() => {
+                      const extraSocialLinks = (content.extraSocialLinks ?? []).filter((_, i) => i !== index);
+                      setContent({ ...content, extraSocialLinks });
+                    }}
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
             </>

@@ -1,6 +1,21 @@
 const iconClass = "h-5 w-5";
 
-export function SocialIcon({ id }: { id: string }) {
+export function resolveSocialIconUrl(src: string) {
+  const path = src.trim();
+  if (!path) return "";
+  if (path.startsWith("/uploads/")) {
+    return `/api/orbit/media/file?path=${encodeURIComponent(path)}`;
+  }
+  return path;
+}
+
+export function SocialIcon({ id, iconSrc }: { id: string; iconSrc?: string }) {
+  const custom = iconSrc?.trim();
+  if (custom) {
+    const src = resolveSocialIconUrl(custom);
+    return <img src={src} alt="" className={`${iconClass} object-contain`} />;
+  }
+
   switch (id) {
     case "google":
       return (
@@ -12,16 +27,7 @@ export function SocialIcon({ id }: { id: string }) {
         </svg>
       );
     case "tripadvisor":
-      return (
-        <svg className={iconClass} viewBox="0 0 24 24" aria-hidden>
-          <circle cx="12" cy="12" r="11" fill="#34E0A1" />
-          <circle cx="8.2" cy="11.5" r="2.3" fill="#fff" />
-          <circle cx="15.8" cy="11.5" r="2.3" fill="#fff" />
-          <circle cx="8.2" cy="11.5" r="1.1" fill="#000" />
-          <circle cx="15.8" cy="11.5" r="1.1" fill="#000" />
-          <path fill="#000" d="M12 6.5c-2.2 0-4.2.7-5.8 1.9l1 1.5c1.2-.9 2.7-1.4 4.3-1.4h.5v-2h-.5z" opacity=".35" />
-        </svg>
-      );
+      return <img src="/brand/tripadvisor-icon.svg" alt="" className={iconClass} width={20} height={20} />;
     case "instagram":
       return (
         <svg className={iconClass} viewBox="0 0 24 24" aria-hidden>
@@ -61,7 +67,8 @@ export function SocialIcon({ id }: { id: string }) {
     default:
       return (
         <svg className={iconClass} viewBox="0 0 24 24" aria-hidden>
-          <circle cx="12" cy="12" r="10" fill="currentColor" opacity=".3" />
+          <circle cx="12" cy="12" r="10" fill="currentColor" opacity=".35" />
+          <path fill="currentColor" d="M8 12h8M12 8v8" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       );
   }
