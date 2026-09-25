@@ -334,12 +334,22 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 </button>
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3">
-                {library.map((item) => (
+                {library.map((item) => {
+                  const thumb =
+                    item.path.startsWith("/uploads/") ?
+                      `/api/orbit/media/file?path=${encodeURIComponent(item.path)}`
+                    : item.path;
+                  return (
                   <article key={item.path} className="overflow-hidden rounded-xl border border-[#efe8e0]">
-                    {item.kind === "video" ? <video src={item.path} className="h-28 w-full object-cover" muted /> : <img src={item.path} alt="" className="h-28 w-full object-cover" />}
+                    {item.kind === "video" ? (
+                      <video src={thumb} className="h-28 w-full object-cover" muted />
+                    ) : (
+                      <img src={thumb} alt="" className="h-28 w-full object-cover" />
+                    )}
                     <p className="truncate px-2 py-2 text-[11px] text-[#6B6B6B]">{item.name}</p>
                   </article>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -930,9 +940,17 @@ function MediaField({
   onLibrary: () => void;
 }) {
   const [broken, setBroken] = useState(false);
-  useEffect(() => setBroken(false), [src]);
+  const [previewToken, setPreviewToken] = useState(0);
+  useEffect(() => {
+    setBroken(false);
+    setPreviewToken((value) => value + 1);
+  }, [src]);
   const video = kind === "video" || /\.(mp4|webm|mov)$/i.test(src);
-  const previewKey = src ? src.replace(/[^\w./-]/g, "") : "empty";
+  const previewKey = src ? `${src}-${previewToken}` : "empty";
+  const previewSrc =
+    src && src.startsWith("/uploads/")
+      ? `/api/orbit/media/file?path=${encodeURIComponent(src)}&t=${previewToken}`
+      : src;
   return (
     <div className="mt-3 text-sm">
       <p className="font-medium">{label}</p>
@@ -940,11 +958,11 @@ function MediaField({
       <div className="mt-2 overflow-hidden rounded-xl border border-[#efe8e0] bg-[#faf7f3]">
         {src ? (
           video ? (
-            <video key={previewKey} src={src} className="h-44 w-full object-cover" muted controls onError={() => setBroken(true)} />
+            <video key={previewKey} src={previewSrc} className="h-44 w-full object-cover" muted controls onError={() => setBroken(true)} />
           ) : (
             <img
               key={previewKey}
-              src={src}
+              src={previewSrc}
               alt=""
               className="h-44 w-full object-cover"
               onError={() => setBroken(true)}
@@ -957,7 +975,11 @@ function MediaField({
       </div>
       {broken && src ? (
         <p className="mt-2 text-xs text-[#c45e0a]">
-          Preview could not load. If upload finished, open {src} in a new tab or use Refresh library in Media.
+          Preview could not load. Re-upload the file, or open{" "}
+          <a href={src} target="_blank" rel="noreferrer" className="underline">
+            {src}
+          </a>{" "}
+          after saving. Use Refresh library in Media if the file is missing on the server.
         </p>
       ) : null}
       <div className="mt-3 flex flex-wrap gap-3">

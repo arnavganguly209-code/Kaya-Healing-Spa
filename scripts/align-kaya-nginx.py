@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 DOMAIN = "kaya.theglobalorbit.com"
+APP_UPLOADS = "/var/www/kaya-healing-spa/public/uploads/"
 SEARCH_DIRS = (
     Path("/etc/nginx/sites-enabled"),
     Path("/etc/nginx/sites-available"),
@@ -82,6 +83,23 @@ def rewrite(text: str, port: str) -> tuple[str, str]:
         updated, count = re.subn(
             r"(server_name[^\n]*" + re.escape(DOMAIN) + r"[^\n]*\n)",
             r"\1        client_max_body_size 120m;\n        proxy_read_timeout 300s;\n        proxy_send_timeout 300s;\n",
+            updated,
+            count=1,
+        )
+        if count:
+            changed = True
+
+    if DOMAIN in updated and "location ^~ /uploads/" not in updated:
+        upload_block = (
+            f"        location ^~ /uploads/ {{\n"
+            f"            alias {APP_UPLOADS};\n"
+            f'            add_header Cache-Control "public, max-age=2592000";\n'
+            f"            access_log off;\n"
+            f"        }}\n"
+        )
+        updated, count = re.subn(
+            r"(server_name[^\n]*" + re.escape(DOMAIN) + r"[^\n]*\n)",
+            r"\1" + upload_block,
             updated,
             count=1,
         )

@@ -63,6 +63,7 @@ jobs:
             cd "${APP_DIR}"
             test "$(pwd)" = "${APP_DIR}"
             mkdir -p public/uploads data
+            chmod -R u+rwX public/uploads 2>/dev/null || true
 
             echo "Syncing origin/main"
             git fetch origin main

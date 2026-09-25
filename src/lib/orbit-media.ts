@@ -1,12 +1,13 @@
 import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from "fs";
 import path from "path";
+import { getUploadDir } from "@/lib/upload-path";
 
 export const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 export const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 export const IMAGE_MAX = 25 * 1024 * 1024;
 export const VIDEO_MAX = 120 * 1024 * 1024;
 
-const uploadDir = path.join(process.cwd(), "public", "uploads");
+const uploadDir = getUploadDir();
 
 export type MediaItem = {
   path: string;
@@ -61,9 +62,14 @@ export function extensionFor(file: File) {
 export async function saveUpload(file: File) {
   const reason = rejectUpload(file);
   if (reason) throw new Error(reason);
-  mkdirSync(uploadDir, { recursive: true });
+  mkdirSync(uploadDir, { recursive: true, mode: 0o775 });
   const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extensionFor(file)}`;
-  writeFileSync(path.join(uploadDir, name), Buffer.from(await file.arrayBuffer()));
+  const fullPath = path.join(uploadDir, name);
+  const buffer = Buffer.from(await file.arrayBuffer());
+  writeFileSync(fullPath, buffer);
+  if (!existsSync(fullPath) || statSync(fullPath).size <= 0) {
+    throw new Error("Upload could not be saved on the server. Check folder permissions for public/uploads.");
+  }
   return { path: `/uploads/${name}`, kind: describeFile(file).kind as "image" | "video" };
 }
 
