@@ -54,7 +54,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
           <Logo priority />
         </Link>
         <nav
-          className="relative z-20 hidden min-w-0 flex-1 items-center justify-center gap-4 xl:flex 2xl:gap-5"
+          className="relative z-20 hidden min-w-0 flex-1 items-center justify-center gap-5 xl:flex xl:gap-7 2xl:gap-8"
           aria-label="Primary"
         >
           {links.map((link) => {
@@ -63,7 +63,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-[13px] font-bold uppercase tracking-[0.12em] ${
+                className={`relative px-1.5 text-[13px] font-bold uppercase tracking-[0.1em] xl:px-2 ${
                   onHero
                     ? active
                       ? "text-white"
