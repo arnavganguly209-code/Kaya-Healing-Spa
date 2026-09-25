@@ -92,6 +92,28 @@ html {
   }
 }
 
+.hero-feature-glass {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 236, 214, 0.78) 0%,
+    rgba(255, 248, 240, 0.65) 45%,
+    rgba(255, 230, 205, 0.72) 100%
+  );
+  box-shadow:
+    0 20px 50px rgba(244, 123, 32, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+}
+
+@media (min-width: 640px) {
+  .hero-feature-glass {
+    border-radius: 24px;
+  }
+}
+
 body {
   background: var(--color-paper);
   color: var(--color-ink);

@@ -56,6 +56,10 @@ export async function PUT(request: Request) {
     services: body.services,
     socialLinks: body.socialLinks?.length ? body.socialLinks : current.socialLinks,
     footerBrand: body.footerBrand ?? current.footerBrand,
+    phone: body.phone ?? current.phone,
+    whatsapp: body.whatsapp?.trim() ?? current.whatsapp,
+    email: body.email ?? current.email,
+    footerText: body.footerText ?? current.footerText,
   });
   revalidatePath("/", "layout");
   revalidatePath("/about");

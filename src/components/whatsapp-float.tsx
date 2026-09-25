@@ -11,17 +11,11 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-export function WhatsAppFloat({
-  phoneTel = site.phoneTel,
-  displayPhone = site.phone,
-}: {
-  phoneTel?: string;
-  displayPhone?: string;
-}) {
+export function WhatsAppFloat({ displayPhone = site.whatsapp }: { displayPhone?: string }) {
   const pathname = usePathname();
   if (pathname.startsWith("/orbit")) return null;
 
-  const href = whatsAppUrl(phoneTel);
+  const href = whatsAppUrl(displayPhone);
 
   return (
     <a

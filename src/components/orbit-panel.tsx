@@ -867,11 +867,19 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           {section === "Footer" && (
             <>
               <Field label="Brand name" value={content.footerBrand} onChange={(value) => setContent({ ...content, footerBrand: value })} />
-              <Field label="Phone" value={content.phone} onChange={(value) => setContent({ ...content, phone: value })} />
+              <Field label="Phone (footer & contact)" value={content.phone} onChange={(value) => setContent({ ...content, phone: value })} />
+              <Field
+                label="WhatsApp number"
+                value={content.whatsapp}
+                onChange={(value) => setContent({ ...content, whatsapp: value })}
+              />
+              <p className="text-xs text-[#6B6B6B]">Used for the floating WhatsApp button and mobile menu. Digits only, e.g. 9860304069.</p>
               <Field label="Email" value={content.email} onChange={(value) => setContent({ ...content, email: value })} />
               <Area label="Footer description" value={content.footerText} onChange={(value) => setContent({ ...content, footerText: value })} />
               <p className="mt-6 text-sm font-semibold">Social & review icons (footer)</p>
-              <p className="text-sm text-[#6B6B6B]">Paste full https links. Icons show when enabled and URL is valid.</p>
+              <p className="text-sm text-[#6B6B6B]">
+                All five platforms show in the footer when enabled. Paste a full https link to make an icon clickable; without a link the icon still appears (dimmed) until you add a URL.
+              </p>
               {content.socialLinks.map((link, index) => (
                 <div key={link.id} className="mt-4 space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                   <div className="flex items-center gap-3">

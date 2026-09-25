@@ -8,15 +8,13 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 export function SiteChrome({
-  phoneDisplay = site.phone,
-  phoneTel = site.phoneTel,
+  whatsapp = site.whatsapp,
   serviceCategories,
   packageCategories,
   footer,
   children,
 }: {
-  phoneDisplay?: string;
-  phoneTel?: string;
+  whatsapp?: string;
   serviceCategories?: string[];
   packageCategories?: string[];
   footer: ReactNode;
@@ -26,10 +24,14 @@ export function SiteChrome({
   if (pathname.startsWith("/orbit")) return <>{children}</>;
   return (
     <>
-      <SiteHeader serviceCategories={serviceCategories} packageCategories={packageCategories} />
-      <main className={pathname === "/" ? "" : "pt-[68px] lg:pt-[108px]"}>{children}</main>
+      <SiteHeader
+        serviceCategories={serviceCategories}
+        packageCategories={packageCategories}
+        whatsappDisplay={whatsapp}
+      />
+      <main className={pathname === "/" ? "" : "pt-[64px] sm:pt-[68px] lg:pt-[108px]"}>{children}</main>
       {footer}
-      <WhatsAppFloat phoneTel={phoneTel} displayPhone={phoneDisplay} />
+      <WhatsAppFloat displayPhone={whatsapp} />
       <BackToTop />
     </>
   );

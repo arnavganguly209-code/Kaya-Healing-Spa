@@ -85,6 +85,7 @@ export type OrbitPageCovers = {
 
 export type OrbitContent = {
   phone: string;
+  whatsapp: string;
   email: string;
   footerText: string;
   footerBrand: string;
@@ -119,11 +120,11 @@ const filePath = path.join(process.cwd(), "data", "orbit-content.json");
 
 function defaultSocialLinks(): OrbitSocialLink[] {
   return [
-    { id: "google", url: site.social.google, enabled: site.social.google.startsWith("https://") },
-    { id: "tripadvisor", url: site.social.tripadvisor, enabled: site.social.tripadvisor.startsWith("https://") },
-    { id: "instagram", url: site.social.instagram, enabled: site.social.instagram.startsWith("https://") },
-    { id: "facebook", url: site.social.facebook, enabled: site.social.facebook.startsWith("https://") },
-    { id: "tiktok", url: site.social.tiktok, enabled: site.social.tiktok.startsWith("https://") },
+    { id: "google", url: site.social.google, enabled: true },
+    { id: "tripadvisor", url: site.social.tripadvisor, enabled: true },
+    { id: "instagram", url: site.social.instagram, enabled: true },
+    { id: "facebook", url: site.social.facebook, enabled: true },
+    { id: "tiktok", url: site.social.tiktok, enabled: true },
   ];
 }
 
@@ -132,7 +133,15 @@ function normalizeSocialLinks(links: OrbitSocialLink[] | undefined): OrbitSocial
   if (!links?.length) return defaults;
   return defaults.map((base) => {
     const saved = links.find((item) => item.id === base.id);
-    return saved ? { id: base.id, url: saved.url || "", enabled: saved.enabled !== false } : base;
+    if (!saved) return { ...base, enabled: true };
+    const url = saved.url ?? "";
+    const userDisabled = saved.enabled === false;
+    const legacyAutoOff = userDisabled && !url.trim();
+    return {
+      id: base.id,
+      url,
+      enabled: legacyAutoOff ? true : saved.enabled !== false,
+    };
   });
 }
 
@@ -250,6 +259,7 @@ function defaultAboutPage(): OrbitAboutPage {
 export function defaultOrbitContent(): OrbitContent {
   return {
     phone: site.phone,
+    whatsapp: site.whatsapp,
     email: site.email,
     footerText:
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
@@ -514,6 +524,7 @@ export function readOrbitContent(): OrbitContent {
       therapists: merged.therapists?.length ? merged.therapists : defaults.therapists,
       packageCategories: merged.packageCategories?.length ? merged.packageCategories : defaults.packageCategories,
       footerBrand: merged.footerBrand || defaults.footerBrand,
+      whatsapp: merged.whatsapp?.trim() || defaults.whatsapp,
       socialLinks: normalizeSocialLinks(merged.socialLinks),
     };
   } catch {

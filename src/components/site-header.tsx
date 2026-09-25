@@ -20,9 +20,11 @@ const links = [
 export function SiteHeader({
   serviceCategories,
   packageCategories,
+  whatsappDisplay = site.whatsapp,
 }: {
   serviceCategories?: string[];
   packageCategories?: string[];
+  whatsappDisplay?: string;
 }) {
   const serviceMenu = serviceCategories?.length ? serviceCategories : [...serviceMenuCategories];
   const packageMenu = packageCategories?.length ? packageCategories : [...packageMenuCategories];
@@ -72,7 +74,7 @@ export function SiteHeader({
           : "border-b-0 border-transparent bg-gradient-to-b from-black/50 via-black/15 to-transparent shadow-none backdrop-blur-0"
       }`}
     >
-      <div className="relative mx-auto flex h-[68px] max-w-[1440px] items-center gap-2 px-4 sm:gap-3 sm:px-5 md:px-8 lg:h-[108px] lg:gap-4">
+      <div className="relative mx-auto flex h-[64px] w-full max-w-[1440px] items-center justify-between gap-3 px-4 sm:h-[68px] sm:px-5 md:px-8 lg:h-[108px] lg:gap-4">
         <Link href="/" className="relative z-10 shrink-0" aria-label="Kaya Healing Spa home">
           <Logo priority />
         </Link>
@@ -165,21 +167,20 @@ export function SiteHeader({
           })}
         </nav>
 
-        <div className="relative z-10 ml-auto flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
+        <div className="relative z-10 flex shrink-0 items-center gap-2">
           <Link
             href="/contact"
-            className={`group/book inline-flex items-center gap-2 rounded-full px-3 py-2.5 text-[11px] font-bold tracking-[0.06em] uppercase transition duration-300 sm:px-5 sm:py-3 sm:text-sm sm:tracking-normal sm:normal-case ${bookClass}`}
+            className={`group/book hidden items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition duration-300 xl:inline-flex ${bookClass}`}
           >
             <Calendar size={16} className="shrink-0 transition-transform duration-300 group-hover/book:scale-110" />
-            <span className="hidden min-[420px]:inline">Book</span>
-            <span className="hidden sm:inline"> Appointment</span>
-            <span aria-hidden className="hidden sm:inline-block transition-transform duration-300 group-hover/book:translate-x-0.5">
+            Book Appointment
+            <span aria-hidden className="inline-block transition-transform duration-300 group-hover/book:translate-x-0.5">
               →
             </span>
           </Link>
           <button
             type="button"
-            className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition xl:hidden ${
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition xl:hidden ${
               onHero ? "text-white hover:bg-white/10" : "text-[#171717] hover:bg-[#f6f1e8]"
             }`}
             aria-expanded={open}
@@ -192,7 +193,7 @@ export function SiteHeader({
       </div>
 
       {open && (
-        <div className="fixed inset-0 top-[68px] z-40 flex flex-col overflow-y-auto bg-white px-5 py-6 sm:px-6 sm:py-8 xl:hidden">
+        <div className="fixed inset-0 top-[64px] z-40 flex flex-col overflow-y-auto bg-white px-5 py-6 sm:top-[68px] sm:px-6 sm:py-8 xl:hidden">
           <nav className="flex flex-col gap-1" aria-label="Mobile">
             {links.map((link) => {
               if (link.href === "/services") {
@@ -251,12 +252,12 @@ export function SiteHeader({
           </nav>
           <div className="mt-8 flex flex-col gap-3">
             <a
-              href={whatsAppUrl()}
+              href={whatsAppUrl(whatsappDisplay)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3.5 text-sm font-bold text-white"
             >
-              WhatsApp {site.phone}
+              WhatsApp {whatsappDisplay}
             </a>
             <Link href="/contact" onClick={() => setOpen(false)} className="btn-primary w-full rounded-full text-center">
               Book Appointment

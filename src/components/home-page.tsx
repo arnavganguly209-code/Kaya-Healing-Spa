@@ -80,24 +80,24 @@ export function HomePage() {
           <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#fafafa] via-[#fafafa]/80 to-transparent" />
         </div>
 
-        <div className="relative z-10 mx-auto flex h-full max-h-[100svh] w-full max-w-[1440px] flex-col justify-end px-5 pb-3 pt-[72px] sm:px-8 md:px-10 lg:px-12 lg:pt-[108px] lg:pb-4 xl:px-14">
+        <div className="relative z-10 mx-auto flex h-full max-h-[100svh] w-full max-w-[1440px] flex-col justify-end px-5 pb-3 pt-[64px] sm:px-8 sm:pt-[68px] md:px-10 lg:px-12 lg:pt-[108px] lg:pb-4 xl:px-14">
           <h1 className="sr-only">
             {hero.titleOrange} {hero.titleDark} — {site.name}
           </h1>
           <div className="relative z-20 w-full shrink-0">
-            <div className="rounded-[20px] border border-white/20 bg-white/92 shadow-[0_16px_40px_rgba(0,0,0,0.12)] sm:rounded-[24px]">
+            <div className="hero-feature-glass relative z-20 w-full shrink-0">
             <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];
                 return (
                   <li
                     key={feature.title}
-                    className="flex items-center gap-3 px-5 py-4 max-[900px]:py-3 sm:gap-4 sm:px-6 sm:py-5 [&:not(:first-child)]:lg:border-l [&:not(:first-child)]:lg:border-[#f0ece8]"
+                    className="flex items-center gap-2.5 px-4 py-3.5 max-[900px]:py-3 sm:gap-4 sm:px-6 sm:py-5 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-[#f47b20]/10 sm:[&:not(:first-child)]:border-t-0 sm:[&:not(:first-child)]:lg:border-l sm:[&:not(:first-child)]:lg:border-[#f47b20]/15"
                   >
-                    <Icon className="shrink-0 text-[#F47B20]" size={32} strokeWidth={1.3} />
-                    <span>
-                      <span className="block text-[15px] font-bold text-[#121212]">{feature.title}</span>
-                      <span className="text-[13px] font-medium text-[#5c5c5c]">{feature.text}</span>
+                    <Icon className="shrink-0 text-[#F47B20]" size={28} strokeWidth={1.3} />
+                    <span className="min-w-0">
+                      <span className="block text-[14px] font-bold leading-snug text-[#1a1512] sm:text-[15px]">{feature.title}</span>
+                      <span className="text-[12px] font-medium leading-snug text-[#5c534a] sm:text-[13px]">{feature.text}</span>
                     </span>
                   </li>
                 );

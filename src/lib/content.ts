@@ -10,6 +10,8 @@ export const site = {
   addressIsPlaceholder: false,
   phone: "01-5355882",
   phoneTel: "+97715355882",
+  /** WhatsApp chat number (display + wa.me). Editable in Orbit → Footer. */
+  whatsapp: "9860304069",
   email: "",
   googleRating: 4.8,
   googleReviewCount: 499,
@@ -276,9 +278,11 @@ export function formatNpr(amount: number) {
   return `NPR ${amount.toLocaleString("en-NP")}`;
 }
 
-/** Opens WhatsApp chat (digits only, no +). */
-export function whatsAppUrl(phoneE164 = site.phoneTel) {
-  const digits = phoneE164.replace(/\D/g, "");
+/** Opens WhatsApp chat (Nepal mobiles → 977 prefix). */
+export function whatsAppUrl(raw = site.whatsapp) {
+  let digits = raw.replace(/\D/g, "");
+  if (digits.startsWith("0")) digits = digits.slice(1);
+  if (digits.length === 10 && digits.startsWith("9")) digits = `977${digits}`;
   return `https://wa.me/${digits}`;
 }
 
