@@ -51,22 +51,20 @@ html {
 }
 
 .book-cta {
-  animation: kaya-book-nudge 2.8s ease-in-out infinite;
+  animation: kaya-book-border 2.8s ease-in-out infinite;
 }
 
 .book-cta-solid {
   animation: kaya-book-glow 2.8s ease-in-out infinite;
 }
 
-@keyframes kaya-book-nudge {
+@keyframes kaya-book-border {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.15);
-    transform: translateY(0);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.06);
-    transform: translateY(-1px);
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.08);
   }
 }
 
@@ -77,6 +75,20 @@ html {
   }
   50% {
     box-shadow: 0 10px 28px rgba(244, 123, 32, 0.38);
+  }
+}
+
+.whatsapp-fab {
+  animation: kaya-whatsapp-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes kaya-whatsapp-pulse {
+  0%,
+  100% {
+    box-shadow: 0 10px 32px rgba(37, 211, 102, 0.4);
+  }
+  50% {
+    box-shadow: 0 12px 40px rgba(37, 211, 102, 0.55), 0 0 0 8px rgba(37, 211, 102, 0.12);
   }
 }
 

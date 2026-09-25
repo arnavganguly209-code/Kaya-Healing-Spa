@@ -2,18 +2,21 @@
 
 import { BackToTop } from "@/components/back-to-top";
 import { SiteHeader } from "@/components/site-header";
+import { WhatsAppFloat } from "@/components/whatsapp-float";
+import { site } from "@/lib/content";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import Link from "next/link";
 
 export function SiteChrome({
-  phone,
+  phoneDisplay = site.phone,
+  phoneTel = site.phoneTel,
   serviceCategories,
   packageCategories,
   footer,
   children,
 }: {
-  phone: string;
+  phoneDisplay?: string;
+  phoneTel?: string;
   serviceCategories?: string[];
   packageCategories?: string[];
   footer: ReactNode;
@@ -23,15 +26,11 @@ export function SiteChrome({
   if (pathname.startsWith("/orbit")) return <>{children}</>;
   return (
     <>
-      <SiteHeader phone={phone} serviceCategories={serviceCategories} packageCategories={packageCategories} />
-      <main className={pathname === "/" ? "" : "pt-[72px] lg:pt-[108px]"}>{children}</main>
+      <SiteHeader serviceCategories={serviceCategories} packageCategories={packageCategories} />
+      <main className={pathname === "/" ? "" : "pt-[68px] lg:pt-[108px]"}>{children}</main>
       {footer}
+      <WhatsAppFloat phoneTel={phoneTel} displayPhone={phoneDisplay} />
       <BackToTop />
-      <div className="fixed bottom-4 left-4 z-40 sm:hidden">
-        <Link href="/contact" className="btn-primary">
-          Book
-        </Link>
-      </div>
     </>
   );
 }

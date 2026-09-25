@@ -276,6 +276,12 @@ export function formatNpr(amount: number) {
   return `NPR ${amount.toLocaleString("en-NP")}`;
 }
 
+/** Opens WhatsApp chat (digits only, no +). */
+export function whatsAppUrl(phoneE164 = site.phoneTel) {
+  const digits = phoneE164.replace(/\D/g, "");
+  return `https://wa.me/${digits}`;
+}
+
 export function getService(slug: string) {
   return defaultServices.find((s) => s.slug === slug);
 }

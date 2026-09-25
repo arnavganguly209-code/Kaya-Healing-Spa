@@ -10,7 +10,7 @@ export function Logo({ priority = false }: { size?: number; priority?: boolean }
         height={184}
         priority={priority}
         unoptimized
-        className="h-[68px] w-[68px] rounded-full object-contain lg:h-[92px] lg:w-[92px]"
+        className="h-[58px] w-[58px] rounded-full object-contain sm:h-[64px] sm:w-[64px] lg:h-[92px] lg:w-[92px]"
       />
     </span>
   );

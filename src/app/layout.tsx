@@ -90,7 +90,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full bg-[#fffcf8] text-[#141210]">
         <JsonLd data={business} />
         <SiteChrome
-          phone={orbit.phone || site.phone}
+          phoneDisplay={orbit.phone || site.phone}
+          phoneTel={site.phoneTel}
           serviceCategories={orbit.categories}
           packageCategories={orbit.packageCategories}
           footer={<SiteFooter />}
