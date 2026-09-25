@@ -2,7 +2,6 @@
 
 import { formApiUrl } from "@/lib/form-api";
 import { TherapistCard } from "@/components/therapist-card";
-import { TherapistCarousel } from "@/components/therapist-carousel";
 import { TherapistPortrait } from "@/components/therapist-portrait";
 import { formatNpr, site } from "@/lib/content";
 import type { OrbitTherapist } from "@/lib/orbit-types";
@@ -380,17 +379,18 @@ function TherapistPicker({
         {required ? "Choose therapist" : "Therapist preference"}
         {required ? " *" : ""}
       </p>
-      <TherapistCarousel ariaLabel="therapist selection" className="mt-3">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {therapists.map((therapist) => (
           <TherapistCard
             key={therapist.slug}
             therapist={therapist}
             compact
+            fullWidth
             selected={value === therapist.slug}
             onSelect={() => onChange(value === therapist.slug ? "" : therapist.slug)}
           />
         ))}
-      </TherapistCarousel>
+      </div>
     </div>
   );
 }

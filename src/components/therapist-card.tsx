@@ -7,11 +7,14 @@ export function TherapistCard({
   compact,
   selected,
   onSelect,
+  fullWidth,
 }: {
   therapist: OrbitTherapist;
   compact?: boolean;
   selected?: boolean;
   onSelect?: () => void;
+  /** Use in grids (e.g. contact form) instead of horizontal carousel cards */
+  fullWidth?: boolean;
 }) {
   const inner = (
     <>
@@ -39,9 +42,13 @@ export function TherapistCard({
     </>
   );
 
-  const frame = `flex w-[min(78vw,240px)] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-white shadow-[0_12px_32px_rgba(23,23,23,0.06)] sm:w-[260px] ${
-    selected ? "border-[#F47B20] ring-2 ring-[#F47B20]/35" : "border-[#e6dfd4]"
-  }`;
+  const frame = fullWidth
+    ? `flex w-full flex-col overflow-hidden rounded-2xl border bg-white shadow-[0_12px_32px_rgba(23,23,23,0.06)] ${
+        selected ? "border-[#F47B20] ring-2 ring-[#F47B20]/35" : "border-[#e6dfd4]"
+      }`
+    : `flex w-[min(78vw,240px)] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-white shadow-[0_12px_32px_rgba(23,23,23,0.06)] sm:w-[260px] ${
+        selected ? "border-[#F47B20] ring-2 ring-[#F47B20]/35" : "border-[#e6dfd4]"
+      }`;
 
   if (onSelect) {
     return (
