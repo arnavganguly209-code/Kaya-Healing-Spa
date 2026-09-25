@@ -1,5 +1,6 @@
 import { FooterSocialLinks } from "@/components/footer-social-links";
 import { Logo } from "@/components/logo";
+import { OrangeLotusBackground } from "@/components/orange-lotus-background";
 import { site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import Link from "next/link";
@@ -30,9 +31,9 @@ export function SiteFooter() {
   const telHref = displayPhone.startsWith("+") ? displayPhone.replace(/\s/g, "") : site.phoneTel;
   return (
     <footer className="relative overflow-hidden bg-[#12100e] text-[#f6f1e8]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F47B20]/80 to-transparent" />
-      <div className="pointer-events-none absolute -left-32 top-0 h-64 w-64 rounded-full bg-[#F47B20]/10 blur-3xl" />
-      <div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-20 md:grid-cols-2 md:px-10 lg:grid-cols-4 lg:gap-14">
+      <OrangeLotusBackground idSuffix="footer" intensity={0.2} showWatermark={false} />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-[#F47B20]/80 to-transparent" />
+      <div className="relative z-[2] mx-auto grid max-w-[1440px] gap-12 px-5 py-20 md:grid-cols-2 md:px-10 lg:grid-cols-4 lg:gap-14">
         <div>
           <Logo />
           <p className="mt-5 font-serif text-2xl text-white">{brand}</p>
@@ -90,7 +91,7 @@ export function SiteFooter() {
           <FooterSocialLinks links={orbit.socialLinks} extra={orbit.extraSocialLinks} />
         </div>
       </div>
-      <div className="border-t border-white/10 bg-black/20">
+      <div className="relative z-[2] border-t border-white/10 bg-black/20">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-5 py-7 text-xs text-white/50 md:flex-row md:items-center md:justify-between md:px-10">
           <p>© {new Date().getFullYear()} {brand}. All rights reserved.</p>
           <div className="flex flex-wrap gap-5">

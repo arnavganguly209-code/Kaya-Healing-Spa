@@ -1,4 +1,5 @@
 import { HeroMedia } from "@/components/hero-media";
+import { OrangeLotusBackground } from "@/components/orange-lotus-background";
 import { Reveal } from "@/components/reveal";
 import { TherapiesSection } from "@/components/therapies-section";
 import { WhyKayaSection } from "@/components/why-kaya-section";
@@ -172,31 +173,34 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="relative bg-[#141210] text-white">
-        <div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:px-8 lg:grid-cols-12 lg:py-32">
+      <section className="relative isolate overflow-hidden bg-[#c45e0a]">
+        <OrangeLotusBackground idSuffix="home-massage" intensity={1} />
+        <div className="relative z-[1] mx-auto grid max-w-[1440px] gap-12 px-5 py-24 md:px-8 lg:grid-cols-12 lg:py-32">
           <div className="relative min-h-[460px] lg:col-span-7">
             <Image
               src="https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=1600&q=80"
               alt="Guest resting during a massage"
               fill
-              className="object-cover"
+              className="object-cover shadow-[0_20px_50px_rgba(0,0,0,0.25)]"
               sizes="(min-width: 1024px) 55vw, 100vw"
             />
           </div>
-          <div className="lg:col-span-5 lg:-ml-16 lg:mt-24 lg:bg-[#141210] lg:p-10">
-            <Flower2 className="text-[#2f8f45]" strokeWidth={1.25} />
-            <h2 className="display mt-4 text-5xl">More than a massage</h2>
-            <p className="mt-5 text-white/70">
-              A single treatment can be wonderful. KAYA is arranged for the whole visit — arrival, the work itself, and the quiet that follows — so relaxation is not squeezed into the last ten minutes.
-            </p>
-            <ul className="mt-8 space-y-6">
-              {pillars.map(([title, text]) => (
-                <li key={title}>
-                  <p className="text-xs tracking-[0.2em] uppercase text-[#e8771a]">{title}</p>
-                  <p className="mt-1 text-white/80">{text}</p>
-                </li>
-              ))}
-            </ul>
+          <div className="lg:col-span-5 lg:-ml-16 lg:mt-24">
+            <div className="rounded-2xl border border-white/30 bg-[#fffcf8]/95 p-8 shadow-[0_24px_60px_rgba(0,0,0,0.22)] backdrop-blur-sm md:p-10">
+              <Flower2 className="text-[#F47B20]" strokeWidth={1.25} />
+              <h2 className="display mt-4 text-5xl text-[#141210]">More than a massage</h2>
+              <p className="mt-5 text-[15px] leading-7 text-[#4a453e]">
+                A single treatment can be wonderful. KAYA is arranged for the whole visit — arrival, the work itself, and the quiet that follows — so relaxation is not squeezed into the last ten minutes.
+              </p>
+              <ul className="mt-8 space-y-6">
+                {pillars.map(([title, text]) => (
+                  <li key={title}>
+                    <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#c45e0a]">{title}</p>
+                    <p className="mt-1 text-[#2a2520]">{text}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
