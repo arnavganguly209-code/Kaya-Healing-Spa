@@ -27,13 +27,14 @@ export function ServiceCatalog({
     setCategory(initialCategory && initialCategory !== "" ? initialCategory : "all");
   }, [initialCategory]);
 
-  const selectCategory = (filter: (typeof filtersDefault)[number]) => {
-    setCategory(filter);
-    if (filter === "all") {
+  const selectCategory = (filter: string) => {
+    const next = filter === "all" ? "all" : filter;
+    setCategory(next);
+    if (next === "all") {
       router.replace(pathname, { scroll: false });
       return;
     }
-    router.replace(`${pathname}?category=${filter}`, { scroll: false });
+    router.replace(`${pathname}?category=${next}`, { scroll: false });
   };
 
   const filters = useMemo(() => {
