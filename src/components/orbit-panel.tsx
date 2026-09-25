@@ -16,6 +16,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   const [saving, setSaving] = useState(false);
   const [library, setLibrary] = useState<MediaItem[]>([]);
   const [picker, setPicker] = useState<((path: string, kind: "image" | "video") => void) | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const contentRef = useRef(content);
   contentRef.current = content;
 
@@ -56,54 +57,83 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   function publish(next: OrbitContent) {
     setContent(next);
     contentRef.current = next;
-    void persist(next);
+    return persist(next);
   }
 
-  async function upload(file: File, apply: (path: string, kind: "image" | "video") => void) {
+  function postUpload(file: File): Promise<{ path: string; kind: "image" | "video" }> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/orbit/media");
+      xhr.withCredentials = true;
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable && event.total > 0) {
+          setUploadProgress(Math.min(99, Math.round((event.loaded / event.total) * 100)));
+        } else {
+          setUploadProgress((value) => (value === null ? 8 : Math.min(92, value + 4)));
+        }
+      };
+      xhr.onload = () => {
+        const raw = xhr.responseText || "";
+        let body: { message?: string; path?: string; kind?: "image" | "video" } = {};
+        try {
+          body = raw ? JSON.parse(raw) : {};
+        } catch {
+          body = {};
+        }
+        if (xhr.status === 413) {
+          reject(new Error("The server said the file is too large. Use an image under 25 MB or a video under 120 MB."));
+          return;
+        }
+        if (xhr.status === 401) {
+          reject(new Error("Sign in expired. Open /orbit/login and enter the passkey again."));
+          return;
+        }
+        if (xhr.status < 200 || xhr.status >= 300 || !body.path) {
+          reject(new Error(body.message || `Upload failed (${xhr.status}). ${raw.slice(0, 160)}`));
+          return;
+        }
+        resolve({ path: body.path, kind: body.kind === "video" ? "video" : "image" });
+      };
+      xhr.onerror = () => reject(new Error("Upload could not reach the server."));
+      const form = new FormData();
+      form.set("file", file);
+      xhr.send(form);
+    });
+  }
+
+  async function upload(file: File, apply: (path: string, kind: "image" | "video") => void | Promise<boolean>) {
     setError("");
     setMessage(`Uploading ${file.name}…`);
+    setUploadProgress(0);
     if (!file || file.size <= 0) {
       setError("Choose a real image or video file.");
       setMessage("");
+      setUploadProgress(null);
       return;
     }
     if (file.size > 120 * 1024 * 1024) {
       setError("That file is over 120 MB.");
       setMessage("");
+      setUploadProgress(null);
       return;
     }
     try {
-      const form = new FormData();
-      form.set("file", file);
-      const response = await fetch("/api/orbit/media", { method: "POST", credentials: "same-origin", body: form });
-      const raw = await response.text();
-      let body: { message?: string; path?: string; kind?: "image" | "video" } = {};
-      try {
-        body = raw ? JSON.parse(raw) : {};
-      } catch {
-        body = {};
-      }
-      if (response.status === 413) {
-        setError("The server said the file is too large. Use an image under 25 MB or a video under 120 MB.");
-        setMessage("");
-        return;
-      }
-      if (response.status === 401) {
-        setError("Sign in expired. Open /orbit/login and enter the passkey again.");
-        setMessage("");
-        return;
-      }
-      if (!response.ok || !body.path) {
-        setError(body.message || `Upload failed (${response.status}). ${raw.slice(0, 140)}`);
-        setMessage("");
-        return;
-      }
-      apply(body.path, body.kind === "video" ? "video" : "image");
+      const saved = await postUpload(file);
+      setUploadProgress(100);
+      const published = await Promise.resolve(apply(saved.path, saved.kind));
       await loadLibrary();
-      setMessage("Uploaded and published to the live site.");
+      if (published === false) {
+        setError(`File uploaded to ${saved.path} but the live site did not save. Click Save changes.`);
+        setMessage("");
+        setUploadProgress(null);
+        return;
+      }
+      setMessage(`Uploaded ${saved.path} — live site updated.`);
+      setUploadProgress(null);
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Upload could not reach the server.");
+      setError(error instanceof Error ? error.message : "Upload could not complete.");
       setMessage("");
+      setUploadProgress(null);
     }
   }
 
@@ -153,6 +183,14 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
         </div>
         {message && <p className="mt-3 text-sm text-[#2f8f45]">{message}</p>}
         {error && <p className="mt-3 text-sm text-[#c45e0a]">{error}</p>}
+        {uploadProgress !== null && (
+          <div className="mt-3 max-w-md">
+            <p className="text-xs font-medium text-[#6B6B6B]">Upload progress: {uploadProgress}%</p>
+            <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-[#efe8e0]">
+              <div className="h-full rounded-full bg-[#F47B20] transition-[width] duration-200" style={{ width: `${uploadProgress}%` }} />
+            </div>
+          </div>
+        )}
         <div className="mt-8 max-w-4xl space-y-5">
           {section === "Hero" && (
             <>
@@ -535,11 +573,32 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
     </div>
   );
 
+  function effectiveHeroSlides(heroState: OrbitContent["hero"]) {
+    if (heroState.slides.length) return heroState.slides;
+    return [
+      {
+        src: heroState.image || "/hero/kaya-hero-spa-hd.png",
+        alt: heroState.alt,
+        kind: "image" as const,
+      },
+    ];
+  }
+
   function updateSlides(slides: OrbitContent["hero"]["slides"]) {
-    publish({ ...contentRef.current, hero: { ...contentRef.current.hero, slides, image: slides[0]?.src || contentRef.current.hero.image } });
+    const next = {
+      ...contentRef.current,
+      hero: {
+        ...contentRef.current.hero,
+        slides,
+        image: slides[0]?.src || contentRef.current.hero.image,
+        alt: slides[0]?.alt || contentRef.current.hero.alt,
+      },
+    };
+    return publish(next);
   }
   function updateSlide(index: number, patch: Partial<OrbitContent["hero"]["slides"][number]>) {
-    updateSlides(contentRef.current.hero.slides.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+    const base = effectiveHeroSlides(contentRef.current.hero);
+    return updateSlides(base.map((item, i) => (i === index ? { ...item, ...patch } : item)));
   }
   function updatePoint(index: number, patch: Partial<OrbitContent["hero"]["points"][number]>) {
     const points = content.hero.points.map((item, i) => (i === index ? { ...item, ...patch } : item));
@@ -609,17 +668,37 @@ function MediaField({
   onUpload: (file: File) => void;
   onLibrary: () => void;
 }) {
+  const [broken, setBroken] = useState(false);
+  useEffect(() => setBroken(false), [src]);
   const video = kind === "video" || /\.(mp4|webm|mov)$/i.test(src);
+  const previewKey = src ? src.replace(/[^\w./-]/g, "") : "empty";
   return (
     <div className="mt-3 text-sm">
       <p className="font-medium">{label}</p>
+      <p className="mt-1 break-all text-[11px] text-[#8a8a8a]">{src || "No file path yet"}</p>
       <div className="mt-2 overflow-hidden rounded-xl border border-[#efe8e0] bg-[#faf7f3]">
         {src ? (
-          video ? <video src={src} className="h-40 w-full object-cover" muted controls /> : <img src={src} alt="" className="h-40 w-full object-cover" />
+          video ? (
+            <video key={previewKey} src={src} className="h-44 w-full object-cover" muted controls onError={() => setBroken(true)} />
+          ) : (
+            <img
+              key={previewKey}
+              src={src}
+              alt=""
+              className="h-44 w-full object-cover"
+              onError={() => setBroken(true)}
+              onLoad={() => setBroken(false)}
+            />
+          )
         ) : (
-          <div className="flex h-40 items-center justify-center text-[#8a8a8a]">No file yet</div>
+          <div className="flex h-44 items-center justify-center text-[#8a8a8a]">No file yet</div>
         )}
       </div>
+      {broken && src ? (
+        <p className="mt-2 text-xs text-[#c45e0a]">
+          Preview could not load. If upload finished, open {src} in a new tab or use Refresh library in Media.
+        </p>
+      ) : null}
       <div className="mt-3 flex flex-wrap gap-3">
         <label className="inline-flex cursor-pointer items-center rounded-full bg-[#F47B20] px-4 py-2 text-sm font-medium text-white">
           Replace

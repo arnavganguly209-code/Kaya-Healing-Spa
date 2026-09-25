@@ -64,7 +64,7 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative isolate min-h-[100svh] overflow-hidden bg-[#0a0a0a]">
+      <section className="relative isolate h-[100svh] min-h-[540px] max-h-[100svh] overflow-hidden bg-[#0a0a0a]">
         <div className="pointer-events-none absolute inset-0 z-0">
           <HeroMedia
             slides={hero.slides}
@@ -77,27 +77,27 @@ export function HomePage() {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(255,255,255,0.97)_0%,rgba(255,255,255,0.88)_32%,rgba(255,255,255,0.45)_48%,rgba(255,255,255,0.08)_65%,transparent_85%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white via-white/90 to-transparent" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.78)_0%,rgba(255,255,255,0.42)_22%,rgba(255,255,255,0.12)_38%,transparent_52%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#fafafa]/90 to-transparent" />
         </div>
 
-        <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col px-5 pt-[72px] sm:px-8 md:px-10 lg:px-12 lg:pt-[108px] xl:px-14">
-          <div className="flex flex-1 items-center py-6 lg:py-4 xl:py-6">
+        <div className="relative z-10 mx-auto flex h-full max-h-[100svh] w-full max-w-[1440px] flex-col px-5 pt-[72px] sm:px-8 md:px-10 lg:px-12 lg:pt-[108px] xl:px-14">
+          <div className="flex min-h-0 flex-1 items-center py-2 max-[900px]:h-auto max-[900px]:items-start max-[900px]:py-3">
             <div className="w-full max-w-[min(100%,520px)] lg:max-w-[480px] xl:max-w-[540px]">
-              <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.26em] text-[#8a8a8a] uppercase">
+              <p className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.26em] text-[#5c5c5c] uppercase">
                 {hero.eyebrow}
                 <span className="h-px w-10 bg-[#F47B20]" />
               </p>
               <h1
-                className="mt-4 text-[44px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#171717] sm:mt-5 sm:text-[58px] md:text-[68px] lg:text-[80px] xl:text-[92px] 2xl:text-[100px]"
+                className="mt-3 text-[clamp(2.35rem,4.2vw+1rem,5.75rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-[#171717] antialiased sm:mt-4"
                 style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
               >
                 <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
               </h1>
-              <p className="mt-3 font-serif text-[22px] leading-tight font-medium text-[#171717] sm:text-[26px] lg:text-[34px] xl:text-[36px]">
+              <p className="mt-2 font-serif text-[clamp(1.15rem,1.5vw+0.75rem,2.15rem)] leading-tight font-medium text-[#171717] antialiased">
                 {hero.subtitle}
               </p>
-              <div className="mt-8 flex flex-wrap gap-4">
+              <div className="mt-5 flex flex-wrap gap-3 max-[900px]:mt-4 sm:mt-6 sm:gap-4">
                 <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[#F47B20] px-7 py-4 text-[15px] font-medium text-white shadow-[0_10px_24px_rgba(244,123,32,0.28)] transition hover:-translate-y-0.5 hover:bg-[#e06d12]">
                   {hero.explore} <span aria-hidden>→</span>
                 </Link>
@@ -106,7 +106,7 @@ export function HomePage() {
                   {hero.book}
                 </Link>
               </div>
-              <ul className="mt-9 flex flex-wrap gap-x-9 gap-y-4">
+              <ul className="mt-6 flex flex-wrap gap-x-7 gap-y-3 max-[900px]:mt-4 sm:mt-7">
                 {hero.points.map((point, index) => {
                   const Icon = pointIcons[index % pointIcons.length];
                   return (
@@ -126,15 +126,15 @@ export function HomePage() {
             </div>
           </div>
 
-          <div className="relative z-20 mb-5 w-full sm:mb-6">
-            <div className="rounded-[24px] border border-white/80 bg-white/70 shadow-[0_16px_40px_rgba(23,23,23,0.08)] backdrop-blur-xl sm:rounded-[28px]">
+          <div className="relative z-20 shrink-0 pb-3 pt-1 sm:pb-4">
+            <div className="rounded-[20px] border border-white/70 bg-white/75 shadow-[0_12px_32px_rgba(23,23,23,0.07)] backdrop-blur-md sm:rounded-[24px]">
             <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];
                 return (
                   <li
                     key={feature.title}
-                    className="flex items-center gap-4 px-7 py-6 [&:not(:first-child)]:lg:border-l [&:not(:first-child)]:lg:border-[#f0ece8]"
+                    className="flex items-center gap-3 px-5 py-4 max-[900px]:py-3 sm:gap-4 sm:px-6 sm:py-5 [&:not(:first-child)]:lg:border-l [&:not(:first-child)]:lg:border-[#f0ece8]"
                   >
                     <Icon className="shrink-0 text-[#F47B20]" size={32} strokeWidth={1.3} />
                     <span>

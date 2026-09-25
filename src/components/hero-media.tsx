@@ -52,7 +52,7 @@ function SlideVisual({
       fill
       priority={priority}
       unoptimized={fullQuality}
-      className={`object-cover ${mirror}`}
+      className={`object-cover contrast-[1.04] saturate-[1.06] ${mirror}`}
       style={{ objectPosition }}
       sizes={sizes}
     />

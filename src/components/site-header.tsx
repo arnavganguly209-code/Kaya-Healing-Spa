@@ -23,6 +23,10 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const isHome = pathname === "/";
   const glass = !isHome || scrolled;
+  const onHero = isHome && !scrolled;
+  const navReadable = onHero
+    ? "[text-shadow:0_0_18px_rgba(255,255,255,0.95),0_1px_2px_rgba(255,255,255,0.9)] antialiased"
+    : "antialiased";
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -62,7 +66,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-[15px] font-extrabold tracking-[0.02em] ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
+                className={`relative text-[15px] font-extrabold tracking-[0.02em] ${navReadable} ${active ? "text-[#F47B20]" : "text-[#171717] hover:text-[#F47B20]"}`}
               >
                 {link.label}
                 {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}
@@ -71,7 +75,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
           })}
         </nav>
         <div className="relative z-10 ml-auto flex shrink-0 items-center gap-4 lg:gap-5">
-          <a href={`tel:${phone.replace(/\s/g, "")}`} className="hidden items-center gap-3 text-[#171717] lg:flex">
+          <a href={`tel:${phone.replace(/\s/g, "")}`} className={`hidden items-center gap-3 text-[#171717] lg:flex ${navReadable}`}>
             <span className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${glass ? "bg-[#fff1e6]" : "bg-[#fff1e6]/35 backdrop-blur-[2px]"}`}>
               <Phone size={18} className="call-pulse text-[#F47B20]" strokeWidth={1.8} />
             </span>

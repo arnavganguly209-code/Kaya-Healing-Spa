@@ -247,24 +247,23 @@ function merge<T>(base: T, saved: Partial<T> | undefined): T {
 
 function normalizeHero(hero: OrbitHero): OrbitHero {
   const latest = "/hero/kaya-hero-spa-hd.png";
-  const stock = [
+  const stockHeroPaths = [
     "/hero/kaya-hero-wide.png",
     "/hero/kaya-hero-uhd.png",
     "/hero/kaya-hero-match.png",
     "/hero/kaya-hero-design.png",
-    "/uploads/1790263964706-po5z83.png",
     "/hero/kaya-hero-spa.png",
   ];
-  const slides = (hero.slides?.length ? hero.slides : [{ src: hero.image, alt: hero.alt, kind: "image" as const }])
+  let slides = (hero.slides?.length ? hero.slides : [{ src: hero.image, alt: hero.alt, kind: "image" as const }])
     .filter((slide) => slide.src)
     .slice(0, 10)
     .map((slide) => ({
       ...slide,
-      src: stock.includes(slide.src) ? latest : slide.src,
+      src: stockHeroPaths.includes(slide.src) ? latest : slide.src,
       kind: (slide.kind === "video" || /\.(mp4|webm|mov)$/i.test(slide.src) ? "video" : "image") as HeroSlide["kind"],
     }));
   if (!slides.length) {
-    slides.push({ src: latest, alt: hero.alt || "KAYA SPA hero", kind: "image" });
+    slides.push({ src: hero.image || latest, alt: hero.alt || "Kaya Healing Spa hero", kind: "image" });
   }
   const first = slides[0] ?? { src: latest, alt: hero.alt, kind: "image" as const };
   const titleOrange = hero.titleOrange === "Kaya" ? "Kaya Healing" : hero.titleOrange || "Kaya Healing";

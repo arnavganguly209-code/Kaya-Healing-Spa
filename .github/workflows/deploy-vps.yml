@@ -62,6 +62,7 @@ jobs:
 
             cd "${APP_DIR}"
             test "$(pwd)" = "${APP_DIR}"
+            mkdir -p public/uploads data
 
             echo "Syncing origin/main"
             git fetch origin main
