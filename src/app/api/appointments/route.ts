@@ -31,10 +31,15 @@ export async function POST(request: Request) {
   if (bookingType === "service" && !body.serviceSlug) {
     return NextResponse.json({ message: "Choose a treatment." }, { status: 400 });
   }
-  if (bookingType === "therapist" && (!body.therapistSlug || !body.serviceSlug)) {
-    return NextResponse.json({ message: "Choose a therapist and treatment." }, { status: 400 });
+  if (bookingType === "therapist") {
+    if (!body.therapistSlug) {
+      return NextResponse.json({ message: "Choose a therapist." }, { status: 400 });
+    }
+    if (!body.serviceSlug && !body.packageSlug) {
+      return NextResponse.json({ message: "Choose a treatment or package for this booking." }, { status: 400 });
+    }
   }
-  if (!body.serviceSlug && !body.packageSlug) {
+  if (bookingType !== "therapist" && !body.serviceSlug && !body.packageSlug) {
     return NextResponse.json({ message: "Choose a treatment or a package." }, { status: 400 });
   }
   if (!Number.isInteger(guests) || guests < 1 || guests > 8) return NextResponse.json({ message: "Guests must be between 1 and 8." }, { status: 400 });
