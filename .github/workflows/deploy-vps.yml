@@ -183,7 +183,12 @@ jobs:
             echo "ERROR: homepage HTML did not contain Kaya"
             exit 1
           fi
-          for path in /sitemap.xml /terms /privacy /manifest.webmanifest /contact; do
+          ABOUT="$(curl -sS --retry 3 --retry-delay 2 "https://kaya.theglobalorbit.com/about" || true)"
+          if ! echo "${ABOUT}" | grep -qi "Brand values"; then
+            echo "ERROR: /about page body missing expected content"
+            exit 1
+          fi
+          for path in /sitemap.xml /terms /privacy /manifest.webmanifest /contact /about; do
             CODE="$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 --retry-delay 2 "https://kaya.theglobalorbit.com${path}" || true)"
             echo "${path} HTTP ${CODE}"
             if [ "${CODE}" != "200" ]; then

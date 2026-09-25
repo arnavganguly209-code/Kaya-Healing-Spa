@@ -1,11 +1,12 @@
+import { CATALOG_COMING_SOON_ALT, CATALOG_COMING_SOON_IMAGE } from "@/lib/catalog-images";
 import { gallery, packages, site } from "@/lib/content";
 import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
 import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 import { defaultTherapists } from "@/lib/default-therapists";
 import { therapistPlaceholderPath } from "@/lib/catalog-images";
 import type { OrbitAboutPage, OrbitExtraSocialLink, OrbitSocialLink, OrbitTherapist } from "@/lib/orbit-types";
-import { fileMtimeMs, writeJsonFileAtomic } from "@/lib/json-file";
 import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
+import { fileMtimeMs, writeJsonFileAtomic } from "@/lib/json-file";
 import { existsSync, readFileSync } from "fs";
 import path from "path";
 
@@ -414,6 +415,43 @@ export function normalizePageCovers(covers: OrbitPageCovers | undefined): OrbitP
   };
 }
 
+function normalizeAboutPage(raw: Partial<OrbitAboutPage> | undefined): OrbitAboutPage {
+  const d = defaultAboutPage();
+  if (!raw) return d;
+  const story = Array.isArray(raw.story) && raw.story.length ? raw.story : d.story;
+  const logos = Array.isArray(raw.logos) && raw.logos.length ? raw.logos : d.logos;
+  return {
+    ...d,
+    ...raw,
+    story,
+    logos,
+    owner: {
+      ...d.owner,
+      ...raw.owner,
+      photo: raw.owner?.photo?.trim() || d.owner.photo,
+      name: raw.owner?.name?.trim() || d.owner.name,
+    },
+    googleRating: raw.googleRating ?? d.googleRating,
+    googleReviewCount: raw.googleReviewCount ?? d.googleReviewCount,
+  };
+}
+
+function applyMenuCatalogImages(content: OrbitContent): OrbitContent {
+  return {
+    ...content,
+    services: content.services.map((service) => ({
+      ...service,
+      image: CATALOG_COMING_SOON_IMAGE,
+      imageAlt: CATALOG_COMING_SOON_ALT,
+    })),
+    packages: content.packages.map((pkg) => ({
+      ...pkg,
+      image: CATALOG_COMING_SOON_IMAGE,
+      imageAlt: CATALOG_COMING_SOON_ALT,
+    })),
+  };
+}
+
 function defaultAboutPage(): OrbitAboutPage {
   return {
     introEyebrow: "About us",
@@ -435,8 +473,8 @@ function defaultAboutPage(): OrbitAboutPage {
       description:
         "Oversees therapist training, room standards, and the guest journey from booking to checkout. Focused on calm pacing and honest communication.",
       experience: "15+ years in Kathmandu hospitality and wellness",
-      photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=900&h=1100&q=85",
-      photoAlt: "Spa director at Kaya Healing Spa",
+      photo: "/catalog/coming-soon.webp",
+      photoAlt: "Kaya Healing Spa leadership",
     },
     logos: [
       {
@@ -468,7 +506,7 @@ function defaultAboutPage(): OrbitAboutPage {
 }
 
 export function defaultOrbitContent(): OrbitContent {
-  return {
+  return applyMenuCatalogImages({
     phone: site.phone,
     whatsapp: site.whatsapp,
     email: site.email,
@@ -606,8 +644,8 @@ export function defaultOrbitContent(): OrbitContent {
         "Wellness here means practical care — pressure you agree to, oil that is warm, rooms that smell clean rather than loud, and a therapist who listens before they begin.",
       linkLabel: "Discover Kaya Healing Spa",
       linkHref: "/about",
-      image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=80",
-      imageAlt: "Spa stones and folded towels",
+      image: "/catalog/coming-soon.webp",
+      imageAlt: CATALOG_COMING_SOON_ALT,
     },
     homePage: defaultHomePage(),
     adminSectionFlags: defaultAdminSectionFlags(),
@@ -620,7 +658,7 @@ export function defaultOrbitContent(): OrbitContent {
     gallery,
     aboutPage: defaultAboutPage(),
     therapists: defaultTherapists(),
-  };
+  });
 }
 
 function merge<T>(base: T, saved: Partial<T> | undefined): T {
@@ -727,13 +765,13 @@ export function readOrbitContent(): OrbitContent {
   } catch (error) {
     console.error("readOrbitContent failed", error);
     orbitContentCache = null;
-    return defaultOrbitContent();
+    return applyMenuCatalogImages(defaultOrbitContent());
   }
 }
 
 function loadOrbitContentFromDisk(): OrbitContent {
   const defaults = defaultOrbitContent();
-  if (!existsSync(filePath)) return defaults;
+  if (!existsSync(filePath)) return applyMenuCatalogImages(defaults);
   try {
     const saved = JSON.parse(readFileSync(filePath, "utf8")) as Partial<OrbitContent>;
     const merged = merge(defaults, saved);
@@ -746,7 +784,7 @@ function loadOrbitContentFromDisk(): OrbitContent {
             packages: defaults.packages,
             therapists: defaults.therapists,
           };
-    return {
+    const built = {
       ...merged,
       ...menuCurrent,
       servicesMenuVersion: SERVICES_MENU_VERSION,
@@ -757,7 +795,7 @@ function loadOrbitContentFromDisk(): OrbitContent {
       homePage: normalizeHomePage(merged.homePage),
       adminSectionFlags: normalizeAdminSectionFlags(merged.adminSectionFlags),
       pageCovers: normalizePageCovers(merged.pageCovers),
-      aboutPage: { ...defaults.aboutPage, ...merged.aboutPage, owner: { ...defaults.aboutPage.owner, ...merged.aboutPage?.owner }, logos: merged.aboutPage?.logos?.length ? merged.aboutPage.logos : defaults.aboutPage.logos },
+      aboutPage: normalizeAboutPage(merged.aboutPage),
       therapists: normalizeTherapists(
         saved.servicesMenuVersion === SERVICES_MENU_VERSION ? merged.therapists : defaults.therapists,
         defaults.therapists,
@@ -768,8 +806,9 @@ function loadOrbitContentFromDisk(): OrbitContent {
       socialLinks: normalizeSocialLinks(merged.socialLinks),
       extraSocialLinks: normalizeExtraSocialLinks(merged.extraSocialLinks),
     };
+    return applyMenuCatalogImages(built);
   } catch {
-    return defaults;
+    return applyMenuCatalogImages(defaults);
   }
 }
 

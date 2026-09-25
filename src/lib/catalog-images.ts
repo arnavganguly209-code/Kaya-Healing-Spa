@@ -1,4 +1,8 @@
-/** Unsplash photo IDs — treatment detail only (hands, products, stones; no faces). */
+/** Shared menu card image until service/package photos are ready. */
+export const CATALOG_COMING_SOON_IMAGE = "/catalog/coming-soon.webp";
+export const CATALOG_COMING_SOON_ALT = "New spa services — coming soon";
+
+/** Unsplash photo IDs — legacy reference only. */
 export const servicePhotoIds: Record<string, string> = {
   "jet-lag-relief-massage": "photo-1519824145371-296894a0daa9",
   "lymphatic-drainage-massage": "photo-1556228720-195a672e8a03",
@@ -42,12 +46,12 @@ export const packagePhotoIds: Record<string, string> = {
   "full-day-escape": "photo-1519824145371-296894a0daa9",
 };
 
-export function serviceImagePath(slug: string) {
-  return `/catalog/services/${slug}.jpg`;
+export function serviceImagePath(_slug?: string) {
+  return CATALOG_COMING_SOON_IMAGE;
 }
 
-export function packageImagePath(slug: string) {
-  return `/catalog/packages/${slug}.jpg`;
+export function packageImagePath(_slug?: string) {
+  return CATALOG_COMING_SOON_IMAGE;
 }
 
 export function therapistPlaceholderPath(slug: string) {

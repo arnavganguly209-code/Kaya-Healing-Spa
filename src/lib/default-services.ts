@@ -1,3 +1,4 @@
+import { CATALOG_COMING_SOON_ALT } from "./catalog-images";
 import type { Service, ServiceCategory } from "./types";
 import { serviceImagePath } from "./catalog-images";
 
@@ -28,7 +29,7 @@ function menuService(
     recommendedFor: [],
     preparation: ["Arrive a little early", "Mention allergies, injuries, or areas to avoid"],
     image,
-    imageAlt: imageAlt || `${name} at Kaya Healing Spa, Kathmandu`,
+    imageAlt: imageAlt || CATALOG_COMING_SOON_ALT,
   };
 }
 

@@ -1,3 +1,4 @@
+import { CATALOG_COMING_SOON_IMAGE } from "@/lib/catalog-images";
 import { PageHero } from "@/components/page-hero";
 import { Reveal } from "@/components/reveal";
 import { labelForCategory, site } from "@/lib/content";
@@ -21,9 +22,18 @@ const values = [
   ["Professionalism", "Draping, hygiene, and timekeeping are part of the craft."],
 ];
 
+function pageImage(src: string | undefined) {
+  if (!src?.trim()) return CATALOG_COMING_SOON_IMAGE;
+  if (src.startsWith("http://") || src.startsWith("https://")) return CATALOG_COMING_SOON_IMAGE;
+  return src;
+}
+
 export default function AboutPage() {
   const orbit = readOrbitContent();
   const about = orbit.aboutPage;
+  const storyParagraphs = about.story?.length ? about.story : [site.tagline];
+  const storyImage = pageImage(orbit.homeAbout.image);
+  const ownerPhoto = pageImage(about.owner.photo);
 
   return (
     <>
@@ -34,6 +44,12 @@ export default function AboutPage() {
         text={orbit.pageCovers.about.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "About" }]}
       />
+
+      <section className="mx-auto max-w-[900px] px-5 py-12 text-center md:px-8">
+        <p className="eyebrow">{about.introEyebrow || "About us"}</p>
+        <h2 className="display mt-3 text-4xl md:text-5xl">{about.introTitle || orbit.pageCovers.about.title}</h2>
+        <p className="prose-quiet mx-auto mt-5 max-w-2xl text-base">{about.introLead || orbit.pageCovers.about.text}</p>
+      </section>
 
       <section className="mx-auto max-w-[900px] px-5 py-16 md:px-8">
         <div className="rounded-2xl border border-[#e6dfd4] bg-[#f6f1e8] p-8 md:p-10">
@@ -72,33 +88,33 @@ export default function AboutPage() {
           <p className="eyebrow">Our story</p>
           <h2 className="display mt-4 text-5xl">Hospitality, then the treatment</h2>
           <div className="prose-quiet mt-6 space-y-4">
-            {about.story.map((paragraph) => (
+            {storyParagraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 48)}>{paragraph}</p>
             ))}
           </div>
         </Reveal>
-        <div className="relative min-h-[420px]">
+        <div className="relative min-h-[420px] overflow-hidden rounded-2xl">
           <Image
-            src={orbit.homeAbout.image}
+            src={storyImage}
             alt={orbit.homeAbout.imageAlt}
             fill
             className="object-cover"
             sizes="(min-width: 1024px) 50vw, 100vw"
-            unoptimized={orbit.homeAbout.image.startsWith("/uploads/") || orbit.homeAbout.image.startsWith("/hero/")}
+            unoptimized
           />
         </div>
       </section>
 
       <section className="bg-[#141210] text-white">
         <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-16 md:grid-cols-[0.9fr_1.1fr] md:px-8">
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-md">
+          <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl">
             <Image
-              src={about.owner.photo}
+              src={ownerPhoto}
               alt={about.owner.photoAlt}
               fill
               className="object-cover"
               sizes="400px"
-              unoptimized={about.owner.photo.startsWith("/uploads/")}
+              unoptimized
             />
           </div>
           <div>
@@ -115,7 +131,7 @@ export default function AboutPage() {
         <h2 className="display text-4xl md:text-5xl">Partners & standards</h2>
         <p className="prose-quiet mt-4 max-w-2xl text-sm">Marks and programmes that shape how we host guests at Northfield.</p>
         <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {about.logos.map((logo) => (
+          {(about.logos?.length ? about.logos : []).map((logo) => (
             <li key={logo.name} className="flex flex-col rounded-2xl border border-[#e6dfd4] bg-white p-6">
               <div className="relative mx-auto h-20 w-20">
                 <Image
