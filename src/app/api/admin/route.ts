@@ -22,6 +22,7 @@ export async function GET() {
       categories: c.categories,
       packageCategories: c.packageCategories,
       adminSectionFlags: c.adminSectionFlags,
+      homePage: c.homePage,
     },
   });
 }
@@ -31,6 +32,7 @@ export async function PUT(request: Request) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return NextResponse.json({ message: "Invalid body." }, { status: 400 });
   const current = readOrbitContent();
+  const bodyHome = body.homePage as typeof current.homePage | undefined;
   writeOrbitContent({
     ...current,
     hero: (body.hero as typeof current.hero) || current.hero,
@@ -46,6 +48,13 @@ export async function PUT(request: Request) {
     therapists: (body.therapists as typeof current.therapists) || current.therapists,
     categories: (body.categories as typeof current.categories) || current.categories,
     packageCategories: (body.packageCategories as typeof current.packageCategories) || current.packageCategories,
+    homePage: bodyHome
+      ? {
+          ...current.homePage,
+          ...bodyHome,
+          reviews: Array.isArray(bodyHome.reviews) ? bodyHome.reviews : current.homePage.reviews,
+        }
+      : current.homePage,
   });
   revalidatePath("/", "layout");
   revalidatePath("/services");

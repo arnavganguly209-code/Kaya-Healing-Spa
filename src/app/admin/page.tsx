@@ -25,6 +25,7 @@ export default async function AdminPage() {
         categories: c.categories,
         packageCategories: c.packageCategories,
         adminSectionFlags: c.adminSectionFlags,
+        homePage: c.homePage,
       }}
     />
   );

@@ -567,6 +567,78 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <Field label="Gallery title" value={content.homePage.galleryTitle} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, galleryTitle: v } })} />
               <Field label="Reviews eyebrow" value={content.homePage.reviewsEyebrow} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsEyebrow: v } })} />
               <Field label="Reviews title" value={content.homePage.reviewsTitle} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsTitle: v } })} />
+              <Area label="Reviews disclaimer" value={content.homePage.reviewsDisclaimer} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsDisclaimer: v } })} />
+              <button
+                type="button"
+                className="mt-4 rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
+                onClick={() =>
+                  setContent({
+                    ...content,
+                    homePage: {
+                      ...content.homePage,
+                      reviews: [
+                        ...content.homePage.reviews,
+                        {
+                          id: `rev-${Date.now()}`,
+                          name: "Guest name",
+                          text: "Review text",
+                          rating: 5,
+                          dateLabel: "Google review",
+                        },
+                      ],
+                    },
+                  })
+                }
+              >
+                Add review slide
+              </button>
+              {content.homePage.reviews.map((rev, index) => (
+                <div key={rev.id} className="mt-4 rounded-2xl border border-[#efe8e0] p-4">
+                  <Field
+                    label="Guest name"
+                    value={rev.name}
+                    onChange={(v) => {
+                      const reviews = content.homePage.reviews.map((r, i) => (i === index ? { ...r, name: v } : r));
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  />
+                  <Area
+                    label="Review text"
+                    value={rev.text}
+                    onChange={(v) => {
+                      const reviews = content.homePage.reviews.map((r, i) => (i === index ? { ...r, text: v } : r));
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  />
+                  <Field
+                    label="Date label (e.g. Google review)"
+                    value={rev.dateLabel}
+                    onChange={(v) => {
+                      const reviews = content.homePage.reviews.map((r, i) => (i === index ? { ...r, dateLabel: v } : r));
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  />
+                  <Field
+                    label="Star rating (1–5)"
+                    value={String(rev.rating)}
+                    onChange={(v) => {
+                      const rating = Math.min(5, Math.max(1, Number(v) || 5));
+                      const reviews = content.homePage.reviews.map((r, i) => (i === index ? { ...r, rating } : r));
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="mt-2 text-xs text-[#c45e0a] underline"
+                    onClick={() => {
+                      const reviews = content.homePage.reviews.filter((_, i) => i !== index);
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  >
+                    Remove review
+                  </button>
+                </div>
+              ))}
               <p className="mt-8 text-sm font-semibold">Closing CTA band</p>
               <Field label="Title" value={content.homePage.cta.title} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, cta: { ...content.homePage.cta, title: v } } })} />
               <Area label="Text" value={content.homePage.cta.text} onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, cta: { ...content.homePage.cta, text: v } } })} />
@@ -1034,6 +1106,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   ["therapists", "Therapists"],
                   ["blog", "Blog"],
                   ["inquiries", "Inquiries"],
+                  ["reviews", "Reviews"],
                 ] as const
               ).map(([key, label]) => (
                 <label key={key} className="mt-3 flex cursor-pointer items-center gap-2 text-sm">

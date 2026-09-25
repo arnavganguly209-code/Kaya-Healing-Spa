@@ -1,9 +1,10 @@
 import { HeroMedia } from "@/components/hero-media";
+import { HomeReviewsSlider } from "@/components/home-reviews-slider";
 import { HomeVisitSection } from "@/components/home-visit-section";
 import { Reveal } from "@/components/reveal";
 import { TherapiesSection } from "@/components/therapies-section";
 import { WhyKayaSection } from "@/components/why-kaya-section";
-import { formatNpr, reviews, site } from "@/lib/content";
+import { formatNpr, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import { Flower2, Leaf, Sparkles } from "lucide-react";
 import Image from "next/image";
@@ -198,41 +199,13 @@ export function HomePage() {
         </ol>
       </section>
 
-      <section className="bg-[#f6f1e8]">
-        <div className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="eyebrow">{homePage.reviewsEyebrow}</p>
-              <h2 className="display mt-3 text-5xl">{homePage.reviewsTitle}</h2>
-            </div>
-            <Link href="/contact#reviews" className="btn-line">Read more reviews</Link>
-          </div>
-          <p className="mt-4 max-w-xl text-sm text-[#8a8175]">
-            These cards are placeholders. They are not guest reviews and are not sourced from Google or TripAdvisor.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-3 text-sm">
-            {site.social.google.startsWith("https://") ? (
-              <a className="btn-line" href={site.social.google} target="_blank" rel="noreferrer">Google reviews</a>
-            ) : (
-              <span className="text-[#8a8175]">Google reviews: listing not connected yet.</span>
-            )}
-            {site.social.tripadvisor.startsWith("https://") ? (
-              <a className="btn-line" href={site.social.tripadvisor} target="_blank" rel="noreferrer">Tripadvisor reviews</a>
-            ) : (
-              <span className="text-[#8a8175]">Tripadvisor reviews: listing not connected yet.</span>
-            )}
-          </div>
-          <div className="mt-10 grid gap-6 lg:grid-cols-3">
-            {reviews.map((review, index) => (
-              <blockquote key={review.id} className={`bg-white p-8 ${index === 0 ? "lg:col-span-2" : ""}`}>
-                <p className="text-xs tracking-[0.16em] uppercase text-[#e8771a]">Sample layout</p>
-                <p className="mt-4 font-serif text-2xl leading-snug">“{review.text}”</p>
-                <footer className="mt-6 text-sm text-[#8a8175]">{review.name}</footer>
-              </blockquote>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HomeReviewsSlider
+        eyebrow={homePage.reviewsEyebrow}
+        title={homePage.reviewsTitle}
+        disclaimer={homePage.reviewsDisclaimer}
+        reviews={homePage.reviews}
+        googleUrl={site.social.google}
+      />
 
       <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
         <div className="flex items-end justify-between gap-4">

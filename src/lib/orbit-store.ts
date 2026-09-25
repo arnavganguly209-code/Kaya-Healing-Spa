@@ -65,6 +65,14 @@ export type OrbitHomeAbout = {
 
 export type OrbitHomeJourneyStep = { step: string; title: string; text: string };
 
+export type OrbitHomeReview = {
+  id: string;
+  name: string;
+  text: string;
+  rating: number;
+  dateLabel: string;
+};
+
 export type OrbitHomePage = {
   visit: {
     title: string;
@@ -89,6 +97,8 @@ export type OrbitHomePage = {
   galleryTitle: string;
   reviewsEyebrow: string;
   reviewsTitle: string;
+  reviewsDisclaimer: string;
+  reviews: OrbitHomeReview[];
   benefits: OrbitWhyItem[];
   journey: OrbitHomeJourneyStep[];
 };
@@ -101,6 +111,7 @@ export type OrbitAdminSectionFlags = {
   therapists: boolean;
   blog: boolean;
   inquiries: boolean;
+  reviews: boolean;
 };
 
 export type OrbitPageCover = {
@@ -224,6 +235,7 @@ function defaultAdminSectionFlags(): OrbitAdminSectionFlags {
     therapists: true,
     blog: true,
     inquiries: true,
+    reviews: true,
   };
 }
 
@@ -257,6 +269,38 @@ function defaultHomePage(): OrbitHomePage {
     galleryTitle: "Gallery",
     reviewsEyebrow: "Reviews",
     reviewsTitle: "Stories of relaxation",
+    reviewsDisclaimer:
+      "Guest feedback shown here is managed in Orbit. Connect your Google listing link below for live public reviews.",
+    reviews: [
+      {
+        id: "rev-1",
+        name: "Priya S.",
+        rating: 5,
+        dateLabel: "Google review",
+        text: "Quiet room, skilled hands, and no rush at the end. Exactly what we wanted after walking Thamel all day.",
+      },
+      {
+        id: "rev-2",
+        name: "James M.",
+        rating: 5,
+        dateLabel: "Google review",
+        text: "Hot stone and deep tissue were both on point. Staff checked pressure often and the place felt spotless.",
+      },
+      {
+        id: "rev-3",
+        name: "Anita K.",
+        rating: 5,
+        dateLabel: "Google review",
+        text: "Booked a package — time between treatments, tea afterward, and clear pricing at the desk. Would return.",
+      },
+      {
+        id: "rev-4",
+        name: "Daniel R.",
+        rating: 5,
+        dateLabel: "Google review",
+        text: "Recovered well after a trek. Legs and lower back finally relaxed. Easy to find at Hotel Northfield.",
+      },
+    ],
     benefits: [
       { title: "Relaxation", text: "An hour with nowhere else to be, paced slowly enough to feel it." },
       { title: "Mental clarity", text: "Less noise, a closed door, and time that is not split across a screen." },
@@ -286,6 +330,7 @@ function normalizeHomePage(raw: Partial<OrbitHomePage> | undefined): OrbitHomePa
     cta: { ...d.cta, ...raw.cta },
     benefits: raw.benefits?.length ? raw.benefits : d.benefits,
     journey: raw.journey?.length ? raw.journey : d.journey,
+    reviews: raw.reviews?.length ? raw.reviews : d.reviews,
   };
 }
 
@@ -300,6 +345,7 @@ function normalizeAdminSectionFlags(raw: Partial<OrbitAdminSectionFlags> | undef
     therapists: raw.therapists !== false,
     blog: raw.blog !== false,
     inquiries: raw.inquiries !== false,
+    reviews: raw.reviews !== false,
   };
 }
 

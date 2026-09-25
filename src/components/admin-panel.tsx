@@ -24,9 +24,10 @@ type AdminData = {
   categories: string[];
   packageCategories: string[];
   adminSectionFlags: OrbitAdminSectionFlags;
+  homePage: OrbitContent["homePage"];
 };
 
-const allSections = ["Dashboard", "Hero", "Footer", "Services", "Packages", "Therapists", "Blog", "Inquiries", "Account"] as const;
+const allSections = ["Dashboard", "Hero", "Footer", "Services", "Packages", "Therapists", "Blog", "Inquiries", "Reviews", "Account"] as const;
 
 const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSectionFlags | null> = {
   Dashboard: null,
@@ -37,6 +38,7 @@ const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSecti
   Therapists: "therapists",
   Blog: "blog",
   Inquiries: "inquiries",
+  Reviews: "reviews",
   Account: null,
 };
 
@@ -490,6 +492,101 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                 ))}
                 {!inquiries.length && <p className="text-sm text-[#6B6B6B]">No inquiries yet.</p>}
               </ul>
+            </>
+          )}
+
+          {section === "Reviews" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">Home page Google-style review slider. Edit guest names, quotes, and labels.</p>
+              <Field
+                label="Reviews eyebrow"
+                value={content.homePage.reviewsEyebrow}
+                onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsEyebrow: v } })}
+              />
+              <Field
+                label="Reviews title"
+                value={content.homePage.reviewsTitle}
+                onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsTitle: v } })}
+              />
+              <Area
+                label="Reviews disclaimer"
+                value={content.homePage.reviewsDisclaimer}
+                onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsDisclaimer: v } })}
+              />
+              <button
+                type="button"
+                className="mt-4 rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
+                onClick={() =>
+                  setContent({
+                    ...content,
+                    homePage: {
+                      ...content.homePage,
+                      reviews: [
+                        ...content.homePage.reviews,
+                        {
+                          id: `rev-${Date.now()}`,
+                          name: "Guest name",
+                          text: "Review text",
+                          rating: 5,
+                          dateLabel: "Google review",
+                        },
+                      ],
+                    },
+                  })
+                }
+              >
+                Add review slide
+              </button>
+              {content.homePage.reviews.map((rev, index) => (
+                <div key={rev.id} className="mt-4 rounded-2xl border border-[#efe8e0] p-4">
+                  <Field
+                    label="Guest name"
+                    value={rev.name}
+                    onChange={(v) => {
+                      const reviews = content.homePage.reviews.map((r, i) => (i === index ? { ...r, name: v } : r));
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  />
+                  <Area
+                    label="Review text"
+                    value={rev.text}
+                    onChange={(v) => {
+                      const reviews = content.homePage.reviews.map((r, i) => (i === index ? { ...r, text: v } : r));
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  />
+                  <Field
+                    label="Date label (e.g. Google review)"
+                    value={rev.dateLabel}
+                    onChange={(v) => {
+                      const reviews = content.homePage.reviews.map((r, i) => (i === index ? { ...r, dateLabel: v } : r));
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  />
+                  <Field
+                    label="Star rating (1–5)"
+                    value={String(rev.rating)}
+                    onChange={(v) => {
+                      const rating = Math.min(5, Math.max(1, Number(v) || 5));
+                      const reviews = content.homePage.reviews.map((r, i) => (i === index ? { ...r, rating } : r));
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="mt-2 text-xs text-[#c45e0a] underline"
+                    onClick={() => {
+                      const reviews = content.homePage.reviews.filter((_, i) => i !== index);
+                      setContent({ ...content, homePage: { ...content.homePage, reviews } });
+                    }}
+                  >
+                    Remove review
+                  </button>
+                </div>
+              ))}
+              <button type="button" className="mt-6 rounded-full bg-[#F47B20] px-5 py-2 text-sm text-white" disabled={saving} onClick={() => publish(content)}>
+                {saving ? "Saving…" : "Save reviews to live site"}
+              </button>
             </>
           )}
 

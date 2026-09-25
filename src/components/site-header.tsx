@@ -64,7 +64,7 @@ export function SiteHeader({
 
   const bookClass = onHero
     ? "book-cta border border-white/70 bg-transparent text-white hover:bg-white/10"
-    : "book-cta-solid bg-[#F47B20] text-white hover:bg-[#e06d12]";
+    : "book-cta-cream border border-[#F47B20]/30 bg-gradient-to-b from-[#fff8f0] to-[#fde5cc] text-[#7a3a12] shadow-[0_10px_28px_rgba(244,123,32,0.2)] hover:from-[#fff3e6] hover:to-[#ffd9b0]";
 
   return (
     <header
