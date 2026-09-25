@@ -92,7 +92,7 @@ export function ServiceCatalog({
         </div>
 
         <p className="mt-8 text-center text-sm text-[#8a8175]">
-          Indicative prices — confirm when you book · {list.length} treatment{list.length === 1 ? "" : "s"}
+          All prices in NPR · {list.length} treatment{list.length === 1 ? "" : "s"}
         </p>
 
         {list.length === 0 ? (
@@ -122,7 +122,15 @@ export function ServiceCatalog({
                   </p>
                   <h2 className="mt-2 font-serif text-2xl leading-tight text-[#141210] md:text-[1.65rem]">{service.name}</h2>
                   <p className="prose-quiet mt-3 flex-1 text-sm leading-relaxed">{service.summary}</p>
-                  <p className="mt-4 text-sm font-semibold text-[#141210]">From {formatNpr(service.priceFromNpr)}</p>
+                  {service.durationOptions.length > 0 ? (
+                    <ul className="mt-3 space-y-1 text-xs font-medium text-[#3d4a6b]">
+                      {service.durationOptions.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-4 text-sm font-semibold text-[#141210]">From {formatNpr(service.priceFromNpr)}</p>
+                  )}
                   <div className="mt-5 flex flex-wrap items-center gap-4 border-t border-[#f0ece8] pt-5">
                     <Link href={`/services/${service.slug}`} className="btn-line">
                       View details

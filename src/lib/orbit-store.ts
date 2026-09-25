@@ -1,4 +1,5 @@
-import { gallery, packages, services, site } from "@/lib/content";
+import { gallery, packages, site } from "@/lib/content";
+import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
 import { defaultTherapists } from "@/lib/default-therapists";
 import type { OrbitAboutPage, OrbitSocialLink, OrbitTherapist } from "@/lib/orbit-types";
 import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
@@ -107,7 +108,12 @@ export type OrbitContent = {
   categories: string[];
   packages: SpaPackage[];
   gallery: GalleryImage[];
+  /** Bump when the code default services menu changes — resets saved services on deploy. */
+  servicesMenuVersion?: number;
 };
+
+/** Increment when replacing the default treatment menu in code. */
+export const SERVICES_MENU_VERSION = 2;
 
 const filePath = path.join(process.cwd(), "data", "orbit-content.json");
 
@@ -294,7 +300,7 @@ export function defaultOrbitContent(): OrbitContent {
           title: "Traditional Massage",
           text: "Release tension, relieve stress and restore your natural balance with expert massage techniques.",
           image: "/therapies/card-massage.png",
-          href: "/services/signature-massage",
+          href: "/services/kaya-healing-therapy",
           alt: "Guest receiving a traditional massage",
           buttonLabel: "Learn More",
         },
@@ -302,7 +308,7 @@ export function defaultOrbitContent(): OrbitContent {
           title: "Ayurvedic Therapy",
           text: "Ancient healing practices to detoxify, rejuvenate and promote complete wellness.",
           image: "/therapies/card-ayurveda.png",
-          href: "/services/shirodhara",
+          href: "/services/shirodhara-massage",
           alt: "Warm oil poured during an Ayurvedic treatment",
           buttonLabel: "Learn More",
         },
@@ -310,7 +316,7 @@ export function defaultOrbitContent(): OrbitContent {
           title: "Facial Treatments",
           text: "Rejuvenate your skin with natural care and professional skincare therapies.",
           image: "/therapies/card-facial.png",
-          href: "/services/calm-facial",
+          href: "/services/hydra-facial",
           alt: "Guest resting during a facial",
           buttonLabel: "Learn More",
         },
@@ -318,7 +324,7 @@ export function defaultOrbitContent(): OrbitContent {
           title: "Hot Stone Therapy",
           text: "Deep relaxation, improve circulation and relieve muscle tension with warm stone therapy.",
           image: "/therapies/card-stones.png",
-          href: "/services/hot-stone",
+          href: "/services/hot-stone-massage",
           alt: "Warm stones prepared for hot stone therapy",
           buttonLabel: "Learn More",
         },
@@ -382,8 +388,9 @@ export function defaultOrbitContent(): OrbitContent {
       imageAlt: "Spa stones and folded towels",
     },
     pageCovers: defaultPageCovers(),
-    services,
-    categories: ["massage", "ayurvedic", "holistic", "body-care", "facial", "wellness", "recovery"],
+    services: defaultServices,
+    categories: [...defaultServiceCategories],
+    servicesMenuVersion: SERVICES_MENU_VERSION,
     packageCategories: ["signature", "couples", "half-day", "full-day", "recovery", "wellness"],
     packages,
     gallery,
@@ -490,8 +497,14 @@ export function readOrbitContent(): OrbitContent {
   try {
     const saved = JSON.parse(readFileSync(filePath, "utf8")) as Partial<OrbitContent>;
     const merged = merge(defaults, saved);
+    const menuCurrent =
+      saved.servicesMenuVersion === SERVICES_MENU_VERSION && merged.services?.length
+        ? { services: merged.services, categories: merged.categories?.length ? merged.categories : defaults.categories }
+        : { services: defaults.services, categories: defaults.categories };
     return {
       ...merged,
+      ...menuCurrent,
+      servicesMenuVersion: SERVICES_MENU_VERSION,
       hero: normalizeHero(merged.hero),
       therapies: normalizeTherapies(merged.therapies),
       whyKaya: normalizeWhyKaya(merged.whyKaya ?? defaults.whyKaya),
@@ -520,6 +533,7 @@ export function writeOrbitContent(content: OrbitContent) {
         whyKaya: normalizeWhyKaya(content.whyKaya),
         aboutPage: { ...defaultAboutPage(), ...content.aboutPage },
         therapists: content.therapists?.length ? content.therapists : defaultTherapists(),
+        servicesMenuVersion: SERVICES_MENU_VERSION,
         socialLinks: normalizeSocialLinks(content.socialLinks),
       },
       null,

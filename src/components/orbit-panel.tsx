@@ -1,6 +1,8 @@
 "use client";
 
 import type { OrbitContent, OrbitPageCovers } from "@/lib/orbit-store";
+import { SERVICES_MENU_VERSION } from "@/lib/orbit-store";
+import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
 import { site } from "@/lib/content";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import { useEffect, useRef, useState } from "react";
@@ -625,17 +627,113 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Services" && (
             <>
-              <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => publish({ ...content, services: [...content.services, { ...content.services[0], slug: `service-${Date.now()}`, name: "New treatment", summary: "Describe this treatment." }] })}>
-                Add treatment
-              </button>
+              <p className="text-sm text-[#6B6B6B]">
+                Full spa menu ({content.services.length} treatments). Prices and durations are shown on the site in NPR. One line per duration option (e.g.{" "}
+                <span className="font-mono text-xs">60 min — NPR 4,500</span>).
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  className="rounded-full border border-[#F47B20]/30 bg-[#fff7f0] px-5 py-3 text-sm font-semibold text-[#c45a0a]"
+                  onClick={() =>
+                    publish({
+                      ...contentRef.current,
+                      services: defaultServices.map((s) => ({ ...s })),
+                      categories: [...defaultServiceCategories],
+                      servicesMenuVersion: SERVICES_MENU_VERSION,
+                    })
+                  }
+                >
+                  Reset to latest menu (32 treatments)
+                </button>
+                <button
+                  type="button"
+                  className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
+                  onClick={() => {
+                    const base = defaultServices[0];
+                    publish({
+                      ...contentRef.current,
+                      services: [
+                        ...contentRef.current.services,
+                        {
+                          ...base,
+                          slug: `treatment-${Date.now()}`,
+                          name: "New treatment",
+                          summary: "Short tagline",
+                          overview: "Full description for the treatment page.",
+                          durationOptions: ["60 min — NPR 0"],
+                          priceFromNpr: 0,
+                        },
+                      ],
+                    });
+                  }}
+                >
+                  Add treatment
+                </button>
+              </div>
               {content.services.map((service, index) => (
                 <div key={`${service.slug}-${index}`} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
                   <Field label="Slug" value={service.slug} onChange={(value) => updateService(index, { slug: value })} />
                   <Field label="Name" value={service.name} onChange={(value) => updateService(index, { name: value })} />
                   <Field label="Category" value={service.category} onChange={(value) => updateService(index, { category: value as typeof service.category })} />
-                  <Area label="Summary" value={service.summary} onChange={(value) => updateService(index, { summary: value })} />
+                  <Area label="Summary (tagline)" value={service.summary} onChange={(value) => updateService(index, { summary: value })} />
+                  <Area label="Overview (detail page)" value={service.overview} onChange={(value) => updateService(index, { overview: value })} />
+                  <Field
+                    label="Primary duration (minutes, for badge)"
+                    value={String(service.durationMinutes)}
+                    onChange={(value) => updateService(index, { durationMinutes: Number(value) || 0 })}
+                  />
+                  <Area
+                    label="Duration & price lines"
+                    value={service.durationOptions.join("\n")}
+                    onChange={(value) =>
+                      updateService(index, {
+                        durationOptions: value
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                  />
                   <Field label="Price from NPR" value={String(service.priceFromNpr)} onChange={(value) => updateService(index, { priceFromNpr: Number(value) || 0 })} />
+                  <Area
+                    label="Benefits (one per line, optional)"
+                    value={service.benefits.join("\n")}
+                    onChange={(value) =>
+                      updateService(index, {
+                        benefits: value
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                  />
+                  <Area
+                    label="What to expect (one per line, optional)"
+                    value={service.expect.join("\n")}
+                    onChange={(value) =>
+                      updateService(index, {
+                        expect: value
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                  />
                   <MediaField label="Image" src={service.image} onUpload={(file) => upload(file, (image: string) => updateService(index, { image }))} onLibrary={() => setPicker((image: string) => updateService(index, { image }))} />
+                  <Field label="Image alt" value={service.imageAlt} onChange={(value) => updateService(index, { imageAlt: value })} />
+                  <button
+                    type="button"
+                    className="text-sm text-red-700 underline"
+                    onClick={() =>
+                      publish({
+                        ...contentRef.current,
+                        services: contentRef.current.services.filter((_, i) => i !== index),
+                      })
+                    }
+                  >
+                    Remove treatment
+                  </button>
                 </div>
               ))}
             </>

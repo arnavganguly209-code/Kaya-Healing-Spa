@@ -3,6 +3,7 @@ import { TherapistStrip } from "@/components/therapist-strip";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { categoryLabels, formatNpr, getService as fallbackService, services, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
+import type { Service } from "@/lib/types";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,7 +11,7 @@ import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ slug: string }> };
 
-function getService(slug: string) {
+function getService(slug: string): Service | undefined {
   return readOrbitContent().services.find((service) => service.slug === slug) ?? fallbackService(slug);
 }
 
@@ -101,7 +102,7 @@ export default async function ServiceDetail({ params }: Props) {
           </ul>
           <p className="mt-6 text-xs tracking-[0.16em] uppercase text-[#8a8175]">From</p>
           <p className="mt-1 font-serif text-4xl">{formatNpr(service.priceFromNpr)}</p>
-          <p className="mt-2 text-xs text-[#8a8175]">Indicative placeholder pricing. This is not a medical treatment.</p>
+          <p className="mt-2 text-xs text-[#8a8175]">Prices in NPR. This is wellness bodywork, not medical treatment.</p>
           <Link href={`/contact?service=${service.slug}&mode=service`} className="btn-primary mt-6 w-full">
             Book appointment
           </Link>
