@@ -1,5 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
-import path from "path";
+import { dataFilePath, readJsonFile, writeJsonFileAtomic } from "@/lib/json-file";
 
 export type AdminCredentials = {
   username: string;
@@ -18,8 +17,8 @@ export type AdminInquiry = {
   payload: Record<string, unknown>;
 };
 
-const credPath = path.join(process.cwd(), "data", "admin-auth.json");
-const inquiryPath = path.join(process.cwd(), "data", "admin-inquiries.json");
+const credPath = dataFilePath("admin-auth.json");
+const inquiryPath = dataFilePath("admin-inquiries.json");
 
 export const defaultAdminCredentials: AdminCredentials = {
   username: "kaya",
@@ -27,57 +26,46 @@ export const defaultAdminCredentials: AdminCredentials = {
 };
 
 export function readAdminCredentials(): AdminCredentials {
-  if (!existsSync(credPath)) return { ...defaultAdminCredentials };
-  try {
-    const saved = JSON.parse(readFileSync(credPath, "utf8")) as Partial<AdminCredentials>;
-    return {
-      username: saved.username?.trim() || defaultAdminCredentials.username,
-      password: saved.password || defaultAdminCredentials.password,
-    };
-  } catch {
-    return { ...defaultAdminCredentials };
-  }
+  const saved = readJsonFile(credPath, () => null as Partial<AdminCredentials> | null);
+  if (!saved) return { ...defaultAdminCredentials };
+  return {
+    username: saved.username?.trim() || defaultAdminCredentials.username,
+    password: saved.password || defaultAdminCredentials.password,
+  };
 }
 
 export function writeAdminCredentials(credentials: AdminCredentials) {
-  mkdirSync(path.dirname(credPath), { recursive: true });
-  writeFileSync(
-    credPath,
-    JSON.stringify(
-      {
-        username: credentials.username.trim() || defaultAdminCredentials.username,
-        password: credentials.password || defaultAdminCredentials.password,
-      },
-      null,
-      2,
-    ),
-  );
+  writeJsonFileAtomic(credPath, {
+    username: credentials.username.trim() || defaultAdminCredentials.username,
+    password: credentials.password || defaultAdminCredentials.password,
+  });
 }
 
 export function readInquiries(): AdminInquiry[] {
-  if (!existsSync(inquiryPath)) return [];
-  try {
-    return JSON.parse(readFileSync(inquiryPath, "utf8")) as AdminInquiry[];
-  } catch {
-    return [];
-  }
+  return readJsonFile(inquiryPath, () => []);
 }
 
 export function appendInquiry(entry: Omit<AdminInquiry, "id" | "createdAt" | "read">) {
-  const list = readInquiries();
   const item: AdminInquiry = {
     ...entry,
     id: `inq-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     createdAt: new Date().toISOString(),
     read: false,
   };
-  list.unshift(item);
-  mkdirSync(path.dirname(inquiryPath), { recursive: true });
-  writeFileSync(inquiryPath, JSON.stringify(list.slice(0, 500), null, 2));
-  return item;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const list = readInquiries();
+      list.unshift(item);
+      writeJsonFileAtomic(inquiryPath, list.slice(0, 500));
+      return item;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("Could not save inquiry.");
 }
 
 export function updateInquiries(list: AdminInquiry[]) {
-  mkdirSync(path.dirname(inquiryPath), { recursive: true });
-  writeFileSync(inquiryPath, JSON.stringify(list.slice(0, 500), null, 2));
+  writeJsonFileAtomic(inquiryPath, list.slice(0, 500));
 }

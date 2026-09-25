@@ -183,7 +183,7 @@ jobs:
             echo "ERROR: homepage HTML did not contain Kaya"
             exit 1
           fi
-          for path in /sitemap.xml /terms /privacy /manifest.webmanifest; do
+          for path in /sitemap.xml /terms /privacy /manifest.webmanifest /contact; do
             CODE="$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 --retry-delay 2 "https://kaya.theglobalorbit.com${path}" || true)"
             echo "${path} HTTP ${CODE}"
             if [ "${CODE}" != "200" ]; then

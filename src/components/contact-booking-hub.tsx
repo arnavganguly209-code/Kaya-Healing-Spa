@@ -1,5 +1,6 @@
 "use client";
 
+import { formApiUrl } from "@/lib/form-api";
 import { TherapistCard } from "@/components/therapist-card";
 import { TherapistCarousel } from "@/components/therapist-carousel";
 import { TherapistPortrait } from "@/components/therapist-portrait";
@@ -7,13 +8,6 @@ import { formatNpr, site } from "@/lib/content";
 import type { OrbitTherapist } from "@/lib/orbit-types";
 import type { Service, SpaPackage } from "@/lib/types";
 import { useEffect, useMemo, useState } from "react";
-
-const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "";
-const useExternalApi = apiBase.startsWith("https://") && !apiBase.includes("localhost") && !apiBase.includes("127.0.0.1");
-
-function endpoint(path: "/appointments" | "/newsletter") {
-  return useExternalApi ? `${apiBase}${path}` : `/api${path}`;
-}
 
 type Status = "idle" | "loading" | "success" | "error";
 type BookingMode = "service" | "package" | "therapist";
@@ -181,7 +175,7 @@ function BookingPanel({
     }
     const therapistForBooking = kind === "therapist" ? therapist || undefined : undefined;
     try {
-      const response = await fetch(endpoint("/appointments"), {
+      const response = await fetch(formApiUrl("appointments"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

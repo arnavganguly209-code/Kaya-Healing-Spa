@@ -1,5 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
-import path from "path";
+import { dataFilePath, readJsonFile, writeJsonFileAtomic } from "@/lib/json-file";
 
 export type BlogPost = {
   slug: string;
@@ -16,7 +15,7 @@ export type BlogPost = {
   featuredImageAlt: string;
 };
 
-const filePath = path.join(process.cwd(), "data", "blog-posts.json");
+const filePath = dataFilePath("blog-posts.json");
 
 function defaultPosts(): BlogPost[] {
   const now = new Date().toISOString();
@@ -70,18 +69,12 @@ function defaultPosts(): BlogPost[] {
 }
 
 export function readBlogPosts(): BlogPost[] {
-  if (!existsSync(filePath)) return defaultPosts();
-  try {
-    const parsed = JSON.parse(readFileSync(filePath, "utf8")) as BlogPost[];
-    return parsed?.length ? parsed : defaultPosts();
-  } catch {
-    return defaultPosts();
-  }
+  const parsed = readJsonFile(filePath, () => null as BlogPost[] | null);
+  return parsed?.length ? parsed : defaultPosts();
 }
 
 export function writeBlogPosts(posts: BlogPost[]) {
-  mkdirSync(path.dirname(filePath), { recursive: true });
-  writeFileSync(filePath, JSON.stringify(posts, null, 2));
+  writeJsonFileAtomic(filePath, posts);
 }
 
 export function getPublishedPosts() {

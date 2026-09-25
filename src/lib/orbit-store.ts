@@ -4,8 +4,9 @@ import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 import { defaultTherapists } from "@/lib/default-therapists";
 import { therapistPlaceholderPath } from "@/lib/catalog-images";
 import type { OrbitAboutPage, OrbitExtraSocialLink, OrbitSocialLink, OrbitTherapist } from "@/lib/orbit-types";
+import { fileMtimeMs, writeJsonFileAtomic } from "@/lib/json-file";
 import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
 
 export type HeroSlide = { src: string; alt: string; kind?: "image" | "video" };
@@ -172,6 +173,12 @@ export type OrbitContent = {
 export { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 
 const filePath = path.join(process.cwd(), "data", "orbit-content.json");
+
+let orbitContentCache: { mtime: number; value: OrbitContent } | null = null;
+
+export function invalidateOrbitContentCache() {
+  orbitContentCache = null;
+}
 
 function defaultSocialLinks(): OrbitSocialLink[] {
   return [
@@ -709,6 +716,22 @@ function normalizeWhyKaya(why: OrbitWhyKaya): OrbitWhyKaya {
 }
 
 export function readOrbitContent(): OrbitContent {
+  try {
+    const mtime = fileMtimeMs(filePath);
+    if (orbitContentCache && orbitContentCache.mtime === mtime) {
+      return orbitContentCache.value;
+    }
+    const value = loadOrbitContentFromDisk();
+    orbitContentCache = { mtime: fileMtimeMs(filePath) || mtime, value };
+    return value;
+  } catch (error) {
+    console.error("readOrbitContent failed", error);
+    orbitContentCache = null;
+    return defaultOrbitContent();
+  }
+}
+
+function loadOrbitContentFromDisk(): OrbitContent {
   const defaults = defaultOrbitContent();
   if (!existsSync(filePath)) return defaults;
   try {
@@ -751,25 +774,20 @@ export function readOrbitContent(): OrbitContent {
 }
 
 export function writeOrbitContent(content: OrbitContent) {
-  mkdirSync(path.dirname(filePath), { recursive: true });
-  writeFileSync(
-    filePath,
-    JSON.stringify(
-      {
-        ...content,
-        hero: normalizeHero(content.hero),
-        therapies: normalizeTherapies(content.therapies),
-        whyKaya: normalizeWhyKaya(content.whyKaya),
-        aboutPage: { ...defaultAboutPage(), ...content.aboutPage },
-        homePage: normalizeHomePage(content.homePage),
-        adminSectionFlags: normalizeAdminSectionFlags(content.adminSectionFlags),
-        therapists: content.therapists?.length ? content.therapists : defaultTherapists(),
-        servicesMenuVersion: SERVICES_MENU_VERSION,
-        socialLinks: normalizeSocialLinks(content.socialLinks),
-        extraSocialLinks: normalizeExtraSocialLinks(content.extraSocialLinks),
-      },
-      null,
-      2,
-    ),
-  );
+  const payload = {
+    ...content,
+    hero: normalizeHero(content.hero),
+    therapies: normalizeTherapies(content.therapies),
+    whyKaya: normalizeWhyKaya(content.whyKaya),
+    aboutPage: { ...defaultAboutPage(), ...content.aboutPage },
+    homePage: normalizeHomePage(content.homePage),
+    adminSectionFlags: normalizeAdminSectionFlags(content.adminSectionFlags),
+    therapists: content.therapists?.length ? content.therapists : defaultTherapists(),
+    servicesMenuVersion: SERVICES_MENU_VERSION,
+    socialLinks: normalizeSocialLinks(content.socialLinks),
+    extraSocialLinks: normalizeExtraSocialLinks(content.extraSocialLinks),
+  };
+  writeJsonFileAtomic(filePath, payload);
+  const mtime = fileMtimeMs(filePath);
+  orbitContentCache = { mtime, value: loadOrbitContentFromDisk() };
 }
