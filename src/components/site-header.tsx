@@ -32,7 +32,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   }, [open]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 48);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -44,8 +44,8 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300 ${
         glass
-          ? "border-b border-white/60 bg-white/75 shadow-[0_8px_32px_rgba(23,23,23,0.04)] backdrop-blur-lg"
-          : "border-b border-transparent bg-transparent shadow-none backdrop-blur-none"
+          ? "border-b border-white/60 bg-white/80 shadow-[0_8px_32px_rgba(23,23,23,0.05)] backdrop-blur-lg"
+          : "border-b-0 border-transparent bg-transparent shadow-none backdrop-blur-0"
       }`}
     >
       <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-5 md:px-8 lg:h-[108px]">

@@ -63,8 +63,8 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative min-h-[100svh] overflow-hidden bg-white lg:min-h-[max(720px,min(100svh,54vw))]">
-        <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 md:bottom-[48px] lg:top-[108px] lg:bottom-[56px]">
+      <section className="relative min-h-[100svh] overflow-hidden bg-white">
+        <div className="pointer-events-none absolute inset-x-0 top-[72px] bottom-0 lg:top-[108px] lg:bottom-[52px]">
           <HeroMedia
             slides={hero.slides}
             display={hero.display}
@@ -72,23 +72,23 @@ export function HomePage() {
             intervalMs={hero.intervalMs}
             flipHorizontal={hero.flipHorizontal}
             objectPosition={hero.objectPosition}
-            className="absolute inset-y-0 right-0 hidden w-[52%] min-w-[280px] max-w-[920px] md:block md:w-[56%] lg:w-[60%] xl:w-[58%] 2xl:w-[55%]"
+            className="absolute inset-y-0 right-0 left-[36%] hidden md:block lg:left-[40%] xl:left-[42%] 2xl:left-[44%]"
             priority
-            sizes="(min-width: 1536px) 920px, 58vw"
+            sizes="(min-width: 1920px) 58vw, (min-width: 1280px) 56vw, 50vw"
           />
-          <div className="absolute inset-y-0 right-0 hidden w-[52%] min-w-[280px] max-w-[920px] bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.92)_12%,rgba(255,255,255,0.4)_28%,transparent_46%)] md:block md:w-[56%] lg:w-[60%] xl:w-[58%] 2xl:w-[55%]" />
-          <div className="absolute inset-x-0 bottom-0 hidden h-20 bg-gradient-to-t from-white via-white/80 to-transparent md:block" />
+          <div className="absolute inset-y-0 right-0 left-[36%] hidden bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.94)_14%,rgba(255,255,255,0.45)_32%,transparent_52%)] md:block lg:left-[40%] xl:left-[42%] 2xl:left-[44%]" />
+          <div className="absolute inset-x-0 bottom-0 hidden h-24 bg-gradient-to-t from-white via-white/85 to-transparent md:block" />
         </div>
 
-        <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1400px] flex-col px-5 pt-[72px] sm:px-8 md:min-h-0 md:px-10 lg:min-h-[calc(100svh-108px)] lg:px-14 lg:pt-[108px]">
-          <div className="flex flex-1 items-center py-6 md:py-10 lg:py-0">
-            <div className="w-full max-w-[540px] md:max-w-[480px] lg:max-w-[520px]">
+        <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col px-5 pt-[72px] sm:px-8 md:px-10 lg:px-12 lg:pt-[108px] xl:px-14">
+          <div className="flex flex-1 items-center py-6 lg:py-4 xl:py-6">
+            <div className="w-full max-w-[min(100%,520px)] lg:max-w-[480px] xl:max-w-[540px]">
               <p className="flex items-center gap-3 text-[11px] font-medium tracking-[0.26em] text-[#8a8a8a] uppercase">
                 {hero.eyebrow}
                 <span className="h-px w-10 bg-[#F47B20]" />
               </p>
               <h1
-                className="mt-4 text-[48px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#171717] sm:mt-5 sm:text-[64px] md:text-[72px] lg:text-[92px] xl:text-[102px]"
+                className="mt-4 text-[44px] leading-[0.95] font-semibold tracking-[-0.03em] text-[#171717] sm:mt-5 sm:text-[58px] md:text-[68px] lg:text-[80px] xl:text-[92px] 2xl:text-[100px]"
                 style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
               >
                 <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
@@ -139,7 +139,8 @@ export function HomePage() {
             />
           </div>
 
-          <div className="relative z-20 mb-5 rounded-[24px] border border-white/80 bg-white/70 shadow-[0_16px_40px_rgba(23,23,23,0.08)] backdrop-blur-xl sm:mb-6 sm:rounded-[28px]">
+          <div className="relative z-20 mb-5 w-full sm:mb-6">
+            <div className="rounded-[24px] border border-white/80 bg-white/70 shadow-[0_16px_40px_rgba(23,23,23,0.08)] backdrop-blur-xl sm:rounded-[28px]">
             <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];
@@ -157,6 +158,7 @@ export function HomePage() {
                 );
               })}
             </ul>
+            </div>
           </div>
         </div>
       </section>
