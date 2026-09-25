@@ -39,7 +39,27 @@ export type OrbitTherapyCard = {
   href: string;
   alt: string;
   buttonLabel?: string;
+  /** Service menu category slug — used when href is missing or generic. */
+  category?: string;
 };
+
+/** Home “Healthier You” cards → live service menu (category filters + one flagship treatment). */
+const THERAPY_CARD_MENU_LINKS: Record<string, string> = {
+  "Traditional Massage": "/services?category=massage",
+  "Ayurvedic Therapy": "/services?category=holistic",
+  "Facial Treatments": "/services?category=facial",
+  "Hot Stone Therapy": "/services/hot-stone-massage",
+};
+
+function resolveTherapyCardHref(card: OrbitTherapyCard): string {
+  const titled = card.title?.trim();
+  if (titled && THERAPY_CARD_MENU_LINKS[titled]) return THERAPY_CARD_MENU_LINKS[titled];
+  const href = card.href?.trim();
+  if (href && href !== "#" && href !== "/services") return href;
+  const category = card.category?.trim();
+  if (category && category !== "all") return `/services?category=${encodeURIComponent(category)}`;
+  return "/services";
+}
 
 export type OrbitWhyItem = { title: string; text: string };
 
@@ -560,7 +580,8 @@ export function defaultOrbitContent(): OrbitContent {
           title: "Traditional Massage",
           text: "Release tension, relieve stress and restore your natural balance with expert massage techniques.",
           image: "/therapies/card-massage.png",
-          href: "/services/kaya-healing-therapy",
+          href: "/services?category=massage",
+          category: "massage",
           alt: "Guest receiving a traditional massage",
           buttonLabel: "Learn More",
         },
@@ -568,7 +589,8 @@ export function defaultOrbitContent(): OrbitContent {
           title: "Ayurvedic Therapy",
           text: "Ancient healing practices to detoxify, rejuvenate and promote complete wellness.",
           image: "/therapies/card-ayurveda.png",
-          href: "/services/shirodhara-massage",
+          href: "/services?category=holistic",
+          category: "holistic",
           alt: "Warm oil poured during an Ayurvedic treatment",
           buttonLabel: "Learn More",
         },
@@ -576,7 +598,8 @@ export function defaultOrbitContent(): OrbitContent {
           title: "Facial Treatments",
           text: "Rejuvenate your skin with natural care and professional skincare therapies.",
           image: "/therapies/card-facial.png",
-          href: "/services/hydra-facial",
+          href: "/services?category=facial",
+          category: "facial",
           alt: "Guest resting during a facial",
           buttonLabel: "Learn More",
         },
@@ -585,6 +608,7 @@ export function defaultOrbitContent(): OrbitContent {
           text: "Deep relaxation, improve circulation and relieve muscle tension with warm stone therapy.",
           image: "/therapies/card-stones.png",
           href: "/services/hot-stone-massage",
+          category: "massage",
           alt: "Warm stones prepared for hot stone therapy",
           buttonLabel: "Learn More",
         },
@@ -721,7 +745,7 @@ function normalizeTherapies(therapies: OrbitContent["therapies"]): OrbitContent[
     .slice(0, 24)
     .map((card) => ({
       ...card,
-      href: card.href || "/services",
+      href: resolveTherapyCardHref(card),
       alt: card.alt || card.title,
       buttonLabel: card.buttonLabel?.trim() || "Learn More",
     }));
