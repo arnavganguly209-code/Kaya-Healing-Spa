@@ -1,11 +1,12 @@
+import { siteBrand } from "@/lib/site-brand";
 import Image from "next/image";
 
 export function Logo({ priority = false }: { size?: number; priority?: boolean }) {
   return (
     <span className="inline-flex shrink-0">
       <Image
-        src="/brand/kaya-logo-hd.webp"
-        alt="Kaya Healing Spa — A Complete Wellness Experience"
+        src={siteBrand.logoWebp}
+        alt={siteBrand.logoAlt}
         width={184}
         height={184}
         priority={priority}

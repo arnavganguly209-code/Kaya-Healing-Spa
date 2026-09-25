@@ -17,10 +17,10 @@ const explore = [
 
 const treatments = [
   ["Massage", "/services?category=massage"],
-  ["Ayurvedic", "/services?category=ayurvedic"],
-  ["Thai", "/services/thai-therapy"],
-  ["Aromatherapy", "/services/aromatherapy"],
-  ["Deep Tissue", "/services/deep-tissue"],
+  ["Holistic & Ayurvedic", "/services?category=holistic"],
+  ["Thai Stretch", "/services/thai-stretch-massage"],
+  ["Aromatic Massage", "/services/nepali-aromatic-massage"],
+  ["Deep Tissue", "/services/deep-tissue-massage"],
   ["Wellness Rituals", "/packages"],
 ];
 
@@ -103,6 +103,9 @@ export function SiteFooter() {
             </Link>
             <Link href="/cookies" className="hover:text-white/80">
               Cookie Policy
+            </Link>
+            <Link href="/sitemap.xml" className="hover:text-white/80">
+              Sitemap
             </Link>
           </div>
         </div>

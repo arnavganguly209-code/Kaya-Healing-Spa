@@ -3,6 +3,7 @@ import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
+import { siteBrand } from "@/lib/site-brand";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: site.name,
     description: "A complete wellness experience in Kathmandu.",
-    images: ["/brand/kaya-logo-hd.png"],
+    images: [siteBrand.logoPng],
   },
   keywords: [
     "Kaya Healing Spa",
@@ -49,7 +50,18 @@ export const metadata: Metadata = {
     "wellness spa Kathmandu",
     "Ayurvedic massage Kathmandu",
   ],
-  icons: { icon: "/brand/kaya-logo-hd.png", apple: "/brand/kaya-logo-hd.png" },
+  icons: {
+    icon: [
+      { url: siteBrand.favicon32, sizes: "32x32", type: "image/png" },
+      { url: siteBrand.logo192, sizes: "192x192", type: "image/png" },
+      { url: siteBrand.logoPng, sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: siteBrand.appleTouch, sizes: "180x180", type: "image/png" }],
+  },
+  manifest: "/manifest.webmanifest",
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -57,7 +69,7 @@ export const metadata: Metadata = {
     url: site.url,
     title: `${site.name} | A Complete Wellness Experience`,
     description: "Luxury spa and wellness in Kathmandu. Massage, Ayurveda, and unhurried spa packages.",
-    images: ["/brand/kaya-logo-hd.png"],
+    images: [{ url: siteBrand.logoPng, width: 512, height: 512, alt: siteBrand.logoAlt }],
   },
 };
 
@@ -65,13 +77,21 @@ export const dynamic = "force-dynamic";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const orbit = readOrbitContent();
+  const phoneDisplay = orbit.phone?.trim() || site.phone;
+  const telRaw = phoneDisplay.startsWith("+") ? phoneDisplay.replace(/\s/g, "") : site.phoneTel;
+  const sameAs = [
+    ...orbit.socialLinks.filter((link) => link.enabled && link.url?.trim()).map((link) => link.url.trim()),
+    ...(orbit.extraSocialLinks ?? []).filter((link) => link.url?.trim()).map((link) => link.url.trim()),
+  ];
+
   const business = {
     "@context": "https://schema.org",
     "@type": "HealthAndBeautyBusiness",
     name: site.name,
     description: "Luxury spa and wellness in Kathmandu, Nepal.",
     slogan: site.tagline,
-    image: `${site.url}/brand/kaya-logo-hd.png`,
+    image: `${site.url}${siteBrand.logoPng}`,
+    logo: `${site.url}${siteBrand.logoPng}`,
     address: {
       "@type": "PostalAddress",
       streetAddress: "Hotel Northfield, Chaksibari",
@@ -80,9 +100,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       postalCode: "44600",
       addressCountry: "NP",
     },
-    telephone: site.phoneTel,
+    telephone: telRaw,
     areaServed: "Kathmandu",
     url: site.url,
+    ...(sameAs.length ? { sameAs } : {}),
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: site.googleRating,
+      reviewCount: site.googleReviewCount,
+      bestRating: 5,
+    },
   };
 
   return (
