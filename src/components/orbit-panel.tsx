@@ -838,7 +838,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           {section === "Page covers" && (
             <>
               <p className="text-sm text-[#6B6B6B]">
-                Branded orange gradient covers (no stock hero photo) for inner pages. Services &amp; Packages also include the catalog heading below the cover.
+                Branded lotus-pattern art banners (no cover photos) for inner pages. Services &amp; Packages also include the catalog heading below the cover.
               </p>
               {(
                 [

@@ -19,7 +19,7 @@ export function TherapistPortrait({
         src={src}
         alt={alt}
         fill
-        className="object-cover object-[50%_22%]"
+        className={`object-cover ${src.includes("/therapists/placeholder-") ? "object-center" : "object-[50%_22%]"}`}
         sizes={sizes}
         unoptimized={src.startsWith("/uploads/") || src.startsWith("/hero/") || src.startsWith("/therapists/") || src.startsWith("/catalog/")}
       />

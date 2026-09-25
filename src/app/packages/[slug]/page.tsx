@@ -1,9 +1,8 @@
-import { Breadcrumbs } from "@/components/breadcrumbs";
+import { PageCoverArt } from "@/components/page-cover-art";
 import { TherapistStrip } from "@/components/therapist-strip";
 import { formatNpr, getPackage, packages as fallbackPackages } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -36,15 +35,17 @@ export default async function PackageDetail({ params }: Props) {
 
   return (
     <article>
-      <div className="relative min-h-[60svh]">
-        <Image src={item.image} alt={item.imageAlt} fill priority className="object-cover" sizes="100vw" />
-        <div className="absolute inset-0 bg-black/45" />
-        <div className="relative z-10 mx-auto flex min-h-[60svh] max-w-[900px] flex-col justify-end px-5 pb-12 pt-32 text-white">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Packages", href: "/packages" }, { label: item.name }]} />
-          <h1 className="display mt-6 text-5xl md:text-6xl">{item.name}</h1>
-          <p className="mt-3 text-white/80">{item.durationLabel}</p>
-        </div>
-      </div>
+      <PageCoverArt
+        eyebrow="Package"
+        title={item.name}
+        tagline={item.summary}
+        text={item.durationLabel}
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Packages", href: "/packages" },
+          { label: item.name },
+        ]}
+      />
       <div className="mx-auto max-w-[800px] px-5 py-16">
         <p className="prose-quiet text-lg">{item.description}</p>
         <ul className="mt-8 divide-y divide-[#e6dfd4] border-y border-[#e6dfd4]">

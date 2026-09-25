@@ -1,11 +1,10 @@
 import { JsonLd } from "@/components/json-ld";
+import { PageCoverArt } from "@/components/page-cover-art";
 import { TherapistStrip } from "@/components/therapist-strip";
-import { Breadcrumbs } from "@/components/breadcrumbs";
 import { categoryLabels, formatNpr, getService as fallbackService, services, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import type { Service } from "@/lib/types";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -49,21 +48,16 @@ export default async function ServiceDetail({ params }: Props) {
           url: `${site.url}/services/${service.slug}`,
         }}
       />
-      <div className="relative min-h-[68svh] bg-[#141210]">
-        <Image src={service.image} alt={service.imageAlt} fill priority className="object-cover" sizes="100vw" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#141210] via-black/40 to-black/20" />
-        <div className="relative z-10 mx-auto flex min-h-[68svh] max-w-[1440px] flex-col justify-end px-5 pb-12 pt-32 md:px-8">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Services", href: "/services" },
-              { label: service.name },
-            ]}
-          />
-          <p className="mt-6 text-xs tracking-[0.2em] uppercase text-white/70">{categoryLabels[service.category]}</p>
-          <h1 className="display mt-3 text-5xl text-white md:text-7xl">{service.name}</h1>
-        </div>
-      </div>
+      <PageCoverArt
+        eyebrow={categoryLabels[service.category]}
+        title={service.name}
+        tagline={service.summary}
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Services", href: "/services" },
+          { label: service.name },
+        ]}
+      />
       <div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 md:px-8 lg:grid-cols-[1.4fr_0.8fr]">
         <div>
           <h2 className="font-serif text-3xl">Treatment overview</h2>

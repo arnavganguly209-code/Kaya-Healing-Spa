@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Therapist photo placeholder">
-  <rect width="800" height="1000" fill="#f0ebe3"/>
-  <rect x="32" y="32" width="736" height="936" rx="8" fill="none" stroke="#F47B20" stroke-width="3" opacity="0.55"/>
-  <circle cx="400" cy="360" r="108" fill="#e8dfd4"/>
-  <text x="400" y="382" text-anchor="middle" font-family="system-ui,sans-serif" font-size="56" font-weight="600" fill="#8a8175">SR</text>
-  <text x="400" y="560" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" letter-spacing="0.12em" fill="#6b635a">KAYA THERAPIST</text>
-  <text x="400" y="600" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" fill="#9a9085">Upload photo in Orbit</text>
+  <rect width="800" height="1000" fill="#f6f1e8"/>
+  <rect x="0" y="920" width="800" height="80" fill="#F47B20" opacity="0.35"/>
+  <rect x="48" y="48" width="704" height="904" rx="12" fill="none" stroke="#F47B20" stroke-width="2" opacity="0.25"/>
 </svg>

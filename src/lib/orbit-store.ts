@@ -2,6 +2,7 @@ import { gallery, packages, site } from "@/lib/content";
 import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
 import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 import { defaultTherapists } from "@/lib/default-therapists";
+import { therapistPlaceholderPath } from "@/lib/catalog-images";
 import type { OrbitAboutPage, OrbitSocialLink, OrbitTherapist } from "@/lib/orbit-types";
 import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
@@ -128,6 +129,18 @@ function defaultSocialLinks(): OrbitSocialLink[] {
   ];
 }
 
+function normalizeTherapists(list: OrbitTherapist[] | undefined, defaults: OrbitTherapist[]): OrbitTherapist[] {
+  const source = list?.length ? list : defaults;
+  return source.map((t) => {
+    const photo = t.photo?.trim() || "";
+    const keepUpload = photo.startsWith("/uploads/");
+    return {
+      ...t,
+      photo: keepUpload ? photo : therapistPlaceholderPath(t.slug),
+      photoAlt: t.photoAlt || `${t.name} — therapist photo`,
+    };
+  });
+}
 function normalizeSocialLinks(links: OrbitSocialLink[] | undefined): OrbitSocialLink[] {
   const defaults = defaultSocialLinks();
   if (!links?.length) return defaults;
@@ -149,7 +162,7 @@ function defaultPageCovers(): OrbitPageCovers {
   return {
     services: {
       eyebrow: "Our services",
-      title: "Treatments designed around you",
+      title: "Our Services",
       tagline: "Our guests return not just for the treatments — but for the feeling they take home.",
       text: "Massage, Ayurvedic oil rituals, body care, facials, and recovery work at Hotel Northfield, Chaksibari.",
       catalogTitle: "Choose your convenient treatment",
@@ -526,7 +539,10 @@ export function readOrbitContent(): OrbitContent {
       homeAbout: { ...defaults.homeAbout, ...merged.homeAbout },
       pageCovers: normalizePageCovers(merged.pageCovers),
       aboutPage: { ...defaults.aboutPage, ...merged.aboutPage, owner: { ...defaults.aboutPage.owner, ...merged.aboutPage?.owner }, logos: merged.aboutPage?.logos?.length ? merged.aboutPage.logos : defaults.aboutPage.logos },
-      therapists: merged.therapists?.length ? merged.therapists : defaults.therapists,
+      therapists: normalizeTherapists(
+        saved.servicesMenuVersion === SERVICES_MENU_VERSION ? merged.therapists : defaults.therapists,
+        defaults.therapists,
+      ),
       packageCategories: merged.packageCategories?.length ? merged.packageCategories : defaults.packageCategories,
       footerBrand: merged.footerBrand || defaults.footerBrand,
       whatsapp: merged.whatsapp?.trim() || defaults.whatsapp,
