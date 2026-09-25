@@ -203,20 +203,7 @@ export const packages: SpaPackage[] = [
   },
 ];
 
-export const gallery: GalleryImage[] = [
-  { id: "g1", src: img("photo-1540555700478-4be289fbecef"), alt: "Hot stones and folded towels", category: "details", width: 1200, height: 1600 },
-  { id: "g2", src: img("photo-1544161515-4ab6ce6db874"), alt: "Massage in a quiet treatment room", category: "treatments", width: 1600, height: 1100 },
-  { id: "g3", src: img("photo-1600334129128-685c5582fd35"), alt: "Guest resting under linen during massage", category: "treatments", width: 1400, height: 1600 },
-  { id: "g4", src: img("photo-1507652313519-d4e9174996dd"), alt: "Still spa pool with warm light", category: "spa", width: 1600, height: 1000 },
-  { id: "g5", src: img("photo-1515377905703-c4788e51af15"), alt: "Massage oils on wood", category: "details", width: 1200, height: 1400 },
-  { id: "g6", src: img("photo-1596178060671-7a80dc8059ea"), alt: "Prepared treatment room", category: "interiors", width: 1600, height: 1100 },
-  { id: "g7", src: img("photo-1570172619644-dfd03ed5d881"), alt: "Facial care", category: "wellness", width: 1400, height: 1600 },
-  { id: "g8", src: img("photo-1552693673-1bf958298935"), alt: "Towels and bottles on a tray", category: "details", width: 1400, height: 1000 },
-  { id: "g9", src: img("photo-1519823551278-64ac92734fb1"), alt: "Spa relaxation room", category: "interiors", width: 1600, height: 1200 },
-  { id: "g10", src: img("photo-1519824145371-296894a0daa9"), alt: "Shoulder massage", category: "treatments", width: 1400, height: 1600 },
-  { id: "g11", src: img("photo-1470259078422-826894b933aa"), alt: "Morning light through trees", category: "wellness", width: 1600, height: 1100 },
-  { id: "g12", src: img("photo-1544161515-4ab6ce6db874", ""), alt: "Hands-on bodywork", category: "spa", width: 1200, height: 1500 },
-];
+export const gallery: GalleryImage[] = [];
 
 export const reviews: Review[] = [
   {

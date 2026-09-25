@@ -50,7 +50,9 @@ export function GalleryGrid({ items }: { items: GalleryImage[] }) {
         ))}
       </div>
       {images.length === 0 ? (
-        <p className="mt-12 font-serif text-3xl">No photographs in this set yet.</p>
+        <p className="mt-12 max-w-xl text-sm leading-7 text-[#6B6B6B]">
+          Gallery photos will appear here after fresh uploads from Orbit. Until then, this page stays empty on purpose.
+        </p>
       ) : (
         <div className="mt-8 columns-1 gap-4 sm:columns-2 lg:columns-3">
           {images.map((image, index) => (

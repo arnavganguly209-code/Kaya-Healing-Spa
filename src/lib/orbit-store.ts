@@ -1,5 +1,5 @@
 import { CATALOG_COMING_SOON_ALT, CATALOG_COMING_SOON_IMAGE } from "@/lib/catalog-images";
-import { gallery, packages, site } from "@/lib/content";
+import { packages, site } from "@/lib/content";
 import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
 import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 import { defaultTherapists } from "@/lib/default-therapists";
@@ -679,7 +679,7 @@ export function defaultOrbitContent(): OrbitContent {
     servicesMenuVersion: SERVICES_MENU_VERSION,
     packageCategories: ["signature", "couples", "half-day", "full-day", "recovery", "wellness"],
     packages,
-    gallery,
+    gallery: [],
     aboutPage: defaultAboutPage(),
     therapists: defaultTherapists(),
   });
@@ -737,6 +737,21 @@ function normalizeHero(hero: OrbitHero): OrbitHero {
     flipHorizontal: hero.flipHorizontal === true,
     objectPosition: hero.objectPosition?.trim() || "62% center",
   };
+}
+
+function normalizeGallery(raw: GalleryImage[] | undefined): GalleryImage[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((item) => typeof item.src === "string" && item.src.startsWith("/uploads/"));
+}
+
+/** Persisted gallery: Orbit uploads only (drops stock/demo URLs). */
+function sanitizeGalleryForStorage(raw: GalleryImage[] | undefined): GalleryImage[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((item) => {
+    const src = item.src?.trim() ?? "";
+    if (!src) return false;
+    return src.startsWith("/uploads/");
+  });
 }
 
 function normalizeTherapies(therapies: OrbitContent["therapies"]): OrbitContent["therapies"] {
@@ -829,6 +844,7 @@ function loadOrbitContentFromDisk(): OrbitContent {
       whatsapp: merged.whatsapp?.trim() || defaults.whatsapp,
       socialLinks: normalizeSocialLinks(merged.socialLinks),
       extraSocialLinks: normalizeExtraSocialLinks(merged.extraSocialLinks),
+      gallery: normalizeGallery(merged.gallery),
     };
     return applyMenuCatalogImages(built);
   } catch {
@@ -849,6 +865,7 @@ export function writeOrbitContent(content: OrbitContent) {
     servicesMenuVersion: SERVICES_MENU_VERSION,
     socialLinks: normalizeSocialLinks(content.socialLinks),
     extraSocialLinks: normalizeExtraSocialLinks(content.extraSocialLinks),
+    gallery: sanitizeGalleryForStorage(content.gallery),
   };
   writeJsonFileAtomic(filePath, payload);
   const mtime = fileMtimeMs(filePath);

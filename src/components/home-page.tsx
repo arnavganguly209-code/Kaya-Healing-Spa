@@ -207,6 +207,7 @@ export function HomePage() {
         googleUrl={site.social.google}
       />
 
+      {preview.length > 0 ? (
       <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
         <div className="flex items-end justify-between gap-4">
           <h2 className="display text-5xl">{homePage.galleryTitle}</h2>
@@ -215,11 +216,12 @@ export function HomePage() {
         <div className="mt-10 columns-1 gap-4 sm:columns-2 lg:columns-3">
           {preview.map((image) => (
             <Link key={image.id} href="/gallery" className="img-zoom mb-4 block break-inside-avoid">
-              <Image src={image.src} alt={image.alt} width={image.width} height={image.height} className="h-auto w-full" />
+              <Image src={image.src} alt={image.alt} width={image.width} height={image.height} className="h-auto w-full" unoptimized={image.src.startsWith("/uploads/")} />
             </Link>
           ))}
         </div>
       </section>
+      ) : null}
 
       <section className="border-y border-[#e6dfd4]">
         <div className="mx-auto grid max-w-[1440px] md:grid-cols-4">
