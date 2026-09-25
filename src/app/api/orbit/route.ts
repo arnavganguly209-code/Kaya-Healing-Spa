@@ -53,6 +53,7 @@ export async function PUT(request: Request) {
     packageCategories: body.packageCategories?.length ? body.packageCategories : current.packageCategories,
     packages: body.packages?.length ? body.packages : current.packages,
     services: body.services,
+    socialLinks: body.socialLinks?.length ? body.socialLinks : current.socialLinks,
     footerBrand: body.footerBrand ?? current.footerBrand,
   });
   revalidatePath("/", "layout");

@@ -1,5 +1,7 @@
 "use client";
 
+import { TherapistCard } from "@/components/therapist-card";
+import { TherapistCarousel } from "@/components/therapist-carousel";
 import { TherapistPortrait } from "@/components/therapist-portrait";
 import { formatNpr, site } from "@/lib/content";
 import type { OrbitTherapist } from "@/lib/orbit-types";
@@ -393,28 +395,17 @@ function TherapistPicker({
         {required ? "Choose therapist" : "Therapist preference"}
         {required ? " *" : ""}
       </p>
-      <div className="mt-3 flex gap-4 overflow-x-auto pb-2 snap-x">
-        {therapists.map((therapist) => {
-          const active = value === therapist.slug;
-          return (
-            <button
-              key={therapist.slug}
-              type="button"
-              onClick={() => onChange(active ? "" : therapist.slug)}
-              className={`w-[168px] shrink-0 snap-start rounded-xl border p-2 text-left transition ${
-                active ? "border-[#F47B20] ring-2 ring-[#F47B20]/30" : "border-[#e6dfd4] bg-white"
-              }`}
-            >
-              <TherapistPortrait src={therapist.photo} alt={therapist.photoAlt} sizes="168px" />
-              <span className="block px-1 pb-1 pt-3">
-                <span className="block font-serif text-lg leading-tight">{therapist.name}</span>
-                <span className="mt-1 block text-[11px] text-[#6B6B6B]">{therapist.experience}</span>
-                <span className="mt-1 block text-xs leading-snug text-[#8a8175] line-clamp-2">{therapist.description}</span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <TherapistCarousel ariaLabel="therapist selection" className="mt-3">
+        {therapists.map((therapist) => (
+          <TherapistCard
+            key={therapist.slug}
+            therapist={therapist}
+            compact
+            selected={value === therapist.slug}
+            onSelect={() => onChange(value === therapist.slug ? "" : therapist.slug)}
+          />
+        ))}
+      </TherapistCarousel>
     </div>
   );
 }

@@ -19,7 +19,7 @@ export function TherapistPortrait({
         src={src}
         alt={alt}
         fill
-        className="object-cover object-top"
+        className="object-cover object-[50%_22%]"
         sizes={sizes}
         unoptimized={src.startsWith("/uploads/") || src.startsWith("/hero/")}
       />

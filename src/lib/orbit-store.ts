@@ -1,6 +1,6 @@
 import { gallery, packages, services, site } from "@/lib/content";
 import { defaultTherapists } from "@/lib/default-therapists";
-import type { OrbitAboutPage, OrbitTherapist } from "@/lib/orbit-types";
+import type { OrbitAboutPage, OrbitSocialLink, OrbitTherapist } from "@/lib/orbit-types";
 import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
@@ -65,6 +65,7 @@ export type OrbitContent = {
   email: string;
   footerText: string;
   footerBrand: string;
+  socialLinks: OrbitSocialLink[];
   hero: OrbitHero;
   therapies: {
     eyebrow: string;
@@ -87,6 +88,25 @@ export type OrbitContent = {
 };
 
 const filePath = path.join(process.cwd(), "data", "orbit-content.json");
+
+function defaultSocialLinks(): OrbitSocialLink[] {
+  return [
+    { id: "google", url: site.social.google, enabled: site.social.google.startsWith("https://") },
+    { id: "tripadvisor", url: site.social.tripadvisor, enabled: site.social.tripadvisor.startsWith("https://") },
+    { id: "instagram", url: site.social.instagram, enabled: site.social.instagram.startsWith("https://") },
+    { id: "facebook", url: site.social.facebook, enabled: site.social.facebook.startsWith("https://") },
+    { id: "tiktok", url: site.social.tiktok, enabled: site.social.tiktok.startsWith("https://") },
+  ];
+}
+
+function normalizeSocialLinks(links: OrbitSocialLink[] | undefined): OrbitSocialLink[] {
+  const defaults = defaultSocialLinks();
+  if (!links?.length) return defaults;
+  return defaults.map((base) => {
+    const saved = links.find((item) => item.id === base.id);
+    return saved ? { id: base.id, url: saved.url || "", enabled: saved.enabled !== false } : base;
+  });
+}
 
 function defaultAboutPage(): OrbitAboutPage {
   return {
@@ -148,6 +168,7 @@ export function defaultOrbitContent(): OrbitContent {
     footerText:
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
     footerBrand: "Kaya Healing Spa",
+    socialLinks: defaultSocialLinks(),
     hero: {
       image: "/hero/kaya-hero-spa-hd.png",
       alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
@@ -398,6 +419,7 @@ export function readOrbitContent(): OrbitContent {
       therapists: merged.therapists?.length ? merged.therapists : defaults.therapists,
       packageCategories: merged.packageCategories?.length ? merged.packageCategories : defaults.packageCategories,
       footerBrand: merged.footerBrand || defaults.footerBrand,
+      socialLinks: normalizeSocialLinks(merged.socialLinks),
     };
   } catch {
     return defaults;
@@ -416,6 +438,7 @@ export function writeOrbitContent(content: OrbitContent) {
         whyKaya: normalizeWhyKaya(content.whyKaya),
         aboutPage: { ...defaultAboutPage(), ...content.aboutPage },
         therapists: content.therapists?.length ? content.therapists : defaultTherapists(),
+        socialLinks: normalizeSocialLinks(content.socialLinks),
       },
       null,
       2,

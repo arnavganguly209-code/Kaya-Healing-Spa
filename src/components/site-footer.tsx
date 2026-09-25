@@ -1,3 +1,4 @@
+import { FooterSocialLinks } from "@/components/footer-social-links";
 import { Logo } from "@/components/logo";
 import { site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
@@ -86,23 +87,7 @@ export function SiteFooter() {
           >
             Join the list
           </Link>
-          <div className="mt-8 flex flex-wrap gap-4 text-[11px] tracking-[0.14em] text-white/50 uppercase">
-            {(
-              [
-                ["Instagram", site.social.instagram],
-                ["Facebook", site.social.facebook],
-                ["TikTok", site.social.tiktok],
-                ["Google", site.social.google],
-                ["TripAdvisor", site.social.tripadvisor],
-              ] as const
-            )
-              .filter(([, href]) => href.startsWith("https://"))
-              .map(([label, href]) => (
-                <a key={label} href={href} target="_blank" rel="noreferrer" className="hover:text-white">
-                  {label}
-                </a>
-              ))}
-          </div>
+          <FooterSocialLinks links={orbit.socialLinks} />
         </div>
       </div>
       <div className="border-t border-white/10 bg-black/20">

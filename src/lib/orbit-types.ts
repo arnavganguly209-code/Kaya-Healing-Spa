@@ -16,6 +16,12 @@ export type OrbitAboutLogo = {
   imageAlt: string;
 };
 
+export type OrbitSocialLink = {
+  id: "google" | "tripadvisor" | "instagram" | "facebook" | "tiktok";
+  url: string;
+  enabled: boolean;
+};
+
 export type OrbitAboutPage = {
   introEyebrow: string;
   introTitle: string;

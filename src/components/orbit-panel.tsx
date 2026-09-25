@@ -2,6 +2,7 @@
 
 import type { OrbitContent } from "@/lib/orbit-store";
 import { site } from "@/lib/content";
+import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import { useEffect, useRef, useState } from "react";
 
 const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
@@ -711,6 +712,39 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <Field label="Phone" value={content.phone} onChange={(value) => setContent({ ...content, phone: value })} />
               <Field label="Email" value={content.email} onChange={(value) => setContent({ ...content, email: value })} />
               <Area label="Footer description" value={content.footerText} onChange={(value) => setContent({ ...content, footerText: value })} />
+              <p className="mt-6 text-sm font-semibold">Social & review icons (footer)</p>
+              <p className="text-sm text-[#6B6B6B]">Paste full https links. Icons show when enabled and URL is valid.</p>
+              {content.socialLinks.map((link, index) => (
+                <div key={link.id} className="mt-4 space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f6f1e8]">
+                      <SocialIcon id={link.id} />
+                    </span>
+                    <p className="text-sm font-semibold">{socialPlatformLabels[link.id]}</p>
+                  </div>
+                  <Field
+                    label="Link URL"
+                    value={link.url}
+                    onChange={(value) => {
+                      const socialLinks = content.socialLinks.map((item, i) => (i === index ? { ...item, url: value } : item));
+                      setContent({ ...content, socialLinks });
+                    }}
+                  />
+                  <label className="flex cursor-pointer items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={link.enabled}
+                      onChange={(event) => {
+                        const socialLinks = content.socialLinks.map((item, i) =>
+                          i === index ? { ...item, enabled: event.target.checked } : item,
+                        );
+                        setContent({ ...content, socialLinks });
+                      }}
+                    />
+                    Show in footer
+                  </label>
+                </div>
+              ))}
             </>
           )}
         </div>
