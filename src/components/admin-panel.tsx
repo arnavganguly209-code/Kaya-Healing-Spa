@@ -311,6 +311,9 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
 
           {section === "Footer" && (
             <>
+              <p className="mb-4 rounded-xl border border-[#efe8e0] bg-[#fff7f0] px-4 py-3 text-sm text-[#6B6B6B]">
+                Copyright line, “Developed by” credit, and legal links at the bottom of the site are edited in <strong>Orbit → Footer</strong> only — not here.
+              </p>
               <Field label="Brand name" value={content.footerBrand} onChange={(v) => setContent({ ...content, footerBrand: v })} />
               <Area label="Footer description" value={content.footerText} onChange={(v) => setContent({ ...content, footerText: v })} />
               <Field label="Phone" value={content.phone} onChange={(v) => setContent({ ...content, phone: v })} />

@@ -159,12 +159,28 @@ export type OrbitPageCovers = {
   blog: OrbitPageCover;
 };
 
+export type OrbitFooterLegalLink = {
+  label: string;
+  href: string;
+};
+
+/** Bottom footer strip: copyright, developer credit, legal links — Orbit-only edits */
+export type OrbitFooterBottom = {
+  copyrightName: string;
+  rightsLine: string;
+  developerLead: string;
+  developerName: string;
+  developerUrl: string;
+  legalLinks: OrbitFooterLegalLink[];
+};
+
 export type OrbitContent = {
   phone: string;
   whatsapp: string;
   email: string;
   footerText: string;
   footerBrand: string;
+  footerBottom: OrbitFooterBottom;
   socialLinks: OrbitSocialLink[];
   extraSocialLinks: OrbitExtraSocialLink[];
   hero: OrbitHero;
@@ -254,6 +270,46 @@ function normalizeExtraSocialLinks(list: OrbitExtraSocialLink[] | undefined): Or
       enabled: item.enabled !== false,
     }))
     .filter((item) => item.label);
+}
+
+function defaultFooterBottom(): OrbitFooterBottom {
+  return {
+    copyrightName: "Kaya Healing Spa",
+    rightsLine: "All rights reserved.",
+    developerLead: "Developed By",
+    developerName: "The Global Orbit",
+    developerUrl: "https://theglobalorbit.com/",
+    legalLinks: [
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms & Conditions", href: "/terms" },
+      { label: "Cookie Policy", href: "/cookies" },
+      { label: "Sitemap", href: "/sitemap.xml" },
+    ],
+  };
+}
+
+export function normalizeFooterBottom(raw: Partial<OrbitFooterBottom> | undefined, defaults?: OrbitFooterBottom): OrbitFooterBottom {
+  return normalizeFooterBottomInternal(raw, defaults ?? defaultFooterBottom());
+}
+
+function normalizeFooterBottomInternal(raw: Partial<OrbitFooterBottom> | undefined, defaults: OrbitFooterBottom): OrbitFooterBottom {
+  const d = defaults;
+  const links = raw?.legalLinks?.length
+    ? raw.legalLinks
+        .map((item) => ({
+          label: item.label?.trim() || "",
+          href: item.href?.trim() || "",
+        }))
+        .filter((item) => item.label && item.href)
+    : d.legalLinks;
+  return {
+    copyrightName: raw?.copyrightName?.trim() || d.copyrightName,
+    rightsLine: raw?.rightsLine?.trim() || d.rightsLine,
+    developerLead: raw?.developerLead?.trim() || d.developerLead,
+    developerName: raw?.developerName?.trim() || d.developerName,
+    developerUrl: raw?.developerUrl?.trim() || d.developerUrl,
+    legalLinks: links.length ? links : d.legalLinks,
+  };
 }
 
 function defaultAdminSectionFlags(): OrbitAdminSectionFlags {
@@ -539,6 +595,7 @@ export function defaultOrbitContent(): OrbitContent {
     footerText:
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
     footerBrand: "Kaya Healing Spa",
+    footerBottom: defaultFooterBottom(),
     socialLinks: defaultSocialLinks(),
     extraSocialLinks: [],
     hero: {
@@ -847,6 +904,7 @@ function loadOrbitContentFromDisk(): OrbitContent {
       ),
       packageCategories: merged.packageCategories?.length ? merged.packageCategories : defaults.packageCategories,
       footerBrand: merged.footerBrand || defaults.footerBrand,
+      footerBottom: normalizeFooterBottom(merged.footerBottom, defaults.footerBottom),
       whatsapp: merged.whatsapp?.trim() || defaults.whatsapp,
       socialLinks: normalizeSocialLinks(merged.socialLinks),
       extraSocialLinks: normalizeExtraSocialLinks(merged.extraSocialLinks),
@@ -871,6 +929,7 @@ export function writeOrbitContent(content: OrbitContent) {
     servicesMenuVersion: SERVICES_MENU_VERSION,
     socialLinks: normalizeSocialLinks(content.socialLinks),
     extraSocialLinks: normalizeExtraSocialLinks(content.extraSocialLinks),
+    footerBottom: normalizeFooterBottom(content.footerBottom, defaultFooterBottom()),
     gallery: sanitizeGalleryForStorage(content.gallery),
   };
   writeJsonFileAtomic(filePath, payload);

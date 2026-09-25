@@ -92,21 +92,29 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="relative z-[2] border-t border-white/10 bg-black/20">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-5 py-7 text-xs text-white/50 md:flex-row md:items-center md:justify-between md:px-10">
-          <p>© {new Date().getFullYear()} {brand}. All rights reserved.</p>
-          <div className="flex flex-wrap gap-5">
-            <Link href="/privacy" className="hover:text-white/80">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-white/80">
-              Terms & Conditions
-            </Link>
-            <Link href="/cookies" className="hover:text-white/80">
-              Cookie Policy
-            </Link>
-            <Link href="/sitemap.xml" className="hover:text-white/80">
-              Sitemap
-            </Link>
+        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-4 px-5 py-7 text-xs text-white/50 md:grid-cols-3 md:items-center md:px-10">
+          <p className="text-center md:text-left">
+            © {new Date().getFullYear()} {orbit.footerBottom.copyrightName}. {orbit.footerBottom.rightsLine}
+          </p>
+          <p className="text-center text-white/55">
+            <span aria-hidden>—</span>
+            {orbit.footerBottom.developerLead}{" "}
+            <a
+              href={orbit.footerBottom.developerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[#E8C547] transition hover:text-[#F5E6A8] hover:underline"
+            >
+              {orbit.footerBottom.developerName}
+            </a>
+            <span aria-hidden>—</span>
+          </p>
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 md:justify-end">
+            {orbit.footerBottom.legalLinks.map((link) => (
+              <Link key={`${link.href}-${link.label}`} href={link.href} className="hover:text-white/80">
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

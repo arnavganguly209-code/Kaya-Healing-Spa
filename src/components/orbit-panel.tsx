@@ -1271,6 +1271,81 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                   </button>
                 </div>
               ))}
+              <p className="mt-10 text-sm font-semibold">Bottom bar (copyright, developer, legal links)</p>
+              <p className="text-sm text-[#6B6B6B]">
+                Shown in three columns at the very bottom of every page. Staff cannot edit this in /admin — only here in Orbit.
+              </p>
+              <Field
+                label="Copyright name (after © year)"
+                value={content.footerBottom.copyrightName}
+                onChange={(value) => setContent({ ...content, footerBottom: { ...content.footerBottom, copyrightName: value } })}
+              />
+              <Field
+                label="Rights line"
+                value={content.footerBottom.rightsLine}
+                onChange={(value) => setContent({ ...content, footerBottom: { ...content.footerBottom, rightsLine: value } })}
+              />
+              <Field
+                label="Developer lead-in (between dashes)"
+                value={content.footerBottom.developerLead}
+                onChange={(value) => setContent({ ...content, footerBottom: { ...content.footerBottom, developerLead: value } })}
+              />
+              <Field
+                label="Developer name (golden link text)"
+                value={content.footerBottom.developerName}
+                onChange={(value) => setContent({ ...content, footerBottom: { ...content.footerBottom, developerName: value } })}
+              />
+              <Field
+                label="Developer URL"
+                value={content.footerBottom.developerUrl}
+                onChange={(value) => setContent({ ...content, footerBottom: { ...content.footerBottom, developerUrl: value } })}
+              />
+              <p className="mt-6 text-sm font-semibold">Legal links (right column)</p>
+              {content.footerBottom.legalLinks.map((link, index) => (
+                <div key={index} className="mt-3 space-y-2 rounded-xl border border-[#efe8e0] p-4">
+                  <Field
+                    label="Label"
+                    value={link.label}
+                    onChange={(value) => {
+                      const legalLinks = content.footerBottom.legalLinks.map((item, i) => (i === index ? { ...item, label: value } : item));
+                      setContent({ ...content, footerBottom: { ...content.footerBottom, legalLinks } });
+                    }}
+                  />
+                  <Field
+                    label="Path or URL"
+                    value={link.href}
+                    onChange={(value) => {
+                      const legalLinks = content.footerBottom.legalLinks.map((item, i) => (i === index ? { ...item, href: value } : item));
+                      setContent({ ...content, footerBottom: { ...content.footerBottom, legalLinks } });
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="text-xs text-[#c45e0a] underline"
+                    onClick={() => {
+                      const legalLinks = content.footerBottom.legalLinks.filter((_, i) => i !== index);
+                      setContent({ ...content, footerBottom: { ...content.footerBottom, legalLinks } });
+                    }}
+                  >
+                    Remove link
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="mt-3 rounded-full border border-[#efe8e0] bg-white px-5 py-2 text-sm"
+                onClick={() =>
+                  setContent({
+                    ...content,
+                    footerBottom: {
+                      ...content.footerBottom,
+                      legalLinks: [...content.footerBottom.legalLinks, { label: "New link", href: "/" }],
+                    },
+                  })
+                }
+              >
+                Add legal link
+              </button>
             </>
           )}
         </div>

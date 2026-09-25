@@ -1,6 +1,6 @@
 import { createSessionToken, isOrbitAuthed, orbitCookie, orbitCookieOptions, passkeyConfigured, passkeyMatches } from "@/lib/orbit-auth";
 import { saveUpload } from "@/lib/orbit-media";
-import { readOrbitContent, writeOrbitContent, normalizePageCovers, type OrbitContent } from "@/lib/orbit-store";
+import { readOrbitContent, writeOrbitContent, normalizePageCovers, normalizeFooterBottom, type OrbitContent } from "@/lib/orbit-store";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
@@ -61,6 +61,9 @@ export async function PUT(request: Request) {
     whatsapp: body.whatsapp?.trim() ?? current.whatsapp,
     email: body.email ?? current.email,
     footerText: body.footerText ?? current.footerText,
+    footerBottom: body.footerBottom
+      ? normalizeFooterBottom(body.footerBottom, current.footerBottom)
+      : current.footerBottom,
   });
   revalidatePath("/", "layout");
   revalidatePath("/about");
