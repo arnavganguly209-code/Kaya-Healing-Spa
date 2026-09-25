@@ -1,11 +1,11 @@
 "use client";
 
-import type { OrbitContent } from "@/lib/orbit-store";
+import type { OrbitContent, OrbitPageCovers } from "@/lib/orbit-store";
 import { site } from "@/lib/content";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import { useEffect, useRef, useState } from "react";
 
-const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Footer"] as const;
+const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Footer"] as const;
 
 type MediaItem = { path: string; name: string; kind: "image" | "video"; size: number };
 
@@ -144,9 +144,20 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   }
 
   const hero = content.hero;
+  const pageCovers = content.pageCovers;
   const heroSlides = hero.slides.length
     ? hero.slides
     : [{ src: hero.image || "/hero/kaya-hero-spa-hd.png", alt: hero.alt, kind: "image" as const }];
+
+  function patchPageCover<K extends keyof OrbitPageCovers>(key: K, patch: Partial<OrbitPageCovers[K]>) {
+    setContent({
+      ...content,
+      pageCovers: {
+        ...content.pageCovers,
+        [key]: { ...content.pageCovers[key], ...patch },
+      },
+    });
+  }
 
   return (
     <div className="flex min-h-[100svh] bg-[#f7f2ea] text-[#171717]">
@@ -706,6 +717,45 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 <MediaField label={image.category} src={image.src} onUpload={(file) => upload(file, (src: string) => updateGallery(index, { src }))} onLibrary={() => setPicker((src: string) => updateGallery(index, { src }))} />
               </div>
             ))}
+          {section === "Page covers" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">
+                Branded orange gradient covers (no stock hero photo) for inner pages. Services &amp; Packages also include the catalog heading below the cover.
+              </p>
+              {(
+                [
+                  ["services", "Services page"],
+                  ["packages", "Packages page"],
+                  ["about", "About page"],
+                  ["contact", "Contact page"],
+                  ["gallery", "Gallery page"],
+                  ["blog", "Blog page"],
+                ] as const
+              ).map(([key, label]) => (
+                <div key={key} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
+                  <p className="text-sm font-semibold">{label}</p>
+                  <Field label="Eyebrow" value={pageCovers[key].eyebrow} onChange={(value) => patchPageCover(key, { eyebrow: value })} />
+                  <Field label="Title" value={pageCovers[key].title} onChange={(value) => patchPageCover(key, { title: value })} />
+                  <Area label="Tagline (quote under title)" value={pageCovers[key].tagline} onChange={(value) => patchPageCover(key, { tagline: value })} />
+                  <Area label="Supporting line" value={pageCovers[key].text} onChange={(value) => patchPageCover(key, { text: value })} />
+                  {(key === "services" || key === "packages") && (
+                    <>
+                      <Field
+                        label="Catalog heading"
+                        value={pageCovers[key].catalogTitle}
+                        onChange={(value) => patchPageCover(key, { catalogTitle: value })}
+                      />
+                      <Area
+                        label="Catalog subtitle"
+                        value={pageCovers[key].catalogSubtitle}
+                        onChange={(value) => patchPageCover(key, { catalogSubtitle: value })}
+                      />
+                    </>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
           {section === "Footer" && (
             <>
               <Field label="Brand name" value={content.footerBrand} onChange={(value) => setContent({ ...content, footerBrand: value })} />

@@ -35,10 +35,10 @@ export default async function ContactPage({
         }}
       />
       <PageHero
-        eyebrow="Contact"
-        title="Book your visit"
-        text={`${site.name} · ${site.addressLine}. Call ${orbit.phone || site.phone} or send a request below.`}
-        image="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=2000&q=80"
+        eyebrow={orbit.pageCovers.contact.eyebrow}
+        title={orbit.pageCovers.contact.title}
+        tagline={orbit.pageCovers.contact.tagline}
+        text={orbit.pageCovers.contact.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Contact" }]}
       />
       <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 md:px-8 lg:grid-cols-[1.15fr_0.85fr]">

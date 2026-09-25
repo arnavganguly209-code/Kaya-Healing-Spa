@@ -60,6 +60,27 @@ export type OrbitHomeAbout = {
   imageAlt: string;
 };
 
+export type OrbitPageCover = {
+  eyebrow: string;
+  title: string;
+  tagline: string;
+  text: string;
+};
+
+export type OrbitCatalogPageCover = OrbitPageCover & {
+  catalogTitle: string;
+  catalogSubtitle: string;
+};
+
+export type OrbitPageCovers = {
+  services: OrbitCatalogPageCover;
+  packages: OrbitCatalogPageCover;
+  about: OrbitPageCover;
+  contact: OrbitPageCover;
+  gallery: OrbitPageCover;
+  blog: OrbitPageCover;
+};
+
 export type OrbitContent = {
   phone: string;
   email: string;
@@ -78,6 +99,7 @@ export type OrbitContent = {
   };
   whyKaya: OrbitWhyKaya;
   homeAbout: OrbitHomeAbout;
+  pageCovers: OrbitPageCovers;
   aboutPage: OrbitAboutPage;
   therapists: OrbitTherapist[];
   packageCategories: string[];
@@ -106,6 +128,64 @@ function normalizeSocialLinks(links: OrbitSocialLink[] | undefined): OrbitSocial
     const saved = links.find((item) => item.id === base.id);
     return saved ? { id: base.id, url: saved.url || "", enabled: saved.enabled !== false } : base;
   });
+}
+
+function defaultPageCovers(): OrbitPageCovers {
+  return {
+    services: {
+      eyebrow: "Our services",
+      title: "Treatments designed around you",
+      tagline: "Our guests return not just for the treatments — but for the feeling they take home.",
+      text: "Massage, Ayurvedic oil rituals, body care, facials, and recovery work at Hotel Northfield, Chaksibari.",
+      catalogTitle: "Choose your convenient treatment",
+      catalogSubtitle: "Browse by category or search the full menu. Duration and pressure can be adjusted when you arrive.",
+    },
+    packages: {
+      eyebrow: "Our packages",
+      title: "Complete wellness experiences",
+      tagline: "Sequences with rest built in — a morning or a day, not a stack of rushed appointments.",
+      text: "Half-day and full-day rituals for couples, recovery, and deep rest in Kathmandu.",
+      catalogTitle: "Explore our packages",
+      catalogSubtitle: "Filter by journey type. Every package includes time to breathe between treatments.",
+    },
+    about: {
+      eyebrow: "About us",
+      title: "Kaya Healing Spa at Hotel Northfield",
+      tagline: "Wellness with intention in the heart of Kathmandu.",
+      text: "A massage spa trusted by hundreds of guests — skilled therapists, quiet rooms, and treatments paced so you leave rested.",
+    },
+    contact: {
+      eyebrow: "Contact",
+      title: "Book your visit",
+      tagline: "Tell us what you need — we will confirm by phone.",
+      text: `${site.name} · ${site.addressLine}. Call ${site.phone} or send a request below.`,
+    },
+    gallery: {
+      eyebrow: "Gallery",
+      title: "Rooms, rituals, details",
+      tagline: "A look at the atmosphere of the spa.",
+      text: "Photographs of treatment rooms, rituals, and quiet details at Kaya Healing Spa.",
+    },
+    blog: {
+      eyebrow: "Journal",
+      title: "Notes from the spa",
+      tagline: "Short pieces on how a visit works.",
+      text: "Rest, recovery, and making the most of your time in Kathmandu.",
+    },
+  };
+}
+
+export function normalizePageCovers(covers: OrbitPageCovers | undefined): OrbitPageCovers {
+  const defaults = defaultPageCovers();
+  if (!covers) return defaults;
+  return {
+    services: { ...defaults.services, ...covers.services },
+    packages: { ...defaults.packages, ...covers.packages },
+    about: { ...defaults.about, ...covers.about },
+    contact: { ...defaults.contact, ...covers.contact },
+    gallery: { ...defaults.gallery, ...covers.gallery },
+    blog: { ...defaults.blog, ...covers.blog },
+  };
 }
 
 function defaultAboutPage(): OrbitAboutPage {
@@ -301,6 +381,7 @@ export function defaultOrbitContent(): OrbitContent {
       image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=80",
       imageAlt: "Spa stones and folded towels",
     },
+    pageCovers: defaultPageCovers(),
     services,
     categories: ["massage", "ayurvedic", "holistic", "body-care", "facial", "wellness", "recovery"],
     packageCategories: ["signature", "couples", "half-day", "full-day", "recovery", "wellness"],
@@ -415,6 +496,7 @@ export function readOrbitContent(): OrbitContent {
       therapies: normalizeTherapies(merged.therapies),
       whyKaya: normalizeWhyKaya(merged.whyKaya ?? defaults.whyKaya),
       homeAbout: { ...defaults.homeAbout, ...merged.homeAbout },
+      pageCovers: normalizePageCovers(merged.pageCovers),
       aboutPage: { ...defaults.aboutPage, ...merged.aboutPage, owner: { ...defaults.aboutPage.owner, ...merged.aboutPage?.owner }, logos: merged.aboutPage?.logos?.length ? merged.aboutPage.logos : defaults.aboutPage.logos },
       therapists: merged.therapists?.length ? merged.therapists : defaults.therapists,
       packageCategories: merged.packageCategories?.length ? merged.packageCategories : defaults.packageCategories,

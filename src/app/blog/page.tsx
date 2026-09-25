@@ -1,5 +1,6 @@
 import { PageHero } from "@/components/page-hero";
 import { site } from "@/lib/content";
+import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -25,13 +26,15 @@ const posts = [
 ];
 
 export default function BlogPage() {
+  const orbit = readOrbitContent();
+  const cover = orbit.pageCovers.blog;
   return (
     <>
       <PageHero
-        eyebrow="Journal"
-        title="Notes from the spa"
-        text="Short pieces on how a visit works. New writing will be added here."
-        image="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=2000&q=80"
+        eyebrow={cover.eyebrow}
+        title={cover.title}
+        tagline={cover.tagline}
+        text={cover.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]}
       />
       <section className="mx-auto grid max-w-[1100px] gap-8 px-5 py-16 md:px-8">

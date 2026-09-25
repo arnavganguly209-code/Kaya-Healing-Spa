@@ -1,6 +1,6 @@
 import { createSessionToken, isOrbitAuthed, orbitCookie, orbitCookieOptions, passkeyConfigured, passkeyMatches } from "@/lib/orbit-auth";
 import { saveUpload } from "@/lib/orbit-media";
-import { readOrbitContent, writeOrbitContent, type OrbitContent } from "@/lib/orbit-store";
+import { readOrbitContent, writeOrbitContent, normalizePageCovers, type OrbitContent } from "@/lib/orbit-store";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
@@ -48,6 +48,7 @@ export async function PUT(request: Request) {
     therapies: body.therapies,
     whyKaya: body.whyKaya,
     homeAbout: body.homeAbout ? { ...current.homeAbout, ...body.homeAbout } : current.homeAbout,
+    pageCovers: body.pageCovers ? normalizePageCovers({ ...current.pageCovers, ...body.pageCovers }) : current.pageCovers,
     aboutPage: body.aboutPage ? { ...current.aboutPage, ...body.aboutPage, owner: { ...current.aboutPage.owner, ...body.aboutPage.owner }, logos: body.aboutPage.logos?.length ? body.aboutPage.logos : current.aboutPage.logos } : current.aboutPage,
     therapists: body.therapists?.length ? body.therapists : current.therapists,
     packageCategories: body.packageCategories?.length ? body.packageCategories : current.packageCategories,
@@ -61,6 +62,8 @@ export async function PUT(request: Request) {
   revalidatePath("/contact");
   revalidatePath("/services");
   revalidatePath("/packages");
+  revalidatePath("/gallery");
+  revalidatePath("/blog");
   return NextResponse.json({ success: true });
 }
 

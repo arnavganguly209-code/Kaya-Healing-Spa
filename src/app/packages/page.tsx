@@ -24,14 +24,16 @@ export default async function PackagesPage({
   return (
     <>
       <PageHero
-        eyebrow="Packages"
-        title="Complete wellness experiences"
-        text="Sequences with rest built in. Choose a category, then book with your preferred therapist."
-        image="https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=2000&q=80"
+        eyebrow={orbit.pageCovers.packages.eyebrow}
+        title={orbit.pageCovers.packages.title}
+        tagline={orbit.pageCovers.packages.tagline}
+        text={orbit.pageCovers.packages.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Packages" }]}
       />
       <PackageCatalog
         initialCategory={params.category ?? "all"}
+        catalogTitle={orbit.pageCovers.packages.catalogTitle}
+        catalogSubtitle={orbit.pageCovers.packages.catalogSubtitle}
         items={items}
         categories={orbit.packageCategories}
       />

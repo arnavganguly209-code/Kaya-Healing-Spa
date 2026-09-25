@@ -39,13 +39,19 @@ export default async function ServicesPage({
         }))}
       />
       <PageHero
-        eyebrow="Services"
-        title="Treatments designed around you"
-        text="Massage, Ayurvedic oil rituals, body care, and recovery work. Choose a starting point — the hour can still be adjusted when you arrive."
-        image="https://images.unsplash.com/photo-1519824145371-296894a0daa9?auto=format&fit=crop&w=2000&q=80"
+        eyebrow={live.pageCovers.services.eyebrow}
+        title={live.pageCovers.services.title}
+        tagline={live.pageCovers.services.tagline}
+        text={live.pageCovers.services.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Services" }]}
       />
-      <ServiceCatalog initialCategory={params.category ?? "all"} items={services} categories={live.categories} />
+      <ServiceCatalog
+        initialCategory={params.category ?? "all"}
+        catalogTitle={live.pageCovers.services.catalogTitle}
+        catalogSubtitle={live.pageCovers.services.catalogSubtitle}
+        items={services}
+        categories={live.categories}
+      />
       <TherapistStrip therapists={live.therapists} intro="Book a treatment and pick your therapist on the contact form." />
     </>
   );

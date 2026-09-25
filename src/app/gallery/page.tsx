@@ -1,6 +1,7 @@
 import { GalleryGrid } from "@/components/gallery-grid";
 import { PageHero } from "@/components/page-hero";
 import { site } from "@/lib/content";
+import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,13 +12,15 @@ export const metadata: Metadata = {
 };
 
 export default function GalleryPage() {
+  const orbit = readOrbitContent();
+  const cover = orbit.pageCovers.gallery;
   return (
     <>
       <PageHero
-        eyebrow="Gallery"
-        title="Rooms, rituals, details"
-        text="A look at the atmosphere of the spa. Photographs will be replaced with KAYA’s own rooms as they are ready."
-        image="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=2000&q=80"
+        eyebrow={cover.eyebrow}
+        title={cover.title}
+        tagline={cover.tagline}
+        text={cover.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Gallery" }]}
       />
       <GalleryGrid />

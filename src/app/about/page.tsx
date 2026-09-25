@@ -28,10 +28,10 @@ export default function AboutPage() {
   return (
     <>
       <PageHero
-        eyebrow={about.introEyebrow}
-        title={about.introTitle}
-        text={about.introLead}
-        image="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=2000&q=80"
+        eyebrow={orbit.pageCovers.about.eyebrow}
+        title={orbit.pageCovers.about.title}
+        tagline={orbit.pageCovers.about.tagline}
+        text={orbit.pageCovers.about.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "About" }]}
       />
 
