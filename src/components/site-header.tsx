@@ -49,12 +49,12 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
           : "border-b-0 border-transparent bg-gradient-to-b from-black/50 via-black/15 to-transparent shadow-none backdrop-blur-0"
       }`}
     >
-      <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-5 md:px-8 lg:h-[108px]">
+      <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center gap-3 px-5 md:px-8 lg:h-[108px] xl:gap-4">
         <Link href="/" className="relative z-10 shrink-0" aria-label="Kaya Healing Spa home">
           <Logo priority />
         </Link>
         <nav
-          className="absolute left-[calc(50%-2.75rem)] z-20 hidden -translate-x-1/2 items-center gap-6 xl:flex 2xl:left-[calc(50%-1.5rem)] 2xl:gap-7"
+          className="relative z-20 hidden min-w-0 flex-1 items-center justify-center gap-4 xl:flex 2xl:gap-5"
           aria-label="Primary"
         >
           {links.map((link) => {
@@ -81,17 +81,21 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
             );
           })}
         </nav>
-        <div className="relative z-10 ml-auto flex shrink-0 items-center gap-4 lg:gap-5">
+        <div className="relative z-10 flex shrink-0 items-center gap-3 lg:gap-4 xl:pl-2">
           <a
             href={`tel:${phone.replace(/\s/g, "")}`}
-            className={`hidden items-center gap-3 lg:flex ${onHero ? "text-white" : "text-[#171717]"}`}
+            className={`group/call hidden items-center gap-3 transition-transform duration-300 hover:-translate-y-0.5 lg:flex ${onHero ? "text-white" : "text-[#171717]"}`}
           >
             <span
-              className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
-                glass ? "bg-[#fff1e6]" : onHero ? "bg-white/15" : "bg-[#fff1e6]/35 backdrop-blur-[2px]"
+              className={`flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-300 group-hover/call:scale-105 ${
+                glass
+                  ? "call-ring bg-[#fff1e6]"
+                  : onHero
+                    ? "call-ring-hero bg-white/15"
+                    : "call-ring bg-[#fff1e6]/35 backdrop-blur-[2px]"
               }`}
             >
-              <Phone size={18} className={`call-pulse ${onHero ? "text-white" : "text-[#F47B20]"}`} strokeWidth={1.8} />
+              <Phone size={18} className={`${onHero ? "text-white" : "text-[#F47B20]"}`} strokeWidth={1.8} />
             </span>
             <span className="leading-tight">
               <span className={`block text-[11px] font-semibold ${onHero ? "text-white/80" : "text-[#5c5c5c]"}`}>Call Us</span>
@@ -100,15 +104,17 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
           </a>
           <Link
             href="/contact"
-            className={`hidden items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition sm:inline-flex ${
+            className={`group/book hidden items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition duration-300 hover:-translate-y-0.5 sm:inline-flex ${
               onHero
-                ? "border border-white/70 bg-transparent text-white hover:bg-white/10"
-                : "bg-[#F47B20] text-white shadow-[0_8px_20px_rgba(244,123,32,0.25)] hover:bg-[#e06d12]"
+                ? "book-cta border border-white/70 bg-transparent text-white hover:bg-white/10"
+                : "book-cta-solid bg-[#F47B20] text-white hover:bg-[#e06d12]"
             }`}
           >
-            <Calendar size={16} />
+            <Calendar size={16} className="transition-transform duration-300 group-hover/book:scale-110" />
             Book Appointment
-            <span aria-hidden>→</span>
+            <span aria-hidden className="inline-block transition-transform duration-300 group-hover/book:translate-x-0.5">
+              →
+            </span>
           </Link>
           <button
             type="button"
