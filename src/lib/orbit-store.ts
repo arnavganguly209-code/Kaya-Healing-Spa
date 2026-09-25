@@ -1,5 +1,6 @@
 import { gallery, packages, site } from "@/lib/content";
 import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
+import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 import { defaultTherapists } from "@/lib/default-therapists";
 import type { OrbitAboutPage, OrbitSocialLink, OrbitTherapist } from "@/lib/orbit-types";
 import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
@@ -112,8 +113,7 @@ export type OrbitContent = {
   servicesMenuVersion?: number;
 };
 
-/** Increment when replacing the default treatment menu in code. */
-export const SERVICES_MENU_VERSION = 2;
+export { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 
 const filePath = path.join(process.cwd(), "data", "orbit-content.json");
 

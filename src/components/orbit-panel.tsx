@@ -1,7 +1,7 @@
 "use client";
 
 import type { OrbitContent, OrbitPageCovers } from "@/lib/orbit-store";
-import { SERVICES_MENU_VERSION } from "@/lib/orbit-store";
+import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
 import { site } from "@/lib/content";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
