@@ -4,7 +4,7 @@ import { TherapiesSection } from "@/components/therapies-section";
 import { WhyKayaSection } from "@/components/why-kaya-section";
 import { formatNpr, reviews, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
-import { Calendar, Flower2, Leaf, Sparkles } from "lucide-react";
+import { Flower2, Leaf, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -58,7 +58,6 @@ export function HomePage() {
   const therapies = orbit.therapies;
   const whyKaya = orbit.whyKaya;
   const homeAbout = orbit.homeAbout;
-  const pointIcons = [Flower2, Leaf, CareIcon];
   const featuredServices = services.slice(0, 6);
   const preview = gallery.slice(0, 6);
 
@@ -77,61 +76,16 @@ export function HomePage() {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.72)_0%,rgba(255,255,255,0.38)_28%,rgba(255,255,255,0.08)_45%,transparent_58%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#fafafa]/90 to-transparent" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0.62)_0%,rgba(10,8,6,0.28)_22%,rgba(10,8,6,0.08)_45%,transparent_62%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#fafafa] via-[#fafafa]/80 to-transparent" />
         </div>
 
-        <div className="relative z-10 mx-auto flex h-full max-h-[100svh] w-full max-w-[1440px] flex-col px-5 pt-[72px] sm:px-8 md:px-10 lg:px-12 lg:pt-[108px] xl:px-14">
-          <div className="flex min-h-0 flex-1 items-center py-2 max-[900px]:h-auto max-[900px]:items-start max-[900px]:py-3">
-            <div className="w-full max-w-[min(100%,520px)] lg:max-w-[480px] xl:max-w-[540px]">
-              <p className="flex items-center gap-3 text-[11px] font-bold tracking-[0.28em] text-[#7a5c45] uppercase">
-                {hero.eyebrow}
-                <span className="h-px w-10 bg-[#F47B20]" />
-              </p>
-              <h1
-                className="mt-3 text-[clamp(2.25rem,4vw+0.85rem,5.5rem)] leading-[0.92] font-semibold tracking-[-0.035em] sm:mt-4"
-                style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
-              >
-                <span className="block text-[#E8680F] drop-shadow-[0_2px_14px_rgba(255,255,255,0.85)]">{hero.titleOrange}</span>
-                <span className="block text-[#141210] drop-shadow-[0_2px_14px_rgba(255,255,255,0.9)]">{hero.titleDark}</span>
-              </h1>
-              <p className="mt-3 font-serif text-[clamp(1.125rem,1.4vw+0.65rem,2rem)] leading-[1.15] font-medium text-[#252525] drop-shadow-[0_1px_12px_rgba(255,255,255,0.88)] sm:mt-4">
-                {hero.subtitle}
-              </p>
-              {hero.body ? (
-                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[#3a3a3a] drop-shadow-[0_1px_10px_rgba(255,255,255,0.75)]">{hero.body}</p>
-              ) : null}
-              <div className="mt-5 flex flex-wrap gap-3 max-[900px]:mt-4 sm:mt-6 sm:gap-4">
-                <Link href="/services" className="inline-flex items-center gap-2 rounded-full bg-[#F47B20] px-7 py-4 text-[15px] font-medium text-white shadow-[0_10px_24px_rgba(244,123,32,0.28)] transition hover:-translate-y-0.5 hover:bg-[#e06d12]">
-                  {hero.explore} <span aria-hidden>→</span>
-                </Link>
-                <Link href="/contact" className="inline-flex items-center gap-2.5 rounded-full border border-[#efe9e3] bg-white px-7 py-4 text-[15px] font-medium text-[#171717] shadow-[0_10px_24px_rgba(23,23,23,0.06)] transition hover:-translate-y-0.5 hover:border-[#F47B20]">
-                  <Calendar size={16} />
-                  {hero.book}
-                </Link>
-              </div>
-              <ul className="mt-6 flex flex-wrap gap-x-7 gap-y-3 max-[900px]:mt-4 sm:mt-7">
-                {hero.points.map((point, index) => {
-                  const Icon = pointIcons[index % pointIcons.length];
-                  return (
-                    <li key={point.title} className="flex items-center gap-3 text-[13px] font-semibold leading-snug text-[#141210] drop-shadow-[0_1px_10px_rgba(255,255,255,0.85)]">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#fff1e6]/90 text-[#F47B20] ring-1 ring-[#F47B20]/20">
-                        <Icon size={19} strokeWidth={1.5} />
-                      </span>
-                      <span>
-                        {point.title}
-                        <br />
-                        {point.text}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </div>
-
-          <div className="relative z-20 shrink-0 pb-3 pt-1 sm:pb-4">
-            <div className="rounded-[20px] border border-[#f0ece8]/90 bg-white/80 shadow-[0_12px_32px_rgba(23,23,23,0.06)] sm:rounded-[24px]">
+        <div className="relative z-10 mx-auto flex h-full max-h-[100svh] w-full max-w-[1440px] flex-col justify-end px-5 pb-3 pt-[72px] sm:px-8 md:px-10 lg:px-12 lg:pt-[108px] lg:pb-4 xl:px-14">
+          <h1 className="sr-only">
+            {hero.titleOrange} {hero.titleDark} — {site.name}
+          </h1>
+          <div className="relative z-20 w-full shrink-0">
+            <div className="rounded-[20px] border border-white/20 bg-white/92 shadow-[0_16px_40px_rgba(0,0,0,0.12)] sm:rounded-[24px]">
             <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];

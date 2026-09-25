@@ -24,9 +24,6 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
   const isHome = pathname === "/";
   const glass = !isHome || scrolled;
   const onHero = isHome && !scrolled;
-  const navReadable = onHero
-    ? "[text-shadow:0_0_20px_rgba(255,255,255,1),0_1px_2px_rgba(255,255,255,1)] subpixel-antialiased"
-    : "subpixel-antialiased";
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -49,7 +46,7 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
       className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300 ${
         glass
           ? "border-b border-white/60 bg-white/80 shadow-[0_8px_32px_rgba(23,23,23,0.05)] backdrop-blur-lg"
-          : "border-b-0 border-transparent bg-transparent shadow-none backdrop-blur-0"
+          : "border-b-0 border-transparent bg-gradient-to-b from-black/50 via-black/15 to-transparent shadow-none backdrop-blur-0"
       }`}
     >
       <div className="relative mx-auto flex h-[72px] max-w-[1440px] items-center px-5 md:px-8 lg:h-[108px]">
@@ -66,32 +63,56 @@ export function SiteHeader({ phone = site.phone }: { phone?: string }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative text-[15px] font-extrabold tracking-[0.03em] ${navReadable} ${active ? "text-[#F47B20]" : "text-[#121212] hover:text-[#F47B20]"}`}
+                className={`relative text-[13px] font-bold uppercase tracking-[0.12em] ${
+                  onHero
+                    ? active
+                      ? "text-white"
+                      : "text-white hover:text-[#F47B20]"
+                    : active
+                      ? "text-[#F47B20]"
+                      : "text-[#121212] hover:text-[#F47B20]"
+                }`}
               >
                 {link.label}
-                {active && <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />}
+                {active && (
+                  <span className="absolute -bottom-1.5 left-0 h-[2px] w-full rounded-full bg-[#F47B20]" />
+                )}
               </Link>
             );
           })}
         </nav>
         <div className="relative z-10 ml-auto flex shrink-0 items-center gap-4 lg:gap-5">
-          <a href={`tel:${phone.replace(/\s/g, "")}`} className={`hidden items-center gap-3 text-[#171717] lg:flex ${navReadable}`}>
-            <span className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${glass ? "bg-[#fff1e6]" : "bg-[#fff1e6]/35 backdrop-blur-[2px]"}`}>
-              <Phone size={18} className="call-pulse text-[#F47B20]" strokeWidth={1.8} />
+          <a
+            href={`tel:${phone.replace(/\s/g, "")}`}
+            className={`hidden items-center gap-3 lg:flex ${onHero ? "text-white" : "text-[#171717]"}`}
+          >
+            <span
+              className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
+                glass ? "bg-[#fff1e6]" : onHero ? "bg-white/15" : "bg-[#fff1e6]/35 backdrop-blur-[2px]"
+              }`}
+            >
+              <Phone size={18} className={`call-pulse ${onHero ? "text-white" : "text-[#F47B20]"}`} strokeWidth={1.8} />
             </span>
             <span className="leading-tight">
-              <span className={`block text-[11px] font-semibold text-[#5c5c5c] ${navReadable}`}>Call Us</span>
-              <span className={`text-sm font-bold text-[#121212] ${navReadable}`}>{phone}</span>
+              <span className={`block text-[11px] font-semibold ${onHero ? "text-white/80" : "text-[#5c5c5c]"}`}>Call Us</span>
+              <span className={`text-sm font-bold ${onHero ? "text-white" : "text-[#121212]"}`}>{phone}</span>
             </span>
           </a>
-          <Link href="/contact" className="hidden items-center gap-2 rounded-full bg-[#F47B20] px-6 py-3 text-sm font-medium text-white shadow-[0_8px_20px_rgba(244,123,32,0.25)] transition hover:bg-[#e06d12] sm:inline-flex">
+          <Link
+            href="/contact"
+            className={`hidden items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition sm:inline-flex ${
+              onHero
+                ? "border border-white/70 bg-transparent text-white hover:bg-white/10"
+                : "bg-[#F47B20] text-white shadow-[0_8px_20px_rgba(244,123,32,0.25)] hover:bg-[#e06d12]"
+            }`}
+          >
             <Calendar size={16} />
             Book Appointment
             <span aria-hidden>→</span>
           </Link>
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center text-[#171717] xl:hidden"
+            className={`inline-flex h-11 w-11 items-center justify-center xl:hidden ${onHero ? "text-white" : "text-[#171717]"}`}
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
