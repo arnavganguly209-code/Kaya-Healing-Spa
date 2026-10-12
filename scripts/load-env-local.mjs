@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "fs";
 import path from "path";
 
-export function loadEnvLocal() {
-  const file = path.join(process.cwd(), ".env.local");
+function loadEnvFile(relativeName) {
+  const file = path.join(process.cwd(), relativeName);
   if (!existsSync(file)) return;
   for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
     const trimmed = line.trim();
@@ -13,4 +13,10 @@ export function loadEnvLocal() {
     const value = trimmed.slice(idx + 1).trim();
     if (!process.env[key]) process.env[key] = value;
   }
+}
+
+/** Load `.env` then `.env.local` (local overrides). Does not print values. */
+export function loadEnvLocal() {
+  loadEnvFile(".env");
+  loadEnvFile(".env.local");
 }
