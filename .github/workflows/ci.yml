@@ -18,3 +18,4 @@ jobs:
       - run: npm ci --include=dev
       - run: npm test
       - run: npm run build
+      - run: node scripts/service-slug-local-http-selftest.mjs

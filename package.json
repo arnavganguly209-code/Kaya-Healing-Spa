@@ -3,15 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/write-route-slug-manifest.mjs && next dev",
+    "build": "node scripts/write-route-slug-manifest.mjs && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node scripts/booking-scheduler-selftest.mjs && node scripts/booking-number-selftest.mjs && node scripts/booking-pdf-selftest.mjs && node scripts/booking-config-selftest.mjs",
+    "test": "node scripts/booking-scheduler-selftest.mjs && node scripts/booking-number-selftest.mjs && node scripts/booking-pdf-selftest.mjs && node scripts/booking-config-selftest.mjs && node scripts/route-slug-manifest-selftest.mjs",
     "verify:env": "node scripts/go-live-check.mjs",
     "verify:mail": "node scripts/smtp-verify.mjs",
     "verify:dns": "node scripts/dns-diagnose.mjs",
-    "verify:domains": "node scripts/verify-domains.mjs"
+    "verify:domains": "node scripts/verify-domains.mjs",
+    "verify:slugs": "node scripts/service-slug-http-selftest.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.4.3",

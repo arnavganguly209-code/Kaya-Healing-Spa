@@ -209,6 +209,7 @@ jobs:
           sleep 5
           npm ci --omit=dev
           node scripts/verify-domains.mjs
+          node scripts/service-slug-http-selftest.mjs
           CODE="$(curl -sS -o /tmp/kaya.html -w '%{http_code}' --retry 8 --retry-delay 3 --retry-all-errors https://kaya.theglobalorbit.com || true)"
           echo "demo homepage HTTP ${CODE}"
           if [ "${CODE}" != "200" ]; then

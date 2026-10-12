@@ -8,18 +8,24 @@ import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const dynamic = "force-dynamic";
+
 function getPackageFromOrbit(slug: string) {
   return readOrbitContent().packages.find((item) => item.slug === slug) ?? getPackage(slug);
 }
 
 export function generateStaticParams() {
-  return fallbackPackages.map((item) => ({ slug: item.slug }));
+  const orbit = readOrbitContent();
+  const slugs = new Set([...fallbackPackages.map((p) => p.slug), ...orbit.packages.map((p) => p.slug)]);
+  return [...slugs].map((slug) => ({ slug }));
 }
+
+export const dynamicParams = false;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const item = getPackageFromOrbit(slug);
-  if (!item) return { title: "Package" };
+  if (!item) notFound();
   return {
     title: item.name,
     description: item.summary,

@@ -10,18 +10,25 @@ import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const dynamic = "force-dynamic";
+
 function getService(slug: string): Service | undefined {
   return readOrbitContent().services.find((service) => service.slug === slug) ?? fallbackService(slug);
 }
 
 export function generateStaticParams() {
-  return services.map((service) => ({ slug: service.slug }));
+  const orbit = readOrbitContent();
+  const slugs = new Set([...services.map((s) => s.slug), ...orbit.services.map((s) => s.slug)]);
+  return [...slugs].map((slug) => ({ slug }));
 }
+
+/** Unknown slugs must return a real HTTP 404 (not a soft 200). */
+export const dynamicParams = false;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const service = getService(slug);
-  if (!service) return { title: "Treatment" };
+  if (!service) notFound();
   return {
     title: service.name,
     description: service.summary,
