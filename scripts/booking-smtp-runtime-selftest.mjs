@@ -4,7 +4,11 @@ const result = spawnSync("npx", ["--yes", "tsx", "scripts/booking-smtp-runtime-r
   cwd: process.cwd(),
   shell: true,
   encoding: "utf8",
-  env: { ...process.env, KAYA_SKIP_ENV_FILE_LOAD: "1" },
+  env: {
+    ...process.env,
+    KAYA_SKIP_ENV_FILE_LOAD: "1",
+    NODE_OPTIONS: [process.env.NODE_OPTIONS, "--use-system-ca"].filter(Boolean).join(" "),
+  },
 });
 
 if (result.status !== 0) {

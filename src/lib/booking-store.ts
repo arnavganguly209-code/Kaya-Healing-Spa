@@ -5,14 +5,16 @@ import { allocateBookingNumber } from "@/lib/booking-sequence";
 import type { BookingEmailDelivery, BookingStatus, SpaBooking } from "@/lib/booking-types";
 import { randomBytes } from "crypto";
 
-const path = dataFilePath("spa-bookings.json");
+function bookingsFile() {
+  return dataFilePath("spa-bookings.json");
+}
 
 export function readBookings(): SpaBooking[] {
-  return readJsonFile(path, () => []);
+  return readJsonFile(bookingsFile(), () => []);
 }
 
 function writeBookings(list: SpaBooking[]) {
-  writeJsonFileAtomic(path, list.slice(0, 5000));
+  writeJsonFileAtomic(bookingsFile(), list.slice(0, 5000));
 }
 
 export function newPdfAccessToken(): string {

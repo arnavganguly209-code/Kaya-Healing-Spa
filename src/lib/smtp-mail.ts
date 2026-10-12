@@ -54,9 +54,26 @@ function isValidRecipient(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !/[\r\n]/.test(email);
 }
 
+const mockSends: SmtpSendInput[] = [];
+
+export function resetMockSmtpSends() {
+  mockSends.length = 0;
+}
+
+export function getMockSmtpSends(): SmtpSendInput[] {
+  return mockSends.slice();
+}
+
 export async function sendSmtpMail(input: SmtpSendInput): Promise<SmtpSendResult> {
   if (!isValidRecipient(input.to)) {
     return { ok: false, error: "Invalid recipient address" };
+  }
+  if (process.env.SMTP_MOCK === "1") {
+    mockSends.push(input);
+    if (process.env.SMTP_MOCK_FAIL === "1") {
+      return { ok: false, error: "mock SMTP rejection" };
+    }
+    return { ok: true, messageId: "mock-smtp-accepted" };
   }
   const transport = createSmtpTransport();
   if (!transport) {

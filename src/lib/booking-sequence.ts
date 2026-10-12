@@ -2,12 +2,14 @@ import { dataFilePath, readJsonFile, writeJsonFileAtomic } from "@/lib/json-file
 import { formatSequentialBookingNumber, maxSequentialFromBookings } from "@/lib/booking-number";
 import type { SpaBooking } from "@/lib/booking-types";
 
-const seqPath = dataFilePath("booking-sequence.json");
+function sequenceFile() {
+  return dataFilePath("booking-sequence.json");
+}
 
 type SequenceState = { lastAssigned: number };
 
 function readSequenceState(): SequenceState {
-  return readJsonFile(seqPath, () => ({ lastAssigned: 2000 }));
+  return readJsonFile(sequenceFile(), () => ({ lastAssigned: 2000 }));
 }
 
 /** Retries on collision; pass current bookings snapshot. */
@@ -21,10 +23,10 @@ export function allocateBookingNumber(existingBookings: SpaBooking[]): string {
 
     const taken = existingBookings.some((b) => (b.bookingNumber || b.reference) === number);
     if (!taken) {
-      writeJsonFileAtomic(seqPath, { lastAssigned: nextSeq });
+      writeJsonFileAtomic(sequenceFile(), { lastAssigned: nextSeq });
       return number;
     }
-    writeJsonFileAtomic(seqPath, { lastAssigned: nextSeq });
+    writeJsonFileAtomic(sequenceFile(), { lastAssigned: nextSeq });
   }
 
   throw new Error("Unable to allocate booking number");

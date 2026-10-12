@@ -28,5 +28,6 @@ export function fileMtimeMs(filePath: string): number {
 }
 
 export function dataFilePath(name: string) {
-  return path.join(process.cwd(), "data", name);
+  const root = process.env.KAYA_DATA_DIR?.trim() || path.join(/* turbopackIgnore: true */ process.cwd(), "data");
+  return path.join(/* turbopackIgnore: true */ root, name);
 }

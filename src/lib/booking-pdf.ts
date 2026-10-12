@@ -23,10 +23,23 @@ function money(amount: number | null | undefined): string {
   return formatNpr(amount);
 }
 
+/** Helvetica/WinAnsi cannot encode Devanagari; never throw while drawing. */
+function pdfText(value: string, max = 96): string {
+  return value
+    .replace(/[^\t\n\r\x20-\x7E]/g, "?")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
+}
+
 export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Array> {
   const orbit = readOrbitContent();
   const phone = orbit.phone || SPA_BOOKING_PHONE;
   const doc = await PDFDocument.create();
+  const number = displayBookingNumber(booking);
+  doc.setTitle(`Kaya Healing Spa Booking ${number}`);
+  doc.setSubject(number);
+  doc.setCreator("Kaya Healing Spa");
   const page = doc.addPage([595.28, 841.89]);
   const { width, height } = page.getSize();
   const margin = 42;
@@ -43,37 +56,36 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
     y -= logoH + 12;
   }
 
-  page.drawText("Kaya Healing Spa", { x: margin, y, size: 18, font: fontBold, color: DARK });
+  page.drawText(pdfText("Kaya Healing Spa"), { x: margin, y, size: 18, font: fontBold, color: DARK });
   y -= 14;
   const address = site.addressLine;
   const addressLines = address.length > 52 ? [address.slice(0, 52), address.slice(52).trim()] : [address];
   for (const line of addressLines.filter(Boolean)) {
-    page.drawText(line, { x: margin, y, size: 8, font, color: MUTED });
+    page.drawText(pdfText(line, 80), { x: margin, y, size: 8, font, color: MUTED });
     y -= 11;
   }
-  page.drawText(phone, { x: margin, y, size: 9, font, color: MUTED });
+  page.drawText(pdfText(phone, 48), { x: margin, y, size: 9, font, color: MUTED });
   y -= 12;
   const contactEmail = smtpFromEmail();
-  page.drawText(contactEmail, { x: margin, y, size: 9, font, color: MUTED });
+  page.drawText(pdfText(contactEmail, 64), { x: margin, y, size: 9, font, color: MUTED });
   y -= 12;
-  page.drawText(spaPublicUrl(), { x: margin, y, size: 9, font, color: MUTED });
+  page.drawText(pdfText(spaPublicUrl(), 72), { x: margin, y, size: 9, font, color: MUTED });
 
   const title = "BOOKING CONFIRMATION";
   page.drawText(title, { x: margin, y: y - 28, size: 14, font: fontBold, color: ORANGE });
   y -= 52;
 
-  const number = displayBookingNumber(booking);
-  page.drawText(`Booking No. ${number}`, { x: margin, y, size: 16, font: fontBold, color: DARK });
+  page.drawText(pdfText(`Booking No. ${number}`, 40), { x: margin, y, size: 16, font: fontBold, color: DARK });
   y -= 28;
 
   const drawSection = (label: string) => {
-    page.drawText(label, { x: margin, y, size: 11, font: fontBold, color: DARK });
+    page.drawText(pdfText(label, 40), { x: margin, y, size: 11, font: fontBold, color: DARK });
     y -= 16;
   };
 
   const drawRow = (label: string, value: string) => {
-    page.drawText(label, { x: margin, y, size: 9, font, color: MUTED });
-    page.drawText(value, { x: margin + 140, y, size: 9, font: fontBold, color: DARK });
+    page.drawText(pdfText(label, 28), { x: margin, y, size: 9, font, color: MUTED });
+    page.drawText(pdfText(value, 70), { x: margin + 140, y, size: 9, font: fontBold, color: DARK });
     y -= 14;
   };
 
@@ -115,15 +127,15 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
   page.drawText("Description", { x: margin + 8, y: tableY, size: 8, font: fontBold, color: MUTED });
   page.drawText("Qty / duration", { x: margin + 200, y: tableY, size: 8, font: fontBold, color: MUTED });
   page.drawText("Line total", { x: margin + 320, y: tableY, size: 8, font: fontBold, color: MUTED });
-  page.drawText(booking.serviceName || booking.packageName || "Treatment", {
+  page.drawText(pdfText(booking.serviceName || booking.packageName || "Treatment", 42), {
     x: margin + 8,
     y: tableY - 16,
     size: 9,
     font,
     color: DARK,
   });
-  page.drawText(`${guests} guest(s) · ${booking.durationMinutes} min`, { x: margin + 200, y: tableY - 16, size: 9, font, color: DARK });
-  page.drawText(money(total), { x: margin + 320, y: tableY - 16, size: 9, font: fontBold, color: DARK });
+  page.drawText(pdfText(`${guests} guest(s) · ${booking.durationMinutes} min`, 28), { x: margin + 200, y: tableY - 16, size: 9, font, color: DARK });
+  page.drawText(pdfText(money(total), 24), { x: margin + 320, y: tableY - 16, size: 9, font: fontBold, color: DARK });
   y -= 96;
 
   drawRow("Subtotal", money(total));
@@ -160,7 +172,7 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
   });
 
   const footerY = margin + 8;
-  page.drawText(`Reference: ${number}`, { x: margin, y: footerY, size: 8, font, color: MUTED });
+  page.drawText(pdfText(`Reference: ${number}`, 40), { x: margin, y: footerY, size: 8, font, color: MUTED });
   page.drawText("Page 1 of 1", { x: width - margin - 52, y: footerY, size: 8, font, color: MUTED });
 
   return doc.save();

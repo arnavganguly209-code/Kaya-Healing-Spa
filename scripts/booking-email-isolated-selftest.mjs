@@ -4,7 +4,10 @@ const result = spawnSync("npx", ["--yes", "tsx", "scripts/booking-email-isolated
   cwd: process.cwd(),
   shell: true,
   encoding: "utf8",
-  env: { ...process.env, NODE_OPTIONS: process.env.NODE_OPTIONS || "" },
+  env: {
+    ...process.env,
+    NODE_OPTIONS: [process.env.NODE_OPTIONS, "--use-system-ca"].filter(Boolean).join(" "),
+  },
 });
 
 if (result.status !== 0) {

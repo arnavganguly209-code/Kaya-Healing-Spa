@@ -6,6 +6,7 @@ import {
   buildAdminBookingNotificationHtml,
   buildBookingConfirmationHtml,
 } from "../src/lib/booking-email";
+import { PDFDocument } from "pdf-lib";
 import { bookingPdfFilename, generateBookingPdf } from "../src/lib/booking-pdf";
 import type { SpaBooking } from "../src/lib/booking-types";
 
@@ -53,6 +54,17 @@ async function main(): Promise<void> {
 
   const filename = bookingPdfFilename(booking);
   if (filename !== "KAYA02099-Booking-Confirmation.pdf") throw new Error("unexpected PDF filename");
+
+  const loaded = await PDFDocument.load(pdf);
+  if (!loaded.getTitle()?.includes("KAYA02099")) throw new Error("PDF metadata missing booking reference");
+  if (loaded.getSubject() !== "KAYA02099") throw new Error("PDF subject missing booking reference");
+  if (loaded.getPageCount() !== 1) throw new Error("PDF should be a single page");
+
+  const unicodeBooking: SpaBooking = { ...booking, name: "काया Test" };
+  const unicodePdf = await generateBookingPdf(unicodeBooking);
+  if (Buffer.from(unicodePdf.subarray(0, 5)).toString("ascii") !== "%PDF-") {
+    throw new Error("unicode customer name broke PDF generation");
+  }
 
   console.log("booking-email-isolated-runner: PASS", pdf.length, "bytes", filename);
 }
