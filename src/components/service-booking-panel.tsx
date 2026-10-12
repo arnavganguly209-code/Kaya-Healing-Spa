@@ -25,6 +25,7 @@ export function ServiceBookingPanel({ service, therapists }: { service: Service;
   const [privacy, setPrivacy] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [message, setMessage] = useState("");
+  const idempotencyKey = useMemo(() => (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `idem-${Date.now()}`), []);
 
   const selectedPrice = durationOptions.find((o) => o.minutes === durationMinutes)?.priceNpr ?? null;
 
@@ -71,6 +72,8 @@ export function ServiceBookingPanel({ service, therapists }: { service: Service;
         therapistSlug: therapistSlug || undefined,
         notes,
         privacyAccepted: privacy,
+        idempotencyKey,
+        guests: 1,
       }),
     });
     const body = await res.json().catch(() => ({}));
@@ -80,7 +83,11 @@ export function ServiceBookingPanel({ service, therapists }: { service: Service;
       return;
     }
     if (body.data?.reference) {
-      window.location.assign(`${CONFIRMATION_PATH}?ref=${encodeURIComponent(body.data.reference)}`);
+      const q = new URLSearchParams({ ref: body.data.reference });
+      if (body.data.pdfToken) q.set("token", body.data.pdfToken);
+      if (body.data.emailSent) q.set("emailSent", "1");
+      if (body.data.emailSkipped) q.set("emailSkipped", "1");
+      window.location.assign(`${CONFIRMATION_PATH}?${q.toString()}`);
       return;
     }
     setStatus("error");

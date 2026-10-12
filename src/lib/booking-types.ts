@@ -13,9 +13,24 @@ export type BookingAuditEntry = {
   by?: "system" | "admin";
 };
 
+export type PaymentStatus = "unpaid" | "partial" | "paid";
+
+export type EmailDeliveryStatus = "pending" | "sent" | "failed" | "skipped";
+
+export type BookingEmailDelivery = {
+  status: EmailDeliveryStatus;
+  resendMessageId?: string;
+  attempts: number;
+  lastAttemptAt?: string;
+  lastError?: string;
+  recipient?: string;
+};
+
 export type SpaBooking = {
   id: string;
+  /** Legacy random ref; new bookings use sequential KAYA02001 in both fields */
   reference: string;
+  bookingNumber?: string;
   status: BookingStatus;
   createdAt: string;
   updatedAt: string;
@@ -35,8 +50,15 @@ export type SpaBooking = {
   priceConfirmed: boolean;
   appointmentDate: string;
   appointmentTime: string;
+  guests?: number;
+  amountPaidNpr?: number;
+  paymentStatus?: PaymentStatus;
+  paymentMethod?: string;
   notes?: string;
   privacyAccepted: boolean;
+  idempotencyKey?: string;
+  pdfAccessToken?: string;
+  emailDelivery?: BookingEmailDelivery;
   audit: BookingAuditEntry[];
 };
 

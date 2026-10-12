@@ -1,5 +1,6 @@
 import { appendInquiry } from "@/lib/admin-store";
-import { createBooking, readBookings } from "@/lib/booking-store";
+import { deliverBookingConfirmation } from "@/lib/booking-confirm";
+import { displayBookingNumber, createBooking, findBookingById, findBookingByIdempotencyKey, readBookings } from "@/lib/booking-store";
 import { readBookingSettings } from "@/lib/booking-settings";
 import { isPastDate, listAvailableSlots, parseDateYmd, timeToMinutes } from "@/lib/booking-scheduler";
 import { parseServiceDurationOptions } from "@/lib/service-pricing";
@@ -24,6 +25,7 @@ type Body = {
   guests?: number;
   notes?: string;
   privacyAccepted?: boolean;
+  idempotencyKey?: string;
 };
 
 export async function POST(request: Request) {
@@ -72,6 +74,30 @@ export async function POST(request: Request) {
       serverPrice = packageItem.priceNpr;
     }
 
+    const guests = Math.min(20, Math.max(1, Number(body.guests) || 1));
+    const idempotencyKey = body.idempotencyKey?.trim() || undefined;
+
+    if (idempotencyKey) {
+      const prior = findBookingByIdempotencyKey(idempotencyKey);
+      if (prior) {
+        const delivery = await deliverBookingConfirmation(prior);
+        const saved = findBookingById(prior.id) ?? prior;
+        return NextResponse.json({
+          success: true,
+          message: "Booking already recorded",
+          data: {
+            reference: displayBookingNumber(saved),
+            bookingNumber: displayBookingNumber(saved),
+            bookingId: saved.id,
+            pdfToken: saved.pdfAccessToken,
+            emailSent: delivery.emailSent,
+            emailSkipped: delivery.emailSkipped,
+            emailError: delivery.emailError,
+          },
+        });
+      }
+    }
+
     const existing = readBookings();
     const slots = listAvailableSlots(body.preferredDate, durationMinutes, settings, existing, body.therapistSlug || undefined);
     if (!slots.includes(body.preferredTime)) {
@@ -80,10 +106,10 @@ export async function POST(request: Request) {
 
     const therapist = body.therapistSlug ? orbit.therapists.find((t) => t.slug === body.therapistSlug) : undefined;
 
-    const booking = createBooking({
-      status: "pending",
+    const { booking, created } = createBooking({
+      status: "confirmed",
       name: body.name.trim(),
-      email: body.email!.trim(),
+      email: body.email!.trim().toLowerCase(),
       phone: body.phone.trim(),
       country: body.country.trim(),
       whatsapp: body.phone.trim(),
@@ -98,23 +124,41 @@ export async function POST(request: Request) {
       priceConfirmed: serverPrice != null && serverPrice > 0,
       appointmentDate: body.preferredDate,
       appointmentTime: body.preferredTime,
+      guests,
+      amountPaidNpr: 0,
+      paymentStatus: "unpaid",
+      paymentMethod: "pay_at_spa",
       notes: body.notes?.trim(),
       privacyAccepted: true,
+      idempotencyKey,
     });
 
-    appendInquiry({
-      type: "booking",
-      name: booking.name,
-      email: booking.email,
-      phone: booking.phone,
-      summary: `${booking.reference} · ${booking.serviceName || booking.packageName || "Booking"}`,
-      payload: { ...body, reference: booking.reference, bookingId: booking.id },
-    });
+    if (created) {
+      appendInquiry({
+        type: "booking",
+        name: booking.name,
+        email: booking.email,
+        phone: booking.phone,
+        summary: `${displayBookingNumber(booking)} · ${booking.serviceName || booking.packageName || "Booking"}`,
+        payload: { reference: displayBookingNumber(booking), bookingId: booking.id },
+      });
+    }
+
+    const delivery = await deliverBookingConfirmation(booking);
+    const saved = findBookingById(booking.id) ?? booking;
 
     return NextResponse.json({
       success: true,
-      message: "Appointment request received",
-      data: { reference: booking.reference, bookingId: booking.id },
+      message: "Booking saved",
+      data: {
+        reference: displayBookingNumber(saved),
+        bookingNumber: displayBookingNumber(saved),
+        bookingId: saved.id,
+        pdfToken: saved.pdfAccessToken,
+        emailSent: delivery.emailSent,
+        emailSkipped: delivery.emailSkipped,
+        emailError: delivery.emailError,
+      },
     });
   } catch (error) {
     console.error("appointments POST failed", error);

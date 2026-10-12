@@ -2,6 +2,7 @@
 
 import type { BlogPost } from "@/lib/blog-store";
 import type { AdminInquiry } from "@/lib/admin-store";
+import { AdminBookingsSection } from "@/components/admin-bookings-section";
 import type { SpaBooking } from "@/lib/booking-types";
 import type { OrbitContent, OrbitAdminSectionFlags } from "@/lib/orbit-store";
 import {
@@ -493,43 +494,27 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
 
           {section === "Bookings" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Structured appointment requests with reference numbers. Update status after reception confirms.</p>
               {bookingSettings && (
-                <div className="mt-4 rounded-xl border border-[#efe8e0] bg-[#faf8f5] p-4 text-sm">
+                <div className="mb-4 rounded-xl border border-[#efe8e0] bg-[#faf8f5] p-4 text-sm">
                   <p className="font-semibold">Availability (read-only summary)</p>
                   <p className="mt-1 text-[#6B6B6B]">
                     Timezone {bookingSettings.timezone} · 8:00 AM–11:45 PM starts · 15-minute intervals · {bookingSettings.blocks?.length || 0} blocked period(s)
                   </p>
-                  <p className="mt-1 text-xs text-[#8a8175]">Full block editor and hour exceptions: use API /api/admin/booking-settings or extend this panel next.</p>
                 </div>
               )}
-              {!bookings.length && <p className="mt-4 text-sm">No bookings yet.</p>}
-              <ul className="mt-6 space-y-4">
-                {bookings.map((b) => (
-                  <li key={b.id} className="rounded-2xl border border-[#efe8e0] p-4">
-                    <p className="font-semibold">{b.reference} · {b.status}</p>
-                    <p className="text-sm text-[#6B6B6B]">{b.name} · {b.email} · {b.phone}</p>
-                    <p className="text-sm">{b.serviceName || b.packageName} · {b.appointmentDate} {b.appointmentTime} · {b.durationMinutes} min</p>
-                    <select
-                      value={b.status}
-                      className="mt-3 rounded-lg border px-3 py-2 text-sm"
-                      onChange={async (e) => {
-                        await fetch("/api/admin/bookings", {
-                          method: "PATCH",
-                          credentials: "same-origin",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ id: b.id, status: e.target.value }),
-                        });
-                        loadBookings();
-                      }}
-                    >
-                      {["pending", "confirmed", "rejected", "cancelled", "completed", "no_show"].map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
-                  </li>
-                ))}
-              </ul>
+              <AdminBookingsSection
+                bookings={bookings}
+                onRefresh={() => void loadBookings()}
+                onStatusChange={async (id, status) => {
+                  await fetch("/api/admin/bookings", {
+                    method: "PATCH",
+                    credentials: "same-origin",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id, status }),
+                  });
+                  loadBookings();
+                }}
+              />
             </>
           )}
 
