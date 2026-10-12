@@ -199,7 +199,7 @@ jobs:
               exit 1
             fi
 
-            echo "Aligning nginx for kaya.theglobalorbit.com only"
+            echo "Aligning nginx for kaya.theglobalorbit.com and kayahealingspa.com.np"
             if ! python3 "${APP_DIR}/scripts/align-kaya-nginx.py" "${APP_PORT}"; then
               sudo python3 "${APP_DIR}/scripts/align-kaya-nginx.py" "${APP_PORT}"
             fi
@@ -242,3 +242,10 @@ jobs:
             fi
           done
           echo "Live site is serving"
+          NP_CODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 https://kayahealingspa.com.np/ || true)"
+          echo "kayahealingspa.com.np HTTP ${NP_CODE}"
+          if [ "${NP_CODE}" = "200" ]; then
+            echo "Primary .np domain is reachable"
+          else
+            echo "WARN: kayahealingspa.com.np not HTTP 200 (check Cloudflare A record and SSL)"
+          fi

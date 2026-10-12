@@ -5,7 +5,9 @@ import re
 import sys
 from pathlib import Path
 
-DOMAIN = "kaya.theglobalorbit.com"
+PRIMARY_DOMAIN = "kaya.theglobalorbit.com"
+EXTRA_DOMAINS = ("kayahealingspa.com.np", "www.kayahealingspa.com.np")
+ALL_MARKERS = (PRIMARY_DOMAIN, *EXTRA_DOMAINS)
 APP_UPLOADS = "/var/www/kaya-healing-spa/public/uploads/"
 SEARCH_DIRS = (
     Path("/etc/nginx/sites-enabled"),
@@ -30,8 +32,17 @@ def rewrite(text: str, port: str) -> tuple[str, str]:
             server_base = depth
             in_kaya = False
 
-        if server_base is not None and "server_name" in line and DOMAIN in line:
+        if server_base is not None and "server_name" in line and any(d in line for d in ALL_MARKERS):
             in_kaya = True
+        if in_kaya and "server_name" in line and PRIMARY_DOMAIN in line:
+            missing = [d for d in EXTRA_DOMAINS if d not in line]
+            if missing:
+                line = line.rstrip("\n")
+                if line.endswith(";"):
+                    line = line[:-1] + " " + " ".join(missing) + ";\n"
+                else:
+                    line = line + " " + " ".join(missing) + "\n"
+                changed = True
 
         if in_kaya and "client_max_body_size" in line:
             new_line, count = re.subn(
@@ -89,9 +100,9 @@ def rewrite(text: str, port: str) -> tuple[str, str]:
                 changed = True
                 saw_proxy = True
 
-    if DOMAIN in updated and "client_max_body_size 120m" not in updated:
+    if PRIMARY_DOMAIN in updated and "client_max_body_size 120m" not in updated:
         updated, count = re.subn(
-            r"(server_name[^\n]*" + re.escape(DOMAIN) + r"[^\n]*\n)",
+            r"(server_name[^\n]*" + re.escape(PRIMARY_DOMAIN) + r"[^\n]*\n)",
             r"\1        client_max_body_size 120m;\n        proxy_read_timeout 300s;\n        proxy_send_timeout 300s;\n        proxy_buffer_size 128k;\n        proxy_buffers 8 256k;\n        proxy_busy_buffers_size 512k;\n",
             updated,
             count=1,
@@ -99,7 +110,7 @@ def rewrite(text: str, port: str) -> tuple[str, str]:
         if count:
             changed = True
 
-    if DOMAIN in updated and "location ^~ /uploads/" not in updated:
+    if PRIMARY_DOMAIN in updated and "location ^~ /uploads/" not in updated:
         upload_block = (
             f"        location ^~ /uploads/ {{\n"
             f"            alias {APP_UPLOADS};\n"
@@ -108,7 +119,7 @@ def rewrite(text: str, port: str) -> tuple[str, str]:
             f"        }}\n"
         )
         updated, count = re.subn(
-            r"(server_name[^\n]*" + re.escape(DOMAIN) + r"[^\n]*\n)",
+            r"(server_name[^\n]*" + re.escape(PRIMARY_DOMAIN) + r"[^\n]*\n)",
             r"\1" + upload_block,
             updated,
             count=1,
@@ -140,7 +151,7 @@ def main() -> int:
         except OSError as exc:
             print(f"skip {path}: {exc}")
             continue
-        if DOMAIN not in original:
+        if not any(d in original for d in ALL_MARKERS):
             continue
         updated, status = rewrite(original, port)
         if status == "missing":
@@ -148,8 +159,8 @@ def main() -> int:
             continue
         if "client_max_body_size 120m" not in updated:
             updated = updated.replace(
-                f"server_name {DOMAIN}",
-                f"server_name {DOMAIN};\n        client_max_body_size 120m;\n        proxy_read_timeout 300s;\n        proxy_send_timeout 300s",
+                f"server_name {PRIMARY_DOMAIN}",
+                f"server_name {PRIMARY_DOMAIN} {' '.join(EXTRA_DOMAINS)};\n        client_max_body_size 120m;\n        proxy_read_timeout 300s;\n        proxy_send_timeout 300s",
                 1,
             )
         if updated == original:
@@ -165,7 +176,7 @@ def main() -> int:
         print(f"updated {path} -> 127.0.0.1:{port}")
 
     if touched == 0:
-        print(f"ERROR: no nginx proxy_pass updated for {DOMAIN}")
+        print(f"ERROR: no nginx proxy_pass updated for {PRIMARY_DOMAIN}")
         return 1
     return 0
 

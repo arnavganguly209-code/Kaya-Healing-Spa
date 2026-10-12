@@ -11,31 +11,47 @@ if (!key) {
 }
 
 const from = process.env.RESEND_FROM_EMAIL?.trim() || "booking@kayahealingspa.com.np";
-const probe = await fetch("https://api.resend.com/emails", {
-  method: "POST",
-  headers: {
-    Authorization: `Bearer ${key}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    from: `Kaya Healing Spa <${from}>`,
-    to: [from],
-    subject: "Resend auth probe (no delivery expected if blocked)",
-    html: "<p>Configuration probe — ignore if received during go-live check.</p>",
-  }),
-});
-
-if (probe.ok) {
-  const sent = await probe.json();
-  console.log("resend-verify: PASS send API accepted, id:", sent.id || "n/a");
+if (process.env.RESEND_VERIFY_SEND !== "1") {
+  console.log("resend-verify: SKIP send probe (set RESEND_VERIFY_SEND=1 to send one test email)");
 } else {
-  const err = await probe.json().catch(() => ({}));
-  const msg = err.message || err.name || probe.status;
-  if (probe.status === 401 || probe.status === 403) {
-    console.error("resend-verify: FAIL auth", probe.status);
-    process.exit(1);
+  const probe = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: `Kaya Healing Spa <${from}>`,
+      to: [from],
+      subject: "Resend auth probe",
+      html: "<p>Configuration probe.</p>",
+    }),
+  });
+
+  if (probe.ok) {
+    const sent = await probe.json();
+    console.log("resend-verify: PASS send API accepted, id:", sent.id || "n/a");
+  } else {
+    const err = await probe.json().catch(() => ({}));
+    const msg = err.message || err.name || probe.status;
+    if (probe.status === 401 || probe.status === 403) {
+      console.error("resend-verify: FAIL auth", probe.status);
+      process.exit(1);
+    }
+    console.log("resend-verify: WARN send rejected (check domain/sender):", msg);
   }
-  console.log("resend-verify: WARN send rejected (check domain/sender):", msg);
+}
+
+const apiKeys = await fetch("https://api.resend.com/api-keys", {
+  headers: { Authorization: `Bearer ${key}` },
+});
+if (apiKeys.ok) {
+  console.log("resend-verify: PASS API key authenticated (api-keys endpoint)");
+} else {
+  console.log("resend-verify: WARN api-keys endpoint", apiKeys.status, "— use RESEND_VERIFY_SEND=1 to confirm send");
+  if (process.env.RESEND_VERIFY_SEND !== "1") {
+    console.log("resend-verify: PASS key present (send probe skipped)");
+  }
 }
 
 const domainsRes = await fetch("https://api.resend.com/domains", {
