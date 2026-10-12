@@ -8,6 +8,7 @@
 #   ORBIT_PASSKEY       written into the server .env when present
 #   RESEND_API_KEY      Resend transactional email (booking confirmations)
 #   BOOKING_PDF_SECRET  optional; generated on VPS on first deploy if omitted
+#   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD  optional (not used for booking email)
 
 name: Deploy to Hostinger VPS
 
@@ -29,6 +30,10 @@ jobs:
       ORBIT_PASSKEY: ${{ secrets.ORBIT_PASSKEY }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       BOOKING_PDF_SECRET: ${{ secrets.BOOKING_PDF_SECRET }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
     steps:
       - name: Pull, build, and restart this app only
         uses: appleboy/ssh-action@v1.2.2
@@ -38,7 +43,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT != '' && secrets.VPS_PORT || 22 }}
           command_timeout: 20m
-          envs: ORBIT_PASSKEY,RESEND_API_KEY,BOOKING_PDF_SECRET
+          envs: ORBIT_PASSKEY,RESEND_API_KEY,BOOKING_PDF_SECRET,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD
           script_stop: true
           script: |
             set -euo pipefail
@@ -119,6 +124,11 @@ jobs:
               write_env_key .env.local BOOKING_PDF_SECRET "${GEN}"
               echo "Generated BOOKING_PDF_SECRET on server (not printed)"
             fi
+            if [ -n "${SMTP_HOST:-}" ]; then write_env_key .env SMTP_HOST "${SMTP_HOST}"; fi
+            if [ -n "${SMTP_PORT:-}" ]; then write_env_key .env SMTP_PORT "${SMTP_PORT}"; fi
+            if [ -n "${SMTP_USER:-}" ]; then write_env_key .env SMTP_USER "${SMTP_USER}"; fi
+            if [ -n "${SMTP_PASSWORD:-}" ]; then write_env_key .env SMTP_PASSWORD "${SMTP_PASSWORD}"; fi
+            write_env_key .env SMTP_SECURE "false"
             echo "Runtime env keys configured (values not logged)"
 
             echo "Installing dependencies"

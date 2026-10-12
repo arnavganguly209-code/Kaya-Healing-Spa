@@ -1,7 +1,9 @@
 /**
  * Verifies Resend API auth and lists domains (no secrets printed).
- * Run: RESEND_API_KEY=... node scripts/resend-verify.mjs
  */
+import { loadEnvLocal } from "./load-env-local.mjs";
+
+loadEnvLocal();
 const key = process.env.RESEND_API_KEY?.trim();
 if (!key) {
   console.log("resend-verify: BLOCKED (RESEND_API_KEY not set)");
