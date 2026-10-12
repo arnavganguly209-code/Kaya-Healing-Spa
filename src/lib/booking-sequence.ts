@@ -20,8 +20,11 @@ export function allocateBookingNumber(existingBookings: SpaBooking[]): string {
     const number = formatSequentialBookingNumber(nextSeq);
 
     const taken = existingBookings.some((b) => (b.bookingNumber || b.reference) === number);
+    if (!taken) {
+      writeJsonFileAtomic(seqPath, { lastAssigned: nextSeq });
+      return number;
+    }
     writeJsonFileAtomic(seqPath, { lastAssigned: nextSeq });
-    if (!taken) return number;
   }
 
   throw new Error("Unable to allocate booking number");

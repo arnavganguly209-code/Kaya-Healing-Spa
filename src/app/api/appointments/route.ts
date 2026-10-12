@@ -1,5 +1,7 @@
 import { appendInquiry } from "@/lib/admin-store";
+import { logBookingConfigIssues } from "@/lib/booking-config";
 import { deliverBookingConfirmation } from "@/lib/booking-confirm";
+import { normalizeAppointmentTime } from "@/lib/booking-time";
 import { displayBookingNumber, createBooking, findBookingById, findBookingByIdempotencyKey, readBookings } from "@/lib/booking-store";
 import { readBookingSettings } from "@/lib/booking-settings";
 import { isPastDate, listAvailableSlots, parseDateYmd, timeToMinutes } from "@/lib/booking-scheduler";
@@ -30,6 +32,7 @@ type Body = {
 
 export async function POST(request: Request) {
   try {
+    logBookingConfigIssues();
     const body = (await request.json().catch(() => null)) as Body | null;
     if (!body) return NextResponse.json({ message: "Invalid request." }, { status: 400 });
 
@@ -43,6 +46,7 @@ export async function POST(request: Request) {
     if (!body.phone || body.phone.trim().length < 6) return NextResponse.json({ message: "Enter a phone number." }, { status: 400 });
     if (!body.country?.trim()) return NextResponse.json({ message: "Select your country." }, { status: 400 });
     if (!body.preferredDate || !body.preferredTime) return NextResponse.json({ message: "Choose a date and time." }, { status: 400 });
+    body.preferredTime = normalizeAppointmentTime(body.preferredTime);
     if (!parseDateYmd(body.preferredDate)) return NextResponse.json({ message: "Invalid date." }, { status: 400 });
 
     const settings = readBookingSettings();

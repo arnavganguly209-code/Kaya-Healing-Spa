@@ -1,3 +1,4 @@
+import { withDataFileLock } from "@/lib/data-file-lock";
 import { dataFilePath, readJsonFile, writeJsonFileAtomic } from "@/lib/json-file";
 import { displayBookingNumber } from "@/lib/booking-number";
 import { allocateBookingNumber } from "@/lib/booking-sequence";
@@ -37,44 +38,51 @@ export function createBooking(
     idempotencyKey?: string;
   },
 ): { booking: SpaBooking; created: boolean } {
-  if (input.idempotencyKey) {
-    const existing = findBookingByIdempotencyKey(input.idempotencyKey);
-    if (existing) return { booking: existing, created: false };
-  }
+  return withDataFileLock("booking-data", () => {
+    if (input.idempotencyKey) {
+      const existing = findBookingByIdempotencyKey(input.idempotencyKey);
+      if (existing) return { booking: existing, created: false };
+    }
 
-  const list = readBookings();
-  const bookingNumber = allocateBookingNumber(list);
-  const now = new Date().toISOString();
-  const total = input.priceNpr ?? 0;
-  const booking: SpaBooking = {
-    ...input,
-    id: `bk-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    bookingNumber,
-    reference: bookingNumber,
-    status: input.status ?? "confirmed",
-    guests: input.guests ?? 1,
-    amountPaidNpr: input.amountPaidNpr ?? 0,
-    paymentStatus: input.paymentStatus ?? "unpaid",
-    paymentMethod: input.paymentMethod ?? "pay_at_spa",
-    pdfAccessToken: newPdfAccessToken(),
-    emailDelivery: input.emailDelivery ?? { status: "pending", attempts: 0 },
-    createdAt: now,
-    updatedAt: now,
-    audit: [{ at: now, status: input.status ?? "confirmed", by: "system" }],
-  };
+    const list = readBookings();
+    const bookingNumber = allocateBookingNumber(list);
+    const now = new Date().toISOString();
+    const total = input.priceNpr ?? 0;
+    const booking: SpaBooking = {
+      ...input,
+      id: `bk-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      bookingNumber,
+      reference: bookingNumber,
+      status: input.status ?? "confirmed",
+      guests: input.guests ?? 1,
+      amountPaidNpr: input.amountPaidNpr ?? 0,
+      paymentStatus: input.paymentStatus ?? "unpaid",
+      paymentMethod: input.paymentMethod ?? "pay_at_spa",
+      pdfAccessToken: newPdfAccessToken(),
+      emailDelivery: input.emailDelivery ?? { status: "pending", attempts: 0 },
+      createdAt: now,
+      updatedAt: now,
+      audit: [{ at: now, status: input.status ?? "confirmed", by: "system" }],
+    };
 
-  if (booking.amountPaidNpr && booking.amountPaidNpr > 0 && total > booking.amountPaidNpr) {
-    booking.paymentStatus = "partial";
-  } else if (booking.amountPaidNpr && total > 0 && booking.amountPaidNpr >= total) {
-    booking.paymentStatus = "paid";
-  }
+    if (booking.amountPaidNpr && booking.amountPaidNpr > 0 && total > booking.amountPaidNpr) {
+      booking.paymentStatus = "partial";
+    } else if (booking.amountPaidNpr && total > 0 && booking.amountPaidNpr >= total) {
+      booking.paymentStatus = "paid";
+    }
 
-  list.unshift(booking);
-  writeBookings(list);
-  return { booking, created: true };
+    if (list.some((b) => (b.bookingNumber || b.reference) === bookingNumber)) {
+      throw new Error("Booking number collision — retry request");
+    }
+
+    list.unshift(booking);
+    writeBookings(list);
+    return { booking, created: true };
+  });
 }
 
 export function updateBookingStatus(id: string, status: BookingStatus, note?: string) {
+  return withDataFileLock("booking-data", () => {
   const list = readBookings();
   const index = list.findIndex((b) => b.id === id);
   if (index < 0) return null;
@@ -88,9 +96,11 @@ export function updateBookingStatus(id: string, status: BookingStatus, note?: st
   list[index] = next;
   writeBookings(list);
   return next;
+  });
 }
 
 export function updateBookingEmailDelivery(id: string, patch: Partial<BookingEmailDelivery>) {
+  return withDataFileLock("booking-data", () => {
   const list = readBookings();
   const index = list.findIndex((b) => b.id === id);
   if (index < 0) return null;
@@ -108,6 +118,7 @@ export function updateBookingEmailDelivery(id: string, patch: Partial<BookingEma
   list[index] = next;
   writeBookings(list);
   return next;
+  });
 }
 
 export function verifyPdfAccess(booking: SpaBooking, token: string): boolean {

@@ -108,6 +108,10 @@ function BookingPanel({
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const idempotencyKey = useMemo(
+    () => (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `idem-${Date.now()}`),
+    [],
+  );
   const [therapistSlug, setTherapistSlug] = useState(initialTherapist ?? "");
   const [offering, setOffering] = useState<TherapistOffering>(() =>
     initialPackage && !initialService ? "package" : "service",
@@ -174,21 +178,31 @@ function BookingPanel({
     }
     const therapistForBooking = kind === "therapist" ? therapist || undefined : undefined;
     try {
+      const privacyAccepted = data.privacyAccepted === "on" || data.privacyAccepted === "true";
+      if (!privacyAccepted) {
+        setStatus("error");
+        setMessage("Please accept the privacy policy and booking terms.");
+        return;
+      }
       const response = await fetch(formApiUrl("appointments"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          bookingType: kind,
+          bookingType: kind === "therapist" ? (offering === "package" ? "package" : "service") : kind,
           name: data.name,
           email: data.email,
           phone: data.phone,
+          country: String(data.country || "Nepal"),
           preferredDate: data.preferredDate,
           preferredTime: data.preferredTime,
+          durationMinutes: 60,
           serviceSlug: outService,
           packageSlug: outPackage,
           therapistSlug: therapistForBooking,
           guests: Number(data.guests || 1),
           notes: data.notes || undefined,
+          privacyAccepted: true,
+          idempotencyKey,
         }),
       });
       const body = await response.json().catch(() => ({}));
@@ -196,8 +210,16 @@ function BookingPanel({
         const detail = Array.isArray(body.message) ? body.message.join(" ") : body.message;
         throw new Error(detail || "The request could not be sent.");
       }
+      if (body.data?.reference) {
+        const q = new URLSearchParams({ ref: body.data.reference });
+        if (body.data.pdfToken) q.set("token", body.data.pdfToken);
+        if (body.data.emailSent) q.set("emailSent", "1");
+        if (body.data.emailSkipped) q.set("emailSkipped", "1");
+        window.location.assign(`/booking/confirmed?${q.toString()}`);
+        return;
+      }
       setStatus("success");
-      setMessage(`Your request is with the spa. This is not confirmed until ${site.name} replies by phone or email.`);
+      setMessage("Booking saved. Check your email for confirmation.");
       form.reset();
       setTherapistSlug(initialTherapist ?? "");
     } catch (error) {
@@ -334,6 +356,7 @@ function BookingPanel({
         <Field name="phone" label="Phone" type="tel" required />
       </div>
       <Field name="email" label="Email" type="email" required />
+      <Field name="country" label="Country" defaultValue="Nepal" required />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field name="preferredDate" label="Preferred date" type="date" required />
         <Field name="preferredTime" label="Preferred time" type="time" required />
@@ -348,6 +371,11 @@ function BookingPanel({
           className="mt-1 w-full rounded-xl border border-[#e6dfd4] px-3 py-3"
           placeholder="Pressure, allergies, couple room, etc."
         />
+      </label>
+
+      <label className="flex gap-2 text-xs text-[#6B6B6B]">
+        <input type="checkbox" name="privacyAccepted" required />
+        I agree to the privacy policy and booking terms.
       </label>
 
       <button type="submit" className="btn-primary w-full sm:w-auto" disabled={status === "loading"}>

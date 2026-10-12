@@ -5,7 +5,9 @@
 #   VPS_SSH_KEY  private key that can log in as that user
 # Optional:
 #   VPS_PORT     SSH port, defaults to 22
-#   ORBIT_PASSKEY  written into the server .env when present
+#   ORBIT_PASSKEY       written into the server .env when present
+#   RESEND_API_KEY      Resend transactional email (booking confirmations)
+#   BOOKING_PDF_SECRET  optional; generated on VPS on first deploy if omitted
 
 name: Deploy to Hostinger VPS
 
@@ -25,6 +27,8 @@ jobs:
     timeout-minutes: 20
     env:
       ORBIT_PASSKEY: ${{ secrets.ORBIT_PASSKEY }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      BOOKING_PDF_SECRET: ${{ secrets.BOOKING_PDF_SECRET }}
     steps:
       - name: Pull, build, and restart this app only
         uses: appleboy/ssh-action@v1.2.2
@@ -34,7 +38,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT != '' && secrets.VPS_PORT || 22 }}
           command_timeout: 20m
-          envs: ORBIT_PASSKEY
+          envs: ORBIT_PASSKEY,RESEND_API_KEY,BOOKING_PDF_SECRET
           script_stop: true
           script: |
             set -euo pipefail
@@ -65,6 +69,15 @@ jobs:
             mkdir -p public/uploads data
             chmod -R u+rwX public/uploads 2>/dev/null || true
 
+            BACKUP_ROOT="/var/backups/kaya-healing-spa"
+            STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+            BACKUP_DIR="${BACKUP_ROOT}/${STAMP}"
+            mkdir -p "${BACKUP_DIR}"
+            if compgen -G "data/*.json" > /dev/null; then
+              cp -a data/*.json "${BACKUP_DIR}/" || true
+              echo "Backed up booking data to ${BACKUP_DIR}"
+            fi
+
             echo "Syncing origin/main"
             git fetch origin main
             git checkout main
@@ -90,10 +103,23 @@ jobs:
             fi
             write_env_key .env ORBIT_PASSKEY "${ORBIT_KEY}"
             write_env_key .env.local ORBIT_PASSKEY "${ORBIT_KEY}"
-            if ! grep -q '^NEXT_PUBLIC_SITE_URL=' .env; then
-              echo 'NEXT_PUBLIC_SITE_URL=https://kaya.theglobalorbit.com' >> .env
+            write_env_key .env SPA_PUBLIC_URL "https://kayahealingspa.com.np"
+            write_env_key .env NEXT_PUBLIC_SITE_URL "https://kayahealingspa.com.np"
+            write_env_key .env RESEND_FROM_EMAIL "booking@kayahealingspa.com.np"
+            if [ -n "${RESEND_API_KEY:-}" ]; then
+              write_env_key .env RESEND_API_KEY "${RESEND_API_KEY}"
+              write_env_key .env.local RESEND_API_KEY "${RESEND_API_KEY}"
             fi
-            echo "Orbit env ready"
+            if [ -n "${BOOKING_PDF_SECRET:-}" ]; then
+              write_env_key .env BOOKING_PDF_SECRET "${BOOKING_PDF_SECRET}"
+              write_env_key .env.local BOOKING_PDF_SECRET "${BOOKING_PDF_SECRET}"
+            elif ! grep -q '^BOOKING_PDF_SECRET=' .env 2>/dev/null; then
+              GEN="$(openssl rand -base64 32 | tr -d '\n')"
+              write_env_key .env BOOKING_PDF_SECRET "${GEN}"
+              write_env_key .env.local BOOKING_PDF_SECRET "${GEN}"
+              echo "Generated BOOKING_PDF_SECRET on server (not printed)"
+            fi
+            echo "Runtime env keys configured (values not logged)"
 
             echo "Installing dependencies"
             npm ci --include=dev

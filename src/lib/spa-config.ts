@@ -19,7 +19,14 @@ export function resendApiKey(): string | undefined {
 }
 
 export function bookingPdfSecret(): string {
-  return process.env.BOOKING_PDF_SECRET?.trim() || process.env.ORBIT_PASSKEY?.trim() || "dev-booking-pdf-secret-change-me";
+  const explicit = process.env.BOOKING_PDF_SECRET?.trim();
+  if (explicit) return explicit;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("BOOKING_PDF_SECRET is required in production");
+  }
+  const fallback = process.env.ORBIT_PASSKEY?.trim();
+  if (fallback) return fallback;
+  return "dev-booking-pdf-secret-local-only";
 }
 
 export const SPA_BOOKING_PHONE = "01-5355882";

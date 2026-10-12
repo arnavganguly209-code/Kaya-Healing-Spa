@@ -2,13 +2,19 @@
 
 import { formApiUrl } from "@/lib/form-api";
 import { packages, services, site } from "@/lib/content";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
+const CONFIRMATION_PATH = "/booking/confirmed";
 
 type Status = "idle" | "loading" | "success" | "error";
 
 export function BookingForm({ service, packageSlug }: { service?: string; packageSlug?: string }) {
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const idempotencyKey = useMemo(
+    () => (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `idem-${Date.now()}`),
+    [],
+  );
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -29,12 +35,16 @@ export function BookingForm({ service, packageSlug }: { service?: string; packag
           name: data.name,
           email: data.email,
           phone: data.phone,
+          country: String(data.country || "Nepal"),
           preferredDate: data.preferredDate,
           preferredTime: data.preferredTime,
+          durationMinutes: 60,
           serviceSlug: data.service || undefined,
           packageSlug: data.packageSlug || undefined,
           guests: Number(data.guests || 1),
           notes: data.notes || undefined,
+          privacyAccepted: data.privacyAccepted === "on",
+          idempotencyKey,
         }),
       });
       const body = await response.json().catch(() => ({}));
@@ -42,8 +52,16 @@ export function BookingForm({ service, packageSlug }: { service?: string; packag
         const detail = Array.isArray(body.message) ? body.message.join(" ") : body.message;
         throw new Error(detail || "The request could not be sent.");
       }
+      if (body.data?.reference) {
+        const q = new URLSearchParams({ ref: body.data.reference });
+        if (body.data.pdfToken) q.set("token", body.data.pdfToken);
+        if (body.data.emailSent) q.set("emailSent", "1");
+        if (body.data.emailSkipped) q.set("emailSkipped", "1");
+        window.location.assign(`${CONFIRMATION_PATH}?${q.toString()}`);
+        return;
+      }
       setStatus("success");
-      setMessage(`Your request is with the spa. This is not a confirmed booking until ${site.name} replies.`);
+      setMessage("Booking saved.");
       form.reset();
     } catch (error) {
       setStatus("error");
@@ -56,6 +74,7 @@ export function BookingForm({ service, packageSlug }: { service?: string; packag
       <Field name="name" label="Name" required />
       <Field name="email" label="Email" type="email" required />
       <Field name="phone" label="Phone" type="tel" required />
+      <Field name="country" label="Country" defaultValue="Nepal" required />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field name="preferredDate" label="Preferred date" type="date" required />
         <Field name="preferredTime" label="Preferred time" type="time" required />
@@ -82,6 +101,10 @@ export function BookingForm({ service, packageSlug }: { service?: string; packag
       <label className="text-sm">
         Special request
         <textarea name="notes" rows={4} className="mt-1 w-full border border-[#e6dfd4] px-3 py-3" />
+      </label>
+      <label className="flex gap-2 text-xs text-[#6B6B6B]">
+        <input type="checkbox" name="privacyAccepted" required />
+        I agree to the privacy policy and booking terms.
       </label>
       <button type="submit" className="btn-primary" disabled={status === "loading"}>
         {status === "loading" ? "Sending…" : "Request Appointment"}
