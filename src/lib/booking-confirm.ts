@@ -2,18 +2,19 @@ import { sendBookingConfirmationEmail } from "@/lib/booking-email";
 import { updateBookingEmailDelivery } from "@/lib/booking-store";
 import type { SpaBooking } from "@/lib/booking-types";
 
+function messageId(booking: SpaBooking): string | undefined {
+  return booking.emailDelivery?.providerMessageId || booking.emailDelivery?.resendMessageId;
+}
+
 export async function deliverBookingConfirmation(booking: SpaBooking): Promise<{
   emailSent: boolean;
   emailSkipped: boolean;
   emailError?: string;
-  resendMessageId?: string;
+  providerMessageId?: string;
 }> {
-  if (booking.emailDelivery?.status === "sent" && booking.emailDelivery.resendMessageId) {
-    return {
-      emailSent: true,
-      emailSkipped: false,
-      resendMessageId: booking.emailDelivery.resendMessageId,
-    };
+  const priorId = messageId(booking);
+  if (booking.emailDelivery?.status === "sent" && priorId) {
+    return { emailSent: true, emailSkipped: false, providerMessageId: priorId };
   }
 
   const attempt = (booking.emailDelivery?.attempts ?? 0) + 1;
@@ -24,18 +25,31 @@ export async function deliverBookingConfirmation(booking: SpaBooking): Promise<{
     recipient: booking.email,
   });
 
-  const result = await sendBookingConfirmationEmail(booking);
+  let result;
+  try {
+    result = await sendBookingConfirmationEmail(booking);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Email/PDF delivery failed";
+    updateBookingEmailDelivery(booking.id, {
+      status: "failed",
+      attempts: attempt,
+      lastAttemptAt: new Date().toISOString(),
+      lastError: msg,
+      recipient: booking.email,
+    });
+    return { emailSent: false, emailSkipped: false, emailError: msg };
+  }
 
   if (result.ok) {
     updateBookingEmailDelivery(booking.id, {
       status: "sent",
-      resendMessageId: result.messageId,
+      providerMessageId: result.messageId,
       attempts: attempt,
       lastAttemptAt: new Date().toISOString(),
       lastError: undefined,
       recipient: booking.email,
     });
-    return { emailSent: true, emailSkipped: false, resendMessageId: result.messageId };
+    return { emailSent: true, emailSkipped: false, providerMessageId: result.messageId };
   }
 
   if (result.skipped) {

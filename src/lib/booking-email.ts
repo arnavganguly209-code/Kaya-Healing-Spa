@@ -3,9 +3,9 @@ import { minutesToTime12, timeToMinutes } from "@/lib/booking-scheduler";
 import { displayBookingNumber } from "@/lib/booking-number";
 import { bookingPdfFilename, generateBookingPdf } from "@/lib/booking-pdf";
 import type { SpaBooking } from "@/lib/booking-types";
-import { SPA_BOOKING_EMAIL, SPA_BOOKING_PHONE, resendApiKey, resendFromEmail, spaPublicUrl } from "@/lib/spa-config";
+import { smtpFromEmail, spaPublicUrl } from "@/lib/spa-config";
 import { readOrbitContent } from "@/lib/orbit-store";
-import { Resend } from "resend";
+import { sendSmtpMail, type SmtpSendResult } from "@/lib/smtp-mail";
 
 function endTimeLabel(booking: SpaBooking): string {
   const start = timeToMinutes(booking.appointmentTime);
@@ -15,12 +15,17 @@ function endTimeLabel(booking: SpaBooking): string {
 
 function buildHtml(booking: SpaBooking): string {
   const orbit = readOrbitContent();
-  const phone = orbit.phone || SPA_BOOKING_PHONE;
+  const phone = orbit.phone || "01-5355882";
+  const contactEmail = smtpFromEmail() || orbit.email;
   const number = displayBookingNumber(booking);
   const total = booking.priceNpr ?? 0;
   const paid = booking.amountPaidNpr ?? 0;
   const due = total > 0 ? Math.max(0, total - paid) : 0;
   const logoUrl = `${spaPublicUrl()}/brand/kaya-logo-hd.png`;
+  const payNote =
+    paid > 0
+      ? `Amount paid: ${formatNpr(paid)}. Balance due: ${formatNpr(due)}.`
+      : "Payment is due at Kaya Healing Spa unless you completed an online payment separately.";
 
   const row = (label: string, value: string) =>
     `<tr><td style="padding:8px 12px;color:#8a8175;font-size:13px;border-bottom:1px solid #efe8e0">${label}</td><td style="padding:8px 12px;color:#141210;font-size:13px;font-weight:600;border-bottom:1px solid #efe8e0">${value}</td></tr>`;
@@ -48,56 +53,28 @@ function buildHtml(booking: SpaBooking): string {
   ${booking.therapistName ? row("Therapist", booking.therapistName) : ""}
   ${row("Total", total > 0 ? formatNpr(total) : "To be confirmed")}
   ${row("Amount paid", formatNpr(paid))}
-  ${row("Due at spa", total > 0 ? formatNpr(due) : "—")}
-  ${row("Payment", "Pay at the spa — no online payment collected")}
-  ${row("Status", booking.status)}
+  ${row("Balance due", total > 0 ? formatNpr(due) : "—")}
+  ${row("Payment", payNote)}
+  ${row("Booking status", booking.status)}
   </table>
-  <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:#4a453e">Please present your booking number at reception. Your PDF confirmation is attached to this email.</p>
+  <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:#4a453e">Please present your booking number at reception. Your PDF confirmation is attached.</p>
   </td></tr>
   <tr><td style="padding:20px 32px 28px;background:#f6f1e8;font-size:12px;color:#6B6B6B;text-align:center">
-  ${phone} · ${SPA_BOOKING_EMAIL}<br/>
+  ${phone}${contactEmail ? ` · ${contactEmail}` : ""}<br/>
   <a href="${spaPublicUrl()}" style="color:#F47B20">${spaPublicUrl()}</a>
   </td></tr>
   </table></td></tr></table></body></html>`;
 }
 
-export type SendBookingEmailResult =
-  | { ok: true; messageId: string; skipped?: false }
-  | { ok: false; error: string; skipped?: boolean };
+export type SendBookingEmailResult = SmtpSendResult;
 
 export async function sendBookingConfirmationEmail(booking: SpaBooking): Promise<SendBookingEmailResult> {
-  const apiKey = resendApiKey();
-  if (!apiKey) {
-    return { ok: false, error: "RESEND_API_KEY is not configured", skipped: true };
-  }
-
   const number = displayBookingNumber(booking);
   const pdfBytes = await generateBookingPdf(booking);
-  const resend = new Resend(apiKey);
-
-  try {
-    const { data, error } = await resend.emails.send({
-      from: resendFromEmail(),
-      to: booking.email,
-      subject: `Booking Confirmed — ${number} | Kaya Healing Spa`,
-      html: buildHtml(booking),
-      attachments: [
-        {
-          filename: bookingPdfFilename(booking),
-          content: Buffer.from(pdfBytes),
-        },
-      ],
-    });
-
-    if (error) {
-      return { ok: false, error: error.message || "Resend rejected the send" };
-    }
-    if (!data?.id) {
-      return { ok: false, error: "Resend did not return a message id" };
-    }
-    return { ok: true, messageId: data.id };
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Email send failed";
-    return { ok: false, error: msg };
-  }
+  return sendSmtpMail({
+    to: booking.email,
+    subject: `Booking Confirmed — ${number} | Kaya Healing Spa`,
+    html: buildHtml(booking),
+    attachments: [{ filename: bookingPdfFilename(booking), content: Buffer.from(pdfBytes) }],
+  });
 }

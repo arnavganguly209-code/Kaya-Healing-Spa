@@ -142,7 +142,7 @@ export function AdminBookingsSection({
               <div><dt className="text-[#8a8175]">Appointment</dt><dd>{selected.appointmentDate} {selected.appointmentTime} · {selected.durationMinutes} min</dd></div>
               <div><dt className="text-[#8a8175]">Service</dt><dd>{selected.serviceName || selected.packageName}</dd></div>
               <div><dt className="text-[#8a8175]">Pricing</dt><dd>Total {selected.priceNpr ? formatNpr(selected.priceNpr) : "TBC"} · Paid {formatNpr(selected.amountPaidNpr ?? 0)} · Due {selected.priceNpr ? formatNpr(dueAmount(selected)) : "—"}</dd></div>
-              <div><dt className="text-[#8a8175]">Email</dt><dd>{selected.emailDelivery?.status} {selected.emailDelivery?.resendMessageId ? `· ${selected.emailDelivery.resendMessageId}` : ""}{selected.emailDelivery?.lastError ? ` · ${selected.emailDelivery.lastError}` : ""}</dd></div>
+              <div><dt className="text-[#8a8175]">Email</dt><dd>{selected.emailDelivery?.status} {(selected.emailDelivery?.providerMessageId || selected.emailDelivery?.resendMessageId) ? `· ${selected.emailDelivery?.providerMessageId || selected.emailDelivery?.resendMessageId}` : ""}{selected.emailDelivery?.lastError ? ` · ${selected.emailDelivery.lastError}` : ""}</dd></div>
               {selected.notes && <div><dt className="text-[#8a8175]">Notes</dt><dd>{selected.notes}</dd></div>}
             </dl>
             <div className="mt-6 flex flex-wrap gap-3">

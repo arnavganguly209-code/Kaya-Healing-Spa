@@ -1,14 +1,13 @@
 # Deploys only this site to the existing Hostinger VPS.
 # Required GitHub Actions secrets:
-#   VPS_HOST     server IP or hostname
-#   VPS_USER     SSH user
-#   VPS_SSH_KEY  private key that can log in as that user
+#   VPS_HOST          server IP or hostname (e.g. 200.97.170.235)
+#   VPS_USER          SSH user (production uses root)
+#   VPS_SSH_KEY       private key (PEM/OpenSSH, full key with newlines)
 # Optional:
-#   VPS_PORT     SSH port, defaults to 22
-#   ORBIT_PASSKEY       written into the server .env when present
-#   RESEND_API_KEY      Resend transactional email (booking confirmations)
-#   BOOKING_PDF_SECRET  optional; generated on VPS on first deploy if omitted
-#   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD  optional (not used for booking email)
+#   VPS_PORT          SSH port (default 22). If deploy fails in ~5s, allow GitHub Actions IPs on the VPS firewall.
+#   ORBIT_PASSKEY
+#   BOOKING_PDF_SECRET  generated on VPS on first deploy if omitted
+#   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM_EMAIL, SMTP_FROM_NAME
 
 name: Deploy to Hostinger VPS
 
@@ -28,22 +27,24 @@ jobs:
     timeout-minutes: 20
     env:
       ORBIT_PASSKEY: ${{ secrets.ORBIT_PASSKEY }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       BOOKING_PDF_SECRET: ${{ secrets.BOOKING_PDF_SECRET }}
       SMTP_HOST: ${{ secrets.SMTP_HOST }}
       SMTP_PORT: ${{ secrets.SMTP_PORT }}
       SMTP_USER: ${{ secrets.SMTP_USER }}
       SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
+      SMTP_FROM_NAME: ${{ secrets.SMTP_FROM_NAME }}
     steps:
+      - uses: actions/checkout@v4
       - name: Pull, build, and restart this app only
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT != '' && secrets.VPS_PORT || 22 }}
+          port: ${{ secrets.VPS_PORT || 22 }}
           command_timeout: 20m
-          envs: ORBIT_PASSKEY,RESEND_API_KEY,BOOKING_PDF_SECRET,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD
+          envs: ORBIT_PASSKEY,BOOKING_PDF_SECRET,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD,SMTP_FROM_EMAIL,SMTP_FROM_NAME
           script_stop: true
           script: |
             set -euo pipefail
@@ -82,6 +83,7 @@ jobs:
               cp -a data/*.json "${BACKUP_DIR}/" || true
               echo "Backed up booking data to ${BACKUP_DIR}"
             fi
+            node "${APP_DIR}/scripts/backup-metadata-check.mjs" || echo "WARN: backup metadata check reported issues"
 
             echo "Syncing origin/main"
             git fetch origin main
@@ -110,33 +112,26 @@ jobs:
             write_env_key .env.local ORBIT_PASSKEY "${ORBIT_KEY}"
             write_env_key .env SPA_PUBLIC_URL "https://kayahealingspa.com.np"
             write_env_key .env NEXT_PUBLIC_SITE_URL "https://kayahealingspa.com.np"
-            write_env_key .env RESEND_FROM_EMAIL "booking@kayahealingspa.com.np"
-            if [ -n "${RESEND_API_KEY:-}" ]; then
-              write_env_key .env RESEND_API_KEY "${RESEND_API_KEY}"
-              write_env_key .env.local RESEND_API_KEY "${RESEND_API_KEY}"
-            fi
-            if [ -n "${BOOKING_PDF_SECRET:-}" ]; then
-              write_env_key .env BOOKING_PDF_SECRET "${BOOKING_PDF_SECRET}"
-              write_env_key .env.local BOOKING_PDF_SECRET "${BOOKING_PDF_SECRET}"
-            elif ! grep -q '^BOOKING_PDF_SECRET=' .env 2>/dev/null; then
-              GEN="$(openssl rand -base64 32 | tr -d '\n')"
-              write_env_key .env BOOKING_PDF_SECRET "${GEN}"
-              write_env_key .env.local BOOKING_PDF_SECRET "${GEN}"
-              echo "Generated BOOKING_PDF_SECRET on server (not printed)"
-            fi
             write_env_key .env SMTP_HOST "${SMTP_HOST:-mail.globalorbitmail.cloud}"
             write_env_key .env SMTP_PORT "${SMTP_PORT:-587}"
             write_env_key .env SMTP_USER "${SMTP_USER:-booking@kayahealingspa.com.np}"
+            write_env_key .env SMTP_FROM_EMAIL "${SMTP_FROM_EMAIL:-${SMTP_USER:-booking@kayahealingspa.com.np}}"
+            write_env_key .env SMTP_FROM_NAME "${SMTP_FROM_NAME:-Kaya Healing Spa}"
             write_env_key .env SMTP_SECURE "false"
             if [ -n "${SMTP_PASSWORD:-}" ]; then
               write_env_key .env SMTP_PASSWORD "${SMTP_PASSWORD}"
               write_env_key .env.local SMTP_PASSWORD "${SMTP_PASSWORD}"
             else
-              echo "WARN: SMTP_PASSWORD GitHub secret not set — SMTP verify will fail until configured"
+              echo "WARN: SMTP_PASSWORD GitHub secret not set — booking email will be skipped until configured"
             fi
-            if [ -z "${RESEND_API_KEY:-}" ]; then
-              echo "ERROR: RESEND_API_KEY GitHub secret is required for production booking email"
-              exit 1
+            if [ -n "${BOOKING_PDF_SECRET:-}" ]; then
+              write_env_key .env BOOKING_PDF_SECRET "${BOOKING_PDF_SECRET}"
+              write_env_key .env.local BOOKING_PDF_SECRET "${BOOKING_PDF_SECRET}"
+            elif ! grep -q '^BOOKING_PDF_SECRET=.' .env 2>/dev/null; then
+              GEN="$(openssl rand -base64 32 | tr -d '\n')"
+              write_env_key .env BOOKING_PDF_SECRET "${GEN}"
+              write_env_key .env.local BOOKING_PDF_SECRET "${GEN}"
+              echo "Generated BOOKING_PDF_SECRET on server (not printed)"
             fi
             echo "Runtime env keys configured (values not logged)"
 
@@ -178,6 +173,7 @@ jobs:
               pm2 start "${NODE_BIN}" \
               --name "${PM2_APP}" \
               --cwd "${APP_DIR}" \
+              --update-env \
               -- node_modules/next/dist/bin/next start -H 0.0.0.0 -p "${APP_PORT}"
             pm2 save
 
@@ -211,34 +207,11 @@ jobs:
         run: |
           set -euo pipefail
           sleep 5
+          npm ci --omit=dev
+          node scripts/verify-domains.mjs
           CODE="$(curl -sS -o /tmp/kaya.html -w '%{http_code}' --retry 8 --retry-delay 3 --retry-all-errors https://kaya.theglobalorbit.com || true)"
-          echo "public HTTP ${CODE}"
+          echo "demo homepage HTTP ${CODE}"
           if [ "${CODE}" != "200" ]; then
             echo "ERROR: https://kaya.theglobalorbit.com returned ${CODE}"
             exit 1
-          fi
-          if ! grep -qi "Kaya" /tmp/kaya.html; then
-            echo "ERROR: homepage HTML did not contain Kaya"
-            exit 1
-          fi
-          ABOUT="$(curl -sS --retry 3 --retry-delay 2 "https://kaya.theglobalorbit.com/about" || true)"
-          if ! echo "${ABOUT}" | grep -qi "Brand values"; then
-            echo "ERROR: /about page body missing expected content"
-            exit 1
-          fi
-          for path in /sitemap.xml /terms /privacy /manifest.webmanifest /contact /about; do
-            CODE="$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 --retry-delay 2 "https://kaya.theglobalorbit.com${path}" || true)"
-            echo "${path} HTTP ${CODE}"
-            if [ "${CODE}" != "200" ]; then
-              echo "ERROR: ${path} returned ${CODE}"
-              exit 1
-            fi
-          done
-          echo "Live site is serving"
-          NP_CODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 https://kayahealingspa.com.np/ || true)"
-          echo "kayahealingspa.com.np HTTP ${NP_CODE}"
-          if [ "${NP_CODE}" = "200" ]; then
-            echo "Primary .np domain is reachable"
-          else
-            echo "WARN: kayahealingspa.com.np not HTTP 200 (check Cloudflare A record and SSL)"
           fi

@@ -99,6 +99,22 @@ export function updateBookingStatus(id: string, status: BookingStatus, note?: st
   });
 }
 
+export function attachInvoiceToBooking(bookingId: string, invoiceId: string, invoiceNumber: string) {
+  return withDataFileLock("booking-data", () => {
+    const list = readBookings();
+    const index = list.findIndex((b) => b.id === bookingId);
+    if (index < 0) return null;
+    list[index] = {
+      ...list[index],
+      invoiceId,
+      invoiceNumber,
+      updatedAt: new Date().toISOString(),
+    };
+    writeBookings(list);
+    return list[index];
+  });
+}
+
 export function updateBookingEmailDelivery(id: string, patch: Partial<BookingEmailDelivery>) {
   return withDataFileLock("booking-data", () => {
   const list = readBookings();

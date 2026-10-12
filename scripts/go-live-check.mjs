@@ -6,15 +6,14 @@ import { loadEnvLocal } from "./load-env-local.mjs";
 loadEnvLocal();
 
 const required = [
-  "RESEND_API_KEY",
-  "RESEND_FROM_EMAIL",
-  "SPA_PUBLIC_URL",
-  "NEXT_PUBLIC_SITE_URL",
-  "BOOKING_PDF_SECRET",
   "SMTP_HOST",
   "SMTP_PORT",
   "SMTP_USER",
   "SMTP_PASSWORD",
+  "SMTP_FROM_EMAIL",
+  "SPA_PUBLIC_URL",
+  "NEXT_PUBLIC_SITE_URL",
+  "BOOKING_PDF_SECRET",
 ];
 
 let fail = 0;
@@ -28,11 +27,9 @@ for (const key of required) {
   }
 }
 
-if (process.env.SPA_PUBLIC_URL !== "https://kayahealingspa.com.np") {
-  console.warn("go-live-check: WARN SPA_PUBLIC_URL is not https://kayahealingspa.com.np");
-}
-if (process.env.RESEND_FROM_EMAIL !== "booking@kayahealingspa.com.np") {
-  console.warn("go-live-check: WARN RESEND_FROM_EMAIL mismatch");
+const publicUrl = process.env.SPA_PUBLIC_URL?.trim() || "";
+if (!publicUrl.includes("kayahealingspa.com.np") && !publicUrl.includes("kaya.theglobalorbit.com")) {
+  console.warn("go-live-check: WARN SPA_PUBLIC_URL is not a known Kaya host");
 }
 
 process.exit(fail ? 1 : 0);

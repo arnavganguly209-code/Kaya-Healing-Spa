@@ -28,7 +28,7 @@ export const site = {
       ? process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "")
       : process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
-        : "https://kayahealingspa.com.np",
+        : "https://kaya.theglobalorbit.com",
   social: {
     instagram: "",
     facebook: "",

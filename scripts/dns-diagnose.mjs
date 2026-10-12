@@ -3,6 +3,8 @@
  */
 import { promises as dns } from "dns";
 
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
 const PRIMARY = "kaya.theglobalorbit.com";
 const TARGET = "kayahealingspa.com.np";
 const WWW = `www.${TARGET}`;
@@ -40,20 +42,25 @@ if (!primary.ok) {
 
 if (primary.ok && !target.ok) {
   console.log(
-    "dns-diagnose: ACTION in Cloudflare (or DNS host): add A record",
+    "dns-diagnose: ACTION in Cloudflare: add proxied A record",
     TARGET,
     "and",
     WWW,
     "→",
     primary.addresses[0],
-    "(same as",
-    PRIMARY + ")",
+    "(origin IP; orange-cloud OK — public A may show Cloudflare anycast)",
   );
   process.exit(1);
 }
 if (primary.ok && target.ok && primary.addresses[0] !== target.addresses[0]) {
-  console.log("dns-diagnose: WARN target IP differs from primary");
-  process.exit(1);
+  console.log(
+    "dns-diagnose: OK proxied DNS (apex",
+    target.addresses.join(","),
+    "≠ origin",
+    primary.addresses[0],
+    ") — confirm Cloudflare origin points to VPS IP",
+  );
+  process.exit(0);
 }
 console.log("dns-diagnose: OK");
 process.exit(0);

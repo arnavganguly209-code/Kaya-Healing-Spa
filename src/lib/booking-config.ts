@@ -1,4 +1,5 @@
-import { bookingFromAddress, resendApiKey, spaPublicUrl } from "@/lib/spa-config";
+import { smtpConfigured } from "@/lib/smtp-mail";
+import { smtpFromEmail, spaPublicUrl } from "@/lib/spa-config";
 
 export type BookingConfigIssue = {
   code: string;
@@ -10,44 +11,38 @@ export function assessBookingConfig(): BookingConfigIssue[] {
   const issues: BookingConfigIssue[] = [];
   const isProd = process.env.NODE_ENV === "production";
 
-  if (!resendApiKey()) {
+  if (!smtpConfigured()) {
     issues.push({
-      code: "RESEND_API_KEY_MISSING",
-      message: "Booking confirmation emails are disabled until RESEND_API_KEY is set.",
+      code: "SMTP_NOT_CONFIGURED",
+      message: "Booking emails require SMTP_HOST, SMTP_USER, SMTP_PASSWORD, and SMTP_FROM_EMAIL.",
       severity: isProd ? "error" : "warning",
     });
   }
 
-  if (!process.env.RESEND_FROM_EMAIL?.trim()) {
+  if (!smtpFromEmail()) {
     issues.push({
-      code: "RESEND_FROM_EMAIL_DEFAULT",
-      message: "Using default sender booking@kayahealingspa.com.np (set RESEND_FROM_EMAIL to override).",
-      severity: "warning",
+      code: "SMTP_FROM_EMAIL_MISSING",
+      message: "Set SMTP_FROM_EMAIL (or SMTP_USER) for the From address.",
+      severity: "error",
     });
   }
 
   if (!process.env.BOOKING_PDF_SECRET?.trim()) {
     issues.push({
       code: "BOOKING_PDF_SECRET_MISSING",
-      message: "Set BOOKING_PDF_SECRET in production (do not rely on dev fallbacks).",
+      message: "Set BOOKING_PDF_SECRET in production.",
       severity: isProd ? "error" : "warning",
     });
   }
 
   const publicUrl = spaPublicUrl();
-  if (!publicUrl.includes("kayahealingspa.com.np") && isProd) {
+  const allowedHosts = ["kayahealingspa.com.np", "kaya.theglobalorbit.com"];
+  if (isProd && !allowedHosts.some((h) => publicUrl.includes(h))) {
     issues.push({
       code: "SPA_PUBLIC_URL",
-      message: "SPA_PUBLIC_URL or NEXT_PUBLIC_SITE_URL should point at https://kayahealingspa.com.np for production emails/PDFs.",
+      message:
+        "SPA_PUBLIC_URL should be https://kayahealingspa.com.np or the demo host https://kaya.theglobalorbit.com.",
       severity: "warning",
-    });
-  }
-
-  if (!bookingFromAddress().includes("@")) {
-    issues.push({
-      code: "RESEND_FROM_INVALID",
-      message: "RESEND_FROM_EMAIL is not a valid address.",
-      severity: "error",
     });
   }
 
@@ -55,8 +50,7 @@ export function assessBookingConfig(): BookingConfigIssue[] {
 }
 
 export function logBookingConfigIssues(): void {
-  const issues = assessBookingConfig();
-  for (const issue of issues) {
+  for (const issue of assessBookingConfig()) {
     const line = `[booking-config] ${issue.code}: ${issue.message}`;
     if (issue.severity === "error") console.error(line);
     else console.warn(line);

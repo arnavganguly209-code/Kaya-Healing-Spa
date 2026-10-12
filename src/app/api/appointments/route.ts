@@ -2,7 +2,16 @@ import { appendInquiry } from "@/lib/admin-store";
 import { logBookingConfigIssues } from "@/lib/booking-config";
 import { deliverBookingConfirmation } from "@/lib/booking-confirm";
 import { normalizeAppointmentTime } from "@/lib/booking-time";
-import { displayBookingNumber, createBooking, findBookingById, findBookingByIdempotencyKey, readBookings } from "@/lib/booking-store";
+import { createInvoiceForBooking } from "@/lib/invoice-store";
+import { createPayAtSpaTransaction } from "@/lib/payment-store";
+import {
+  attachInvoiceToBooking,
+  displayBookingNumber,
+  createBooking,
+  findBookingById,
+  findBookingByIdempotencyKey,
+  readBookings,
+} from "@/lib/booking-store";
 import { readBookingSettings } from "@/lib/booking-settings";
 import { isPastDate, listAvailableSlots, parseDateYmd, timeToMinutes } from "@/lib/booking-scheduler";
 import { parseServiceDurationOptions } from "@/lib/service-pricing";
@@ -146,6 +155,19 @@ export async function POST(request: Request) {
         summary: `${displayBookingNumber(booking)} · ${booking.serviceName || booking.packageName || "Booking"}`,
         payload: { reference: displayBookingNumber(booking), bookingId: booking.id },
       });
+      try {
+        const invoice = createInvoiceForBooking(booking);
+        attachInvoiceToBooking(booking.id, invoice.id, invoice.invoiceNumber);
+        createPayAtSpaTransaction({
+          bookingId: booking.id,
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.invoiceNumber,
+          amountNpr: booking.priceNpr ?? 0,
+          merchantReference: displayBookingNumber(booking),
+        });
+      } catch (invoiceErr) {
+        console.error("invoice/ledger write failed (booking kept)", invoiceErr);
+      }
     }
 
     const delivery = await deliverBookingConfirmation(booking);

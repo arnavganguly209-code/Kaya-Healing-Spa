@@ -19,11 +19,19 @@ export type EmailDeliveryStatus = "pending" | "sent" | "failed" | "skipped";
 
 export type BookingEmailDelivery = {
   status: EmailDeliveryStatus;
+  /** SMTP Message-ID or provider reference */
+  providerMessageId?: string;
+  /** @deprecated legacy Resend field */
   resendMessageId?: string;
   attempts: number;
   lastAttemptAt?: string;
   lastError?: string;
   recipient?: string;
+};
+
+export type SpaBookingBilling = {
+  invoiceId?: string;
+  invoiceNumber?: string;
 };
 
 export type SpaBooking = {
@@ -59,6 +67,8 @@ export type SpaBooking = {
   idempotencyKey?: string;
   pdfAccessToken?: string;
   emailDelivery?: BookingEmailDelivery;
+  invoiceId?: string;
+  invoiceNumber?: string;
   audit: BookingAuditEntry[];
 };
 
