@@ -107,6 +107,8 @@ export async function POST(request: Request) {
             emailSent,
             emailSkipped,
             emailError: saved.emailDelivery?.lastError,
+            adminEmailSent: saved.adminEmailDelivery?.status === "sent",
+            adminEmailError: saved.adminEmailDelivery?.lastError,
             bookingStatus: saved.status,
           },
         });
@@ -186,6 +188,9 @@ export async function POST(request: Request) {
         emailSent: delivery.emailSent,
         emailSkipped: delivery.emailSkipped,
         emailError: delivery.emailError,
+        adminEmailSent: delivery.adminEmailSent,
+        adminEmailSkipped: delivery.adminEmailSkipped,
+        adminEmailError: delivery.adminEmailError,
         bookingStatus: saved.status,
       },
     });

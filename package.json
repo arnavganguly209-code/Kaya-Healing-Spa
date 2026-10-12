@@ -9,8 +9,7 @@
     "lint": "eslint",
     "test": "node scripts/booking-scheduler-selftest.mjs && node scripts/booking-number-selftest.mjs && node scripts/booking-pricing-selftest.mjs && node scripts/booking-email-provider-selftest.mjs && node scripts/booking-pdf-selftest.mjs && node scripts/booking-config-selftest.mjs && node scripts/route-slug-manifest-selftest.mjs",
     "verify:env": "node scripts/go-live-check.mjs",
-    "verify:mail": "node scripts/resend-verify.mjs",
-    "verify:smtp": "node scripts/smtp-verify.mjs",
+    "verify:mail": "node scripts/smtp-verify.mjs",
     "verify:dns": "node scripts/dns-diagnose.mjs",
     "verify:domains": "node scripts/verify-domains.mjs",
     "verify:slugs": "node scripts/service-slug-http-selftest.mjs"
@@ -22,8 +21,7 @@
     "nodemailer": "^10.1.0",
     "pdf-lib": "^1.17.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "resend": "^4.8.0"
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

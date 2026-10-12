@@ -1,13 +1,26 @@
 import nodemailer from "nodemailer";
 import type { Transporter } from "nodemailer";
-import { smtpConfig, smtpFromAddress, smtpFromName } from "@/lib/spa-config";
+import { smtpConfig, smtpFromAddress } from "@/lib/spa-config";
 
 let cached: Transporter | null = null;
+let cachedKey = "";
 
-function getTransport(): Transporter | null {
+function transportKey(cfg: ReturnType<typeof smtpConfig>) {
+  return `${cfg.host}:${cfg.port}:${cfg.secure}:${cfg.user}`;
+}
+
+export function sanitizeSmtpError(message: string): string {
+  return message
+    .replace(/password[=:\s][^\s]+/gi, "password=[redacted]")
+    .replace(/AUTH[^.]+/gi, "AUTH [redacted]")
+    .slice(0, 500);
+}
+
+export function createSmtpTransport(): Transporter | null {
   const cfg = smtpConfig();
   if (!cfg.password) return null;
-  if (!cached) {
+  const key = transportKey(cfg);
+  if (!cached || cachedKey !== key) {
     cached = nodemailer.createTransport({
       host: cfg.host,
       port: cfg.port,
@@ -15,7 +28,11 @@ function getTransport(): Transporter | null {
       requireTLS: cfg.starttls,
       auth: { user: cfg.user, pass: cfg.password },
       tls: { minVersion: "TLSv1.2", rejectUnauthorized: true },
+      connectionTimeout: 20_000,
+      greetingTimeout: 15_000,
+      socketTimeout: 25_000,
     });
+    cachedKey = key;
   }
   return cached;
 }
@@ -32,8 +49,15 @@ export type SmtpSendResult =
   | { ok: true; messageId: string }
   | { ok: false; error: string; skipped?: boolean };
 
+function isValidRecipient(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !/[\r\n]/.test(email);
+}
+
 export async function sendSmtpMail(input: SmtpSendInput): Promise<SmtpSendResult> {
-  const transport = getTransport();
+  if (!isValidRecipient(input.to)) {
+    return { ok: false, error: "Invalid recipient address" };
+  }
+  const transport = createSmtpTransport();
   if (!transport) {
     return { ok: false, error: "SMTP is not configured (missing SMTP_PASSWORD or host)", skipped: true };
   }
@@ -41,7 +65,7 @@ export async function sendSmtpMail(input: SmtpSendInput): Promise<SmtpSendResult
     const info = await transport.sendMail({
       from: smtpFromAddress(),
       to: input.to,
-      subject: input.subject,
+      subject: input.subject.replace(/[\r\n]/g, " "),
       html: input.html,
       text: input.text,
       attachments: input.attachments?.map((a) => ({
@@ -50,14 +74,27 @@ export async function sendSmtpMail(input: SmtpSendInput): Promise<SmtpSendResult
         contentType: "application/pdf",
       })),
     });
-    const messageId = typeof info.messageId === "string" ? info.messageId : "smtp-sent";
+    const messageId = typeof info.messageId === "string" ? info.messageId : "smtp-accepted";
     return { ok: true, messageId };
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "SMTP send failed";
-    return { ok: false, error: msg };
+    const raw = e instanceof Error ? e.message : "SMTP send failed";
+    return { ok: false, error: sanitizeSmtpError(raw) };
+  }
+}
+
+export async function verifySmtpConnection(): Promise<{ ok: boolean; error?: string }> {
+  const transport = createSmtpTransport();
+  if (!transport) return { ok: false, error: "SMTP not configured" };
+  try {
+    await transport.verify();
+    return { ok: true };
+  } catch (e) {
+    const raw = e instanceof Error ? e.message : "verify failed";
+    return { ok: false, error: sanitizeSmtpError(raw) };
   }
 }
 
 export function smtpConfigured(): boolean {
-  return Boolean(smtpConfig().password && smtpConfig().host && smtpConfig().user);
+  const cfg = smtpConfig();
+  return Boolean(cfg.password && cfg.host && cfg.user);
 }

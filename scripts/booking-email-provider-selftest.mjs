@@ -1,25 +1,17 @@
 /**
- * Documents provider selection without sending mail.
+ * Booking email uses SMTP only (no third-party transactional APIs).
  */
-const provider = (() => {
-  const raw = process.env.BOOKING_EMAIL_PROVIDER?.trim().toLowerCase();
-  if (raw === "resend" || raw === "smtp") return raw;
-  if (process.env.RESEND_API_KEY?.trim()) return "resend";
-  return "smtp";
-})();
+const required = ["SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM_EMAIL"];
 
-if (provider !== "resend" && provider !== "smtp") {
-  console.error("booking-email-provider-selftest: FAIL invalid provider", provider);
-  process.exit(1);
-}
-
-const requiredResend = ["RESEND_API_KEY", "BOOKING_FROM_EMAIL"];
-const requiredSmtp = ["SMTP_HOST", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM_EMAIL"];
-
-for (const key of provider === "resend" ? requiredResend : requiredSmtp) {
+for (const key of required) {
   if (!process.env[key] && process.env.CI !== "true") {
     console.log(`booking-email-provider-selftest: note ${key} not set locally (OK for dev)`);
   }
 }
 
-console.log("booking-email-provider-selftest: OK provider", provider);
+if (process.env.RESEND_API_KEY) {
+  console.error("booking-email-provider-selftest: FAIL RESEND_API_KEY should not be used");
+  process.exit(1);
+}
+
+console.log("booking-email-provider-selftest: OK provider smtp");

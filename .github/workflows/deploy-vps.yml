@@ -7,9 +7,8 @@
 #   VPS_PORT          SSH port (default 22). If deploy fails in ~5s, allow GitHub Actions IPs on the VPS firewall.
 #   ORBIT_PASSKEY
 #   BOOKING_PDF_SECRET  generated on VPS on first deploy if omitted
-#   RESEND_API_KEY, BOOKING_FROM_EMAIL, BOOKING_FROM_NAME (recommended)
-#   BOOKING_EMAIL_PROVIDER=resend|smtp (optional; defaults to resend when RESEND_API_KEY is set)
-#   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM_EMAIL, SMTP_FROM_NAME (SMTP fallback only)
+#   SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASSWORD, SMTP_FROM_EMAIL, SMTP_FROM_NAME
+#   BOOKING_NOTIFICATION_EMAIL (staff new-booking alerts)
 
 name: Deploy to Hostinger VPS
 
@@ -36,10 +35,8 @@ jobs:
       SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
       SMTP_FROM_NAME: ${{ secrets.SMTP_FROM_NAME }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      BOOKING_FROM_EMAIL: ${{ secrets.BOOKING_FROM_EMAIL }}
-      BOOKING_FROM_NAME: ${{ secrets.BOOKING_FROM_NAME }}
-      BOOKING_EMAIL_PROVIDER: ${{ secrets.BOOKING_EMAIL_PROVIDER }}
+      SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
+      BOOKING_NOTIFICATION_EMAIL: ${{ secrets.BOOKING_NOTIFICATION_EMAIL }}
     steps:
       - uses: actions/checkout@v4
       - name: Pull, build, and restart this app only
@@ -50,7 +47,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
           command_timeout: 20m
-          envs: ORBIT_PASSKEY,BOOKING_PDF_SECRET,RESEND_API_KEY,BOOKING_FROM_EMAIL,BOOKING_FROM_NAME,BOOKING_EMAIL_PROVIDER,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASSWORD,SMTP_FROM_EMAIL,SMTP_FROM_NAME
+          envs: ORBIT_PASSKEY,BOOKING_PDF_SECRET,BOOKING_NOTIFICATION_EMAIL,SMTP_HOST,SMTP_PORT,SMTP_SECURE,SMTP_USER,SMTP_PASSWORD,SMTP_FROM_EMAIL,SMTP_FROM_NAME
           script_stop: true
           script: |
             set -euo pipefail
@@ -118,27 +115,15 @@ jobs:
             write_env_key .env.local ORBIT_PASSKEY "${ORBIT_KEY}"
             write_env_key .env SPA_PUBLIC_URL "https://kayahealingspa.com.np"
             write_env_key .env NEXT_PUBLIC_SITE_URL "https://kayahealingspa.com.np"
-            write_env_key .env BOOKING_FROM_EMAIL "${BOOKING_FROM_EMAIL:-booking@kayahealingspa.com.np}"
-            write_env_key .env BOOKING_FROM_NAME "${BOOKING_FROM_NAME:-Kaya Healing Spa}"
-            if [ -n "${BOOKING_EMAIL_PROVIDER:-}" ]; then
-              write_env_key .env BOOKING_EMAIL_PROVIDER "${BOOKING_EMAIL_PROVIDER}"
-            elif [ -n "${RESEND_API_KEY:-}" ]; then
-              write_env_key .env BOOKING_EMAIL_PROVIDER "resend"
-            else
-              write_env_key .env BOOKING_EMAIL_PROVIDER "smtp"
-            fi
-            if [ -n "${RESEND_API_KEY:-}" ]; then
-              write_env_key .env RESEND_API_KEY "${RESEND_API_KEY}"
-              write_env_key .env.local RESEND_API_KEY "${RESEND_API_KEY}"
-            else
-              echo "WARN: RESEND_API_KEY GitHub secret not set — using SMTP provider if configured"
-            fi
             write_env_key .env SMTP_HOST "${SMTP_HOST:-mail.globalorbitmail.cloud}"
-            write_env_key .env SMTP_PORT "${SMTP_PORT:-587}"
+            write_env_key .env SMTP_PORT "${SMTP_PORT:-465}"
+            write_env_key .env SMTP_SECURE "${SMTP_SECURE:-true}"
             write_env_key .env SMTP_USER "${SMTP_USER:-booking@kayahealingspa.com.np}"
             write_env_key .env SMTP_FROM_EMAIL "${SMTP_FROM_EMAIL:-${SMTP_USER:-booking@kayahealingspa.com.np}}"
             write_env_key .env SMTP_FROM_NAME "${SMTP_FROM_NAME:-Kaya Healing Spa}"
-            write_env_key .env SMTP_SECURE "false"
+            if [ -n "${BOOKING_NOTIFICATION_EMAIL:-}" ]; then
+              write_env_key .env BOOKING_NOTIFICATION_EMAIL "${BOOKING_NOTIFICATION_EMAIL}"
+            fi
             if [ -n "${SMTP_PASSWORD:-}" ]; then
               write_env_key .env SMTP_PASSWORD "${SMTP_PASSWORD}"
               write_env_key .env.local SMTP_PASSWORD "${SMTP_PASSWORD}"

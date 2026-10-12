@@ -60,6 +60,7 @@ export function createBooking(
       paymentMethod: input.paymentMethod ?? "pay_at_spa",
       pdfAccessToken: newPdfAccessToken(),
       emailDelivery: input.emailDelivery ?? { status: "pending", attempts: 0 },
+      adminEmailDelivery: input.adminEmailDelivery ?? { status: "pending", attempts: 0 },
       createdAt: now,
       updatedAt: now,
       audit: [{ at: now, status: input.status ?? "confirmed", by: "system" }],
@@ -115,25 +116,44 @@ export function attachInvoiceToBooking(bookingId: string, invoiceId: string, inv
   });
 }
 
-export function updateBookingEmailDelivery(id: string, patch: Partial<BookingEmailDelivery>) {
-  return withDataFileLock("booking-data", () => {
-  const list = readBookings();
-  const index = list.findIndex((b) => b.id === id);
-  if (index < 0) return null;
-  const current = list[index].emailDelivery ?? { status: "pending", attempts: 0 };
+function patchEmailDelivery(
+  list: SpaBooking[],
+  index: number,
+  field: "emailDelivery" | "adminEmailDelivery",
+  patch: Partial<BookingEmailDelivery>,
+) {
+  const current = list[index][field] ?? { status: "pending", attempts: 0 };
   const nextDelivery: BookingEmailDelivery = {
     ...current,
     ...patch,
     attempts: patch.attempts ?? current.attempts,
   };
-  const next = {
+  list[index] = {
     ...list[index],
-    emailDelivery: nextDelivery,
+    [field]: nextDelivery,
     updatedAt: new Date().toISOString(),
   };
-  list[index] = next;
-  writeBookings(list);
-  return next;
+}
+
+export function updateBookingEmailDelivery(id: string, patch: Partial<BookingEmailDelivery>) {
+  return withDataFileLock("booking-data", () => {
+    const list = readBookings();
+    const index = list.findIndex((b) => b.id === id);
+    if (index < 0) return null;
+    patchEmailDelivery(list, index, "emailDelivery", patch);
+    writeBookings(list);
+    return list[index];
+  });
+}
+
+export function updateBookingAdminEmailDelivery(id: string, patch: Partial<BookingEmailDelivery>) {
+  return withDataFileLock("booking-data", () => {
+    const list = readBookings();
+    const index = list.findIndex((b) => b.id === id);
+    if (index < 0) return null;
+    patchEmailDelivery(list, index, "adminEmailDelivery", patch);
+    writeBookings(list);
+    return list[index];
   });
 }
 

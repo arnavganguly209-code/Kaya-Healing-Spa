@@ -3,7 +3,7 @@ import { minutesToTime12, timeToMinutes } from "@/lib/booking-scheduler";
 import { displayBookingNumber } from "@/lib/booking-number";
 import { bookingAmountDueNpr, bookingAmountPaidNpr, bookingGrandTotalNpr } from "@/lib/booking-pricing";
 import type { SpaBooking } from "@/lib/booking-types";
-import { bookingFromEmail, SPA_BOOKING_PHONE, spaPublicUrl } from "@/lib/spa-config";
+import { smtpFromEmail, SPA_BOOKING_PHONE, spaPublicUrl } from "@/lib/spa-config";
 import { readOrbitContent } from "@/lib/orbit-store";
 import { embedBrandLogo } from "@/lib/pdf-brand";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
@@ -53,7 +53,7 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
   }
   page.drawText(phone, { x: margin, y, size: 9, font, color: MUTED });
   y -= 12;
-  const contactEmail = bookingFromEmail();
+  const contactEmail = smtpFromEmail();
   page.drawText(contactEmail, { x: margin, y, size: 9, font, color: MUTED });
   y -= 12;
   page.drawText(spaPublicUrl(), { x: margin, y, size: 9, font, color: MUTED });

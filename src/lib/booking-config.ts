@@ -1,5 +1,4 @@
-import { bookingEmailProvider, bookingFromEmail, spaPublicUrl } from "@/lib/spa-config";
-import { resendConfigured } from "@/lib/resend-mail";
+import { bookingNotificationEmail, smtpFromEmail, spaPublicUrl } from "@/lib/spa-config";
 import { smtpConfigured } from "@/lib/smtp-mail";
 
 export type BookingConfigIssue = {
@@ -11,29 +10,29 @@ export type BookingConfigIssue = {
 export function assessBookingConfig(): BookingConfigIssue[] {
   const issues: BookingConfigIssue[] = [];
   const isProd = process.env.NODE_ENV === "production";
-  const provider = bookingEmailProvider();
 
-  if (provider === "resend") {
-    if (!resendConfigured()) {
-      issues.push({
-        code: "RESEND_NOT_CONFIGURED",
-        message: "Booking emails use Resend — set RESEND_API_KEY and BOOKING_FROM_EMAIL.",
-        severity: isProd ? "error" : "warning",
-      });
-    }
-  } else if (!smtpConfigured()) {
+  if (!smtpConfigured()) {
     issues.push({
       code: "SMTP_NOT_CONFIGURED",
-      message: "Booking emails use SMTP — set SMTP_HOST, SMTP_USER, SMTP_PASSWORD, and SMTP_FROM_EMAIL.",
+      message:
+        "Booking emails require SMTP_HOST, SMTP_USER, SMTP_PASSWORD, and SMTP_FROM_EMAIL (mail.globalorbitmail.cloud).",
       severity: isProd ? "error" : "warning",
     });
   }
 
-  if (!bookingFromEmail()) {
+  if (!smtpFromEmail()) {
     issues.push({
-      code: "BOOKING_FROM_EMAIL_MISSING",
-      message: "Set BOOKING_FROM_EMAIL (or SMTP_FROM_EMAIL).",
+      code: "SMTP_FROM_EMAIL_MISSING",
+      message: "Set SMTP_FROM_EMAIL to booking@kayahealingspa.com.np (or SMTP_USER).",
       severity: "error",
+    });
+  }
+
+  if (!bookingNotificationEmail()) {
+    issues.push({
+      code: "BOOKING_NOTIFICATION_EMAIL_MISSING",
+      message: "Set BOOKING_NOTIFICATION_EMAIL for staff booking alerts.",
+      severity: "warning",
     });
   }
 
@@ -60,7 +59,7 @@ export function assessBookingConfig(): BookingConfigIssue[] {
 }
 
 export function logBookingConfigIssues(): void {
-  console.info(`[booking-config] email provider: ${bookingEmailProvider()}`);
+  console.info("[booking-config] email provider: smtp");
   for (const issue of assessBookingConfig()) {
     const line = `[booking-config] ${issue.code}: ${issue.message}`;
     if (issue.severity === "error") console.error(line);

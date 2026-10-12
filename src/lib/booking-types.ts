@@ -66,7 +66,10 @@ export type SpaBooking = {
   privacyAccepted: boolean;
   idempotencyKey?: string;
   pdfAccessToken?: string;
+  /** Customer confirmation email */
   emailDelivery?: BookingEmailDelivery;
+  /** Staff booking notification email */
+  adminEmailDelivery?: BookingEmailDelivery;
   invoiceId?: string;
   invoiceNumber?: string;
   audit: BookingAuditEntry[];

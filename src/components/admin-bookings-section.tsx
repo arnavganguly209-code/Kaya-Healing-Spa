@@ -146,7 +146,8 @@ export function AdminBookingsSection({
               <th className="px-3 py-3">Total</th>
               <th className="px-3 py-3">Paid / due</th>
               <th className="px-3 py-3">Status</th>
-              <th className="px-3 py-3">Email</th>
+              <th className="px-3 py-3">Customer email</th>
+              <th className="px-3 py-3">Staff email</th>
               <th className="px-3 py-3">Actions</th>
             </tr>
           </thead>
@@ -179,6 +180,7 @@ export function AdminBookingsSection({
                   </select>
                 </td>
                 <td className="px-3 py-3 text-xs">{b.emailDelivery?.status ?? "pending"}</td>
+                <td className="px-3 py-3 text-xs">{b.adminEmailDelivery?.status ?? "pending"}</td>
                 <td className="px-3 py-3">
                   <button type="button" className="text-xs font-semibold text-[#F47B20] hover:underline" onClick={() => setSelected(b)}>
                     Details
@@ -213,7 +215,8 @@ export function AdminBookingsSection({
               <div><dt className="text-[#8a8175]">Service</dt><dd>{selected.serviceName || selected.packageName}</dd></div>
               <div><dt className="text-[#8a8175]">Pricing</dt><dd>Total {selected.priceNpr ? formatNpr(selected.priceNpr) : "TBC"} · Paid {formatNpr(selected.amountPaidNpr ?? 0)} · Due {selected.priceNpr ? formatNpr(dueAmount(selected)) : "—"} · {selected.paymentStatus ?? "unpaid"}</dd></div>
               <div><dt className="text-[#8a8175]">Booking status</dt><dd>{selected.status}</dd></div>
-              <div><dt className="text-[#8a8175]">Email delivery</dt><dd>{selected.emailDelivery?.status} {(selected.emailDelivery?.providerMessageId || selected.emailDelivery?.resendMessageId) ? `· ${selected.emailDelivery?.providerMessageId || selected.emailDelivery?.resendMessageId}` : ""}{selected.emailDelivery?.lastError ? ` · ${selected.emailDelivery.lastError}` : ""}</dd></div>
+              <div><dt className="text-[#8a8175]">Customer email</dt><dd>{selected.emailDelivery?.status}{(selected.emailDelivery?.providerMessageId) ? ` · ${selected.emailDelivery.providerMessageId}` : ""}{selected.emailDelivery?.lastError ? ` · ${selected.emailDelivery.lastError}` : ""}</dd></div>
+              <div><dt className="text-[#8a8175]">Staff notification</dt><dd>{selected.adminEmailDelivery?.status ?? "pending"}{(selected.adminEmailDelivery?.providerMessageId) ? ` · ${selected.adminEmailDelivery.providerMessageId}` : ""}{selected.adminEmailDelivery?.lastError ? ` · ${selected.adminEmailDelivery.lastError}` : ""}</dd></div>
               {selected.invoiceNumber && <div><dt className="text-[#8a8175]">Invoice</dt><dd>{selected.invoiceNumber}</dd></div>}
               {selected.notes && <div><dt className="text-[#8a8175]">Notes</dt><dd>{selected.notes}</dd></div>}
             </dl>
@@ -228,7 +231,7 @@ export function AdminBookingsSection({
               <a href={`/api/admin/bookings/pdf?id=${encodeURIComponent(selected.id)}`} className="btn-primary text-sm">Download booking confirmation</a>
               <a href={`/api/admin/bookings/pdf?id=${encodeURIComponent(selected.id)}&variant=invoice`} className="btn-line text-sm">Download invoice</a>
               <button type="button" disabled={resendBusy} className="btn-line text-sm" onClick={() => resendEmail(selected.id)}>
-                {resendBusy ? "Sending…" : "Resend confirmation email"}
+                {resendBusy ? "Sending…" : "Retry customer & staff emails"}
               </button>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { formatNpr, site } from "@/lib/content";
 import type { SpaInvoice } from "@/lib/billing-types";
 import type { SpaBooking } from "@/lib/booking-types";
-import { bookingFromEmail, spaPublicUrl } from "@/lib/spa-config";
+import { smtpFromEmail, spaPublicUrl } from "@/lib/spa-config";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { embedBrandLogo } from "@/lib/pdf-brand";
 
@@ -31,7 +31,7 @@ export async function generateInvoicePdf(booking: SpaBooking, invoice: SpaInvoic
   y -= 12;
   page.drawText(site.addressLine, { x: margin, y, size: 8, font, color: MUTED, maxWidth: contentWidth });
   y -= 22;
-  page.drawText(`${site.phone} · ${bookingFromEmail()}`, { x: margin, y, size: 9, font, color: MUTED });
+  page.drawText(`${site.phone} · ${smtpFromEmail()}`, { x: margin, y, size: 9, font, color: MUTED });
   y -= 12;
   page.drawText(spaPublicUrl(), { x: margin, y, size: 9, font, color: MUTED });
 
