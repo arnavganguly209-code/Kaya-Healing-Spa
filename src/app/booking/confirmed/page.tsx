@@ -1,10 +1,17 @@
 import { displayBookingNumber, findBookingByReference } from "@/lib/booking-store";
-import { formatNpr } from "@/lib/content";
+import { bookingAmountDueNpr, bookingGrandTotalNpr, bookingAmountPaidNpr } from "@/lib/booking-pricing";
+import { formatNpr, site } from "@/lib/content";
 import { minutesToTime12, timeToMinutes } from "@/lib/booking-scheduler";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
+
+function statusHeading(status: string) {
+  if (status === "pending") return "Your reservation request was received";
+  if (status === "confirmed") return "Thank you for booking with Kaya Healing Spa";
+  return "Booking update";
+}
 
 export default async function BookingConfirmedPage({
   searchParams,
@@ -20,11 +27,13 @@ export default async function BookingConfirmedPage({
   const number = displayBookingNumber(booking);
   const token = params.token?.trim() || booking.pdfAccessToken || "";
   const timeLabel = minutesToTime12(timeToMinutes(booking.appointmentTime));
-  const total = booking.priceNpr ?? 0;
-  const paid = booking.amountPaidNpr ?? 0;
-  const due = total > 0 ? Math.max(0, total - paid) : 0;
-  const emailSent = params.emailSent === "1" || booking.emailDelivery?.status === "sent";
-  const emailSkipped = params.emailSkipped === "1" || booking.emailDelivery?.status === "skipped";
+  const total = bookingGrandTotalNpr(booking);
+  const paid = bookingAmountPaidNpr(booking);
+  const due = bookingAmountDueNpr(booking);
+  const emailStatus = booking.emailDelivery?.status;
+  const emailSent = emailStatus === "sent";
+  const emailSkipped = emailStatus === "skipped";
+  const emailFailed = emailStatus === "failed" || emailStatus === "pending";
   const pdfHref = token ? `/api/bookings/pdf?ref=${encodeURIComponent(number)}&token=${encodeURIComponent(token)}` : null;
 
   return (
@@ -32,10 +41,14 @@ export default async function BookingConfirmedPage({
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#e8f5e9] text-2xl text-[#2f8f45]" aria-hidden>
         ✓
       </div>
-      <p className="mt-6 text-xs font-semibold tracking-[0.2em] text-[#F47B20] uppercase">Booking confirmed</p>
-      <h1 className="mt-3 font-serif text-4xl text-[#141210]">Thank you for booking with Kaya Healing Spa</h1>
+      <p className="mt-6 text-xs font-semibold tracking-[0.2em] text-[#F47B20] uppercase">
+        {booking.status === "confirmed" ? "Booking confirmed" : booking.status.replace(/_/g, " ")}
+      </p>
+      <h1 className="mt-3 font-serif text-4xl text-[#141210]">{statusHeading(booking.status)}</h1>
       <p className="mt-6 text-sm leading-7 text-[#4a453e]">
-        Thank you for choosing Kaya Healing Spa. Your booking has been received successfully. Please keep your booking number for reference and present it at reception when you arrive. Payment will be collected at the spa.
+        {booking.status === "pending"
+          ? "We have received your request. Our team will review availability and contact you if anything needs to change. Payment will be collected at the spa when your appointment is confirmed."
+          : "Your booking has been saved. Please keep your booking number and present it at reception. Payment is due at the spa — no online payment has been collected."}
       </p>
 
       <div className="mt-8 rounded-2xl border-2 border-[#F47B20]/30 bg-[#fff7f0] p-6 text-center">
@@ -63,37 +76,48 @@ export default async function BookingConfirmedPage({
           <dd>{booking.guests ?? 1}</dd>
         </div>
         <div>
-          <dt className="text-[#8a8175]">Total</dt>
+          <dt className="text-[#8a8175]">Grand total</dt>
           <dd>{total > 0 ? formatNpr(total) : "To be confirmed at reception"}</dd>
         </div>
         <div>
-          <dt className="text-[#8a8175]">Due at spa</dt>
+          <dt className="text-[#8a8175]">Amount paid</dt>
+          <dd>{formatNpr(paid)}</dd>
+        </div>
+        <div>
+          <dt className="text-[#8a8175]">Amount due at spa</dt>
           <dd className="font-semibold">{total > 0 ? formatNpr(due) : "—"}</dd>
         </div>
         <div>
           <dt className="text-[#8a8175]">Payment</dt>
-          <dd>Pay at the spa — no online payment collected</dd>
+          <dd>Pay at Spa · {booking.paymentStatus ?? "unpaid"}</dd>
+        </div>
+        <div>
+          <dt className="text-[#8a8175]">Booking status</dt>
+          <dd>{booking.status}</dd>
         </div>
       </dl>
 
       {emailSent ? (
-        <p className="mt-6 text-sm text-[#2f8f45]">A confirmation email with PDF attachment was sent to {booking.email}.</p>
+        <p className="mt-6 text-sm text-[#2f8f45]">
+          A confirmation email with your PDF was accepted by our mail provider for {booking.email}. If it does not arrive within a few minutes, check spam or contact us.
+        </p>
       ) : emailSkipped ? (
         <p className="mt-6 text-sm text-[#8a8175]">
-          Your reservation is saved. Email confirmation is not configured on the server yet — please save your booking number or download the PDF below.
+          Your reservation is saved. Email is not configured on the server yet — download your PDF below or call {site.phone}.
         </p>
-      ) : (
+      ) : emailFailed ? (
         <p className="mt-6 text-sm text-amber-900">
-          Your reservation is saved. We could not send the confirmation email yet — please download your PDF or contact reception with booking number {number}.
+          Your reservation is saved. We could not send the confirmation email yet — download your PDF or contact us at {site.phone} with booking number {number}.
         </p>
-      )}
+      ) : null}
 
       <div className="mt-8 flex flex-wrap gap-4">
         {pdfHref ? (
           <a href={pdfHref} className="btn-primary inline-flex">
-            Download booking PDF
+            Download booking confirmation PDF
           </a>
         ) : null}
+        <Link href="/contact" className="btn-line inline-flex">Contact the spa</Link>
         <Link href="/" className="btn-line inline-flex">Return to website</Link>
       </div>
     </div>

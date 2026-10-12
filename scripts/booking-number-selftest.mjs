@@ -22,7 +22,19 @@ function assert(cond, msg) {
 
 assert(parse("KAYA02001") === 2001, "parse 02001");
 assert(format(2001) === "KAYA02001", "format 2001");
+assert(format(2002) === "KAYA02002", "format 2002");
 assert(parse("KAYA-abc") === null, "legacy ref not sequential");
+
+function maxFromBookings(bookings, floor = 2000) {
+  let max = floor;
+  for (const b of bookings) {
+    const n = parse(b.bookingNumber || b.reference);
+    if (n != null && n > max) max = n;
+  }
+  return max;
+}
+assert(maxFromBookings([{ reference: "KAYA02005" }]) === 2005, "preserve existing max");
+assert(maxFromBookings([]) + 1 === 2001, "fresh sequence next is 2001");
 
 const seqPath = path.join(process.cwd(), "data", "booking-sequence.json");
 try {

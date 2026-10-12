@@ -1,5 +1,6 @@
+import { bookingEmailProvider, bookingFromEmail, spaPublicUrl } from "@/lib/spa-config";
+import { resendConfigured } from "@/lib/resend-mail";
 import { smtpConfigured } from "@/lib/smtp-mail";
-import { smtpFromEmail, spaPublicUrl } from "@/lib/spa-config";
 
 export type BookingConfigIssue = {
   code: string;
@@ -10,19 +11,28 @@ export type BookingConfigIssue = {
 export function assessBookingConfig(): BookingConfigIssue[] {
   const issues: BookingConfigIssue[] = [];
   const isProd = process.env.NODE_ENV === "production";
+  const provider = bookingEmailProvider();
 
-  if (!smtpConfigured()) {
+  if (provider === "resend") {
+    if (!resendConfigured()) {
+      issues.push({
+        code: "RESEND_NOT_CONFIGURED",
+        message: "Booking emails use Resend — set RESEND_API_KEY and BOOKING_FROM_EMAIL.",
+        severity: isProd ? "error" : "warning",
+      });
+    }
+  } else if (!smtpConfigured()) {
     issues.push({
       code: "SMTP_NOT_CONFIGURED",
-      message: "Booking emails require SMTP_HOST, SMTP_USER, SMTP_PASSWORD, and SMTP_FROM_EMAIL.",
+      message: "Booking emails use SMTP — set SMTP_HOST, SMTP_USER, SMTP_PASSWORD, and SMTP_FROM_EMAIL.",
       severity: isProd ? "error" : "warning",
     });
   }
 
-  if (!smtpFromEmail()) {
+  if (!bookingFromEmail()) {
     issues.push({
-      code: "SMTP_FROM_EMAIL_MISSING",
-      message: "Set SMTP_FROM_EMAIL (or SMTP_USER) for the From address.",
+      code: "BOOKING_FROM_EMAIL_MISSING",
+      message: "Set BOOKING_FROM_EMAIL (or SMTP_FROM_EMAIL).",
       severity: "error",
     });
   }
@@ -50,6 +60,7 @@ export function assessBookingConfig(): BookingConfigIssue[] {
 }
 
 export function logBookingConfigIssues(): void {
+  console.info(`[booking-config] email provider: ${bookingEmailProvider()}`);
   for (const issue of assessBookingConfig()) {
     const line = `[booking-config] ${issue.code}: ${issue.message}`;
     if (issue.severity === "error") console.error(line);

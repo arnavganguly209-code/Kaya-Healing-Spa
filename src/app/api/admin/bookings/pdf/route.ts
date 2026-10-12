@@ -1,6 +1,8 @@
 import { isAdminAuthed } from "@/lib/admin-auth";
 import { bookingPdfFilename, generateBookingPdf } from "@/lib/booking-pdf";
 import { findBookingById, findBookingByReference } from "@/lib/booking-store";
+import { findInvoiceByBookingId } from "@/lib/invoice-store";
+import { generateInvoicePdf, invoicePdfFilename } from "@/lib/invoice-pdf";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -15,9 +17,13 @@ export async function GET(request: Request) {
   if (!booking) return NextResponse.json({ message: "Booking not found." }, { status: 404 });
 
   try {
-    const pdf = await generateBookingPdf(booking);
-    const variant = searchParams.get("variant") === "invoice" ? "Invoice" : "Booking-Confirmation";
-    const filename = bookingPdfFilename(booking).replace("Booking-Confirmation", variant);
+    const isInvoice = searchParams.get("variant") === "invoice";
+    const invoice = isInvoice ? findInvoiceByBookingId(booking.id) : null;
+    if (isInvoice && !invoice) {
+      return NextResponse.json({ message: "No invoice on file for this booking." }, { status: 404 });
+    }
+    const pdf = isInvoice && invoice ? await generateInvoicePdf(booking, invoice) : await generateBookingPdf(booking);
+    const filename = isInvoice && invoice ? invoicePdfFilename(invoice) : bookingPdfFilename(booking);
     return new NextResponse(Buffer.from(pdf), {
       status: 200,
       headers: {

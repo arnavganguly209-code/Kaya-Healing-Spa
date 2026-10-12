@@ -8,17 +8,38 @@ export function spaPublicUrl(): string {
   return raw.replace(/\/$/, "");
 }
 
-export function smtpFromEmail(): string {
+export function bookingFromEmail(): string {
   return (
+    process.env.BOOKING_FROM_EMAIL?.trim() ||
+    process.env.RESEND_FROM_EMAIL?.trim() ||
     process.env.SMTP_FROM_EMAIL?.trim() ||
     process.env.SMTP_USER?.trim() ||
-    process.env.RESEND_FROM_EMAIL?.trim() ||
-    ""
+    "booking@kayahealingspa.com.np"
   );
 }
 
+export function bookingFromName(): string {
+  return process.env.BOOKING_FROM_NAME?.trim() || process.env.SMTP_FROM_NAME?.trim() || "Kaya Healing Spa";
+}
+
+export function bookingFromAddress(): string {
+  return `${bookingFromName()} <${bookingFromEmail()}>`;
+}
+
+/** Production default: Resend when API key is set; override with BOOKING_EMAIL_PROVIDER=resend|smtp */
+export function bookingEmailProvider(): "resend" | "smtp" {
+  const raw = process.env.BOOKING_EMAIL_PROVIDER?.trim().toLowerCase();
+  if (raw === "resend" || raw === "smtp") return raw;
+  if (process.env.RESEND_API_KEY?.trim()) return "resend";
+  return "smtp";
+}
+
+export function smtpFromEmail(): string {
+  return process.env.SMTP_FROM_EMAIL?.trim() || process.env.SMTP_USER?.trim() || bookingFromEmail();
+}
+
 export function smtpFromName(): string {
-  return process.env.SMTP_FROM_NAME?.trim() || "Kaya Healing Spa";
+  return bookingFromName();
 }
 
 export function smtpFromAddress(): string {

@@ -93,8 +93,9 @@ export async function POST(request: Request) {
     if (idempotencyKey) {
       const prior = findBookingByIdempotencyKey(idempotencyKey);
       if (prior) {
-        const delivery = await deliverBookingConfirmation(prior);
         const saved = findBookingById(prior.id) ?? prior;
+        const emailSent = saved.emailDelivery?.status === "sent";
+        const emailSkipped = saved.emailDelivery?.status === "skipped";
         return NextResponse.json({
           success: true,
           message: "Booking already recorded",
@@ -103,9 +104,10 @@ export async function POST(request: Request) {
             bookingNumber: displayBookingNumber(saved),
             bookingId: saved.id,
             pdfToken: saved.pdfAccessToken,
-            emailSent: delivery.emailSent,
-            emailSkipped: delivery.emailSkipped,
-            emailError: delivery.emailError,
+            emailSent,
+            emailSkipped,
+            emailError: saved.emailDelivery?.lastError,
+            bookingStatus: saved.status,
           },
         });
       }
@@ -184,6 +186,7 @@ export async function POST(request: Request) {
         emailSent: delivery.emailSent,
         emailSkipped: delivery.emailSkipped,
         emailError: delivery.emailError,
+        bookingStatus: saved.status,
       },
     });
   } catch (error) {

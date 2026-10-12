@@ -137,6 +137,32 @@ export function updateBookingEmailDelivery(id: string, patch: Partial<BookingEma
   });
 }
 
+export function recordBookingPayment(id: string, amountNpr: number, note?: string) {
+  return withDataFileLock("booking-data", () => {
+    const list = readBookings();
+    const index = list.findIndex((b) => b.id === id);
+    if (index < 0) return null;
+    const booking = list[index];
+    const total = booking.priceNpr ?? 0;
+    const paid = Math.max(0, (booking.amountPaidNpr ?? 0) + amountNpr);
+    let paymentStatus = booking.paymentStatus ?? "unpaid";
+    if (total > 0 && paid >= total) paymentStatus = "paid";
+    else if (paid > 0) paymentStatus = "partial";
+
+    const now = new Date().toISOString();
+    const next = {
+      ...booking,
+      amountPaidNpr: paid,
+      paymentStatus,
+      updatedAt: now,
+      audit: [...booking.audit, { at: now, status: booking.status, note: note || `Payment recorded: NPR ${amountNpr}`, by: "admin" as const }],
+    };
+    list[index] = next;
+    writeBookings(list);
+    return next;
+  });
+}
+
 export function verifyPdfAccess(booking: SpaBooking, token: string): boolean {
   return Boolean(booking.pdfAccessToken && token && booking.pdfAccessToken === token);
 }
