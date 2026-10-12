@@ -10,7 +10,8 @@
     "test": "node scripts/booking-scheduler-selftest.mjs && node scripts/booking-number-selftest.mjs && node scripts/booking-pdf-selftest.mjs",
     "verify:env": "node scripts/go-live-check.mjs",
     "verify:mail": "node scripts/smtp-verify.mjs && node scripts/resend-verify.mjs",
-    "verify:dns": "node scripts/dns-diagnose.mjs"
+    "verify:dns": "node scripts/dns-diagnose.mjs",
+    "verify:domains": "node scripts/verify-domains.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.4.3",

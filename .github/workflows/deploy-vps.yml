@@ -200,16 +200,9 @@ jobs:
             fi
 
             echo "Aligning nginx for kaya.theglobalorbit.com and kayahealingspa.com.np"
-            if ! python3 "${APP_DIR}/scripts/align-kaya-nginx.py" "${APP_PORT}"; then
-              sudo python3 "${APP_DIR}/scripts/align-kaya-nginx.py" "${APP_PORT}"
-            fi
-            if nginx -t; then
-              systemctl reload nginx
-            elif sudo nginx -t; then
-              sudo systemctl reload nginx
-            else
-              echo "ERROR: nginx config test failed"
-              exit 1
+            chmod +x "${APP_DIR}/scripts/vps-kaya-nginx-fix.sh"
+            if ! bash "${APP_DIR}/scripts/vps-kaya-nginx-fix.sh"; then
+              sudo bash "${APP_DIR}/scripts/vps-kaya-nginx-fix.sh"
             fi
 
             echo "Kaya deploy ready on port ${APP_PORT}"
