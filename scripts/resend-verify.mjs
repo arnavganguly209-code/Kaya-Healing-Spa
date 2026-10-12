@@ -10,19 +10,43 @@ if (!key) {
   process.exit(0);
 }
 
-const res = await fetch("https://api.resend.com/domains", {
+const from = process.env.RESEND_FROM_EMAIL?.trim() || "booking@kayahealingspa.com.np";
+const probe = await fetch("https://api.resend.com/emails", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    from: `Kaya Healing Spa <${from}>`,
+    to: [from],
+    subject: "Resend auth probe (no delivery expected if blocked)",
+    html: "<p>Configuration probe — ignore if received during go-live check.</p>",
+  }),
+});
+
+if (probe.ok) {
+  const sent = await probe.json();
+  console.log("resend-verify: PASS send API accepted, id:", sent.id || "n/a");
+} else {
+  const err = await probe.json().catch(() => ({}));
+  const msg = err.message || err.name || probe.status;
+  if (probe.status === 401 || probe.status === 403) {
+    console.error("resend-verify: FAIL auth", probe.status);
+    process.exit(1);
+  }
+  console.log("resend-verify: WARN send rejected (check domain/sender):", msg);
+}
+
+const domainsRes = await fetch("https://api.resend.com/domains", {
   headers: { Authorization: `Bearer ${key}` },
 });
-if (!res.ok) {
-  console.error("resend-verify: FAIL auth or API error", res.status);
-  process.exit(1);
-}
-const body = await res.json();
-const domains = Array.isArray(body.data) ? body.data : [];
-const target = domains.find((d) => d.name === "kayahealingspa.com.np");
-console.log("resend-verify: OK authenticated, domains:", domains.length);
-if (target) {
-  console.log("resend-verify: kayahealingspa.com.np status:", target.status || "unknown");
+if (domainsRes.ok) {
+  const body = await domainsRes.json();
+  const domains = Array.isArray(body.data) ? body.data : [];
+  const target = domains.find((d) => d.name === "kayahealingspa.com.np");
+  if (target) console.log("resend-verify: domain kayahealingspa.com.np status:", target.status || "unknown");
+  else console.log("resend-verify: WARN domain kayahealingspa.com.np not listed");
 } else {
-  console.log("resend-verify: WARN kayahealingspa.com.np not found in account");
+  console.log("resend-verify: WARN domains API", domainsRes.status, "(send test is authoritative)");
 }

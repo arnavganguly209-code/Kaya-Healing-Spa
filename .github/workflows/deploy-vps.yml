@@ -124,11 +124,20 @@ jobs:
               write_env_key .env.local BOOKING_PDF_SECRET "${GEN}"
               echo "Generated BOOKING_PDF_SECRET on server (not printed)"
             fi
-            if [ -n "${SMTP_HOST:-}" ]; then write_env_key .env SMTP_HOST "${SMTP_HOST}"; fi
-            if [ -n "${SMTP_PORT:-}" ]; then write_env_key .env SMTP_PORT "${SMTP_PORT}"; fi
-            if [ -n "${SMTP_USER:-}" ]; then write_env_key .env SMTP_USER "${SMTP_USER}"; fi
-            if [ -n "${SMTP_PASSWORD:-}" ]; then write_env_key .env SMTP_PASSWORD "${SMTP_PASSWORD}"; fi
+            write_env_key .env SMTP_HOST "${SMTP_HOST:-mail.globalorbitmail.cloud}"
+            write_env_key .env SMTP_PORT "${SMTP_PORT:-587}"
+            write_env_key .env SMTP_USER "${SMTP_USER:-booking@kayahealingspa.com.np}"
             write_env_key .env SMTP_SECURE "false"
+            if [ -n "${SMTP_PASSWORD:-}" ]; then
+              write_env_key .env SMTP_PASSWORD "${SMTP_PASSWORD}"
+              write_env_key .env.local SMTP_PASSWORD "${SMTP_PASSWORD}"
+            else
+              echo "WARN: SMTP_PASSWORD GitHub secret not set — SMTP verify will fail until configured"
+            fi
+            if [ -z "${RESEND_API_KEY:-}" ]; then
+              echo "ERROR: RESEND_API_KEY GitHub secret is required for production booking email"
+              exit 1
+            fi
             echo "Runtime env keys configured (values not logged)"
 
             echo "Installing dependencies"
