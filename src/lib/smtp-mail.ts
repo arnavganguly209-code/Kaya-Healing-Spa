@@ -11,7 +11,8 @@ function transportKey(cfg: ReturnType<typeof smtpConfig>) {
 
 export function sanitizeSmtpError(message: string): string {
   return message
-    .replace(/password[=:\s][^\s]+/gi, "password=[redacted]")
+    .replace(/SMTP_PASSWORD/gi, "SMTP_CREDENTIAL")
+    .replace(/\bpass(?:word)?\s*[=:]\s*\S+/gi, "password=[redacted]")
     .replace(/AUTH[^.]+/gi, "AUTH [redacted]")
     .slice(0, 500);
 }
@@ -59,7 +60,7 @@ export async function sendSmtpMail(input: SmtpSendInput): Promise<SmtpSendResult
   }
   const transport = createSmtpTransport();
   if (!transport) {
-    return { ok: false, error: "SMTP is not configured (missing SMTP_PASSWORD or host)", skipped: true };
+    return { ok: false, error: "SMTP is not configured (missing host or SMTP credential)", skipped: true };
   }
   try {
     const info = await transport.sendMail({

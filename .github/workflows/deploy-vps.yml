@@ -91,7 +91,15 @@ jobs:
             echo "Syncing origin/main"
             git fetch origin main
             git checkout main
+            NGINX_FIX="${APP_DIR}/scripts/vps-kaya-nginx-fix.sh"
+            if [ -f "${NGINX_FIX}" ]; then
+              cp -a "${NGINX_FIX}" "${BACKUP_DIR}/vps-kaya-nginx-fix.sh" || true
+            fi
             git reset --hard origin/main
+            if [ -f "${BACKUP_DIR}/vps-kaya-nginx-fix.sh" ]; then
+              cp -a "${BACKUP_DIR}/vps-kaya-nginx-fix.sh" "${NGINX_FIX}"
+              echo "Restored local scripts/vps-kaya-nginx-fix.sh after git reset"
+            fi
 
             write_env_key() {
               file="$1"
@@ -148,6 +156,7 @@ jobs:
               write_env_key .env.local BOOKING_PDF_SECRET "${GEN}"
               echo "Generated BOOKING_PDF_SECRET on server (not printed)"
             fi
+            chmod 600 .env .env.local 2>/dev/null || true
             echo "Runtime env keys configured (values not logged)"
 
             echo "Installing dependencies"
@@ -185,11 +194,9 @@ jobs:
               fi
             fi
             NODE_ENV=production PORT="${APP_PORT}" HOSTNAME=0.0.0.0 ORBIT_PASSKEY="${ORBIT_KEY}" \
-              pm2 start "${NODE_BIN}" \
-              --name "${PM2_APP}" \
-              --cwd "${APP_DIR}" \
-              --update-env \
-              -- node_modules/next/dist/bin/next start -H 0.0.0.0 -p "${APP_PORT}"
+              pm2 start ecosystem.config.cjs \
+              --only "${PM2_APP}" \
+              --update-env
             pm2 save
 
             echo "Waiting for local HTTP 200 on ${APP_PORT}"
