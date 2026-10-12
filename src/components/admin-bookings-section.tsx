@@ -63,14 +63,14 @@ export function AdminBookingsSection({
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const slice = filtered.slice(page * pageSize, page * pageSize + pageSize);
 
-  async function resendEmail(id: string) {
+  async function retryEmail(id: string, target: "customer" | "admin" | "both") {
     setResendBusy(true);
     try {
       await fetch("/api/admin/bookings/resend-email", {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, target }),
       });
       onRefresh();
     } finally {
@@ -230,8 +230,11 @@ export function AdminBookingsSection({
             <div className="mt-6 flex flex-wrap gap-3">
               <a href={`/api/admin/bookings/pdf?id=${encodeURIComponent(selected.id)}`} className="btn-primary text-sm">Download booking confirmation</a>
               <a href={`/api/admin/bookings/pdf?id=${encodeURIComponent(selected.id)}&variant=invoice`} className="btn-line text-sm">Download invoice</a>
-              <button type="button" disabled={resendBusy} className="btn-line text-sm" onClick={() => resendEmail(selected.id)}>
-                {resendBusy ? "Sending…" : "Retry customer & staff emails"}
+              <button type="button" disabled={resendBusy} className="btn-line text-sm" onClick={() => retryEmail(selected.id, "customer")}>
+                {resendBusy ? "Sending…" : "Retry customer email"}
+              </button>
+              <button type="button" disabled={resendBusy} className="btn-line text-sm" onClick={() => retryEmail(selected.id, "admin")}>
+                {resendBusy ? "Sending…" : "Retry staff notification"}
               </button>
             </div>
           </div>

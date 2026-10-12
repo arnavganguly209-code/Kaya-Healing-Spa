@@ -116,13 +116,22 @@ jobs:
             write_env_key .env SPA_PUBLIC_URL "https://kayahealingspa.com.np"
             write_env_key .env NEXT_PUBLIC_SITE_URL "https://kayahealingspa.com.np"
             write_env_key .env SMTP_HOST "${SMTP_HOST:-mail.globalorbitmail.cloud}"
-            write_env_key .env SMTP_PORT "${SMTP_PORT:-465}"
-            write_env_key .env SMTP_SECURE "${SMTP_SECURE:-true}"
+            write_env_key .env SMTP_PORT "${SMTP_PORT:-587}"
+            write_env_key .env SMTP_SECURE "${SMTP_SECURE:-false}"
             write_env_key .env SMTP_USER "${SMTP_USER:-booking@kayahealingspa.com.np}"
             write_env_key .env SMTP_FROM_EMAIL "${SMTP_FROM_EMAIL:-${SMTP_USER:-booking@kayahealingspa.com.np}}"
             write_env_key .env SMTP_FROM_NAME "${SMTP_FROM_NAME:-Kaya Healing Spa}"
             if [ -n "${BOOKING_NOTIFICATION_EMAIL:-}" ]; then
               write_env_key .env BOOKING_NOTIFICATION_EMAIL "${BOOKING_NOTIFICATION_EMAIL}"
+            fi
+            write_env_key .env.local SMTP_HOST "${SMTP_HOST:-mail.globalorbitmail.cloud}"
+            write_env_key .env.local SMTP_PORT "${SMTP_PORT:-587}"
+            write_env_key .env.local SMTP_SECURE "${SMTP_SECURE:-false}"
+            write_env_key .env.local SMTP_USER "${SMTP_USER:-booking@kayahealingspa.com.np}"
+            write_env_key .env.local SMTP_FROM_EMAIL "${SMTP_FROM_EMAIL:-${SMTP_USER:-booking@kayahealingspa.com.np}}"
+            write_env_key .env.local SMTP_FROM_NAME "${SMTP_FROM_NAME:-Kaya Healing Spa}"
+            if [ -n "${BOOKING_NOTIFICATION_EMAIL:-}" ]; then
+              write_env_key .env.local BOOKING_NOTIFICATION_EMAIL "${BOOKING_NOTIFICATION_EMAIL}"
             fi
             if [ -n "${SMTP_PASSWORD:-}" ]; then
               write_env_key .env SMTP_PASSWORD "${SMTP_PASSWORD}"

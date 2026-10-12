@@ -7,7 +7,7 @@ import { loadEnvLocal } from "./load-env-local.mjs";
 loadEnvLocal();
 
 const host = process.env.SMTP_HOST?.trim() || "mail.globalorbitmail.cloud";
-const port = Number(process.env.SMTP_PORT || 465);
+const port = Number(process.env.SMTP_PORT || 587);
 const secureExplicit = process.env.SMTP_SECURE?.trim().toLowerCase();
 const secure = secureExplicit === "true" || (secureExplicit !== "false" && port === 465);
 const user = process.env.SMTP_USER?.trim();

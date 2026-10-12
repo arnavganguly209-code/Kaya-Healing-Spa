@@ -1,6 +1,7 @@
 import { appendInquiry } from "@/lib/admin-store";
 import { logBookingConfigIssues } from "@/lib/booking-config";
 import { deliverBookingConfirmation } from "@/lib/booking-confirm";
+import { publicBookingEmailError } from "@/lib/booking-public-errors";
 import { normalizeAppointmentTime } from "@/lib/booking-time";
 import { createInvoiceForBooking } from "@/lib/invoice-store";
 import { createPayAtSpaTransaction } from "@/lib/payment-store";
@@ -106,7 +107,7 @@ export async function POST(request: Request) {
             pdfToken: saved.pdfAccessToken,
             emailSent,
             emailSkipped,
-            emailError: saved.emailDelivery?.lastError,
+            emailError: publicBookingEmailError(saved.emailDelivery?.lastError),
             adminEmailSent: saved.adminEmailDelivery?.status === "sent",
             adminEmailError: saved.adminEmailDelivery?.lastError,
             bookingStatus: saved.status,
@@ -187,7 +188,7 @@ export async function POST(request: Request) {
         pdfToken: saved.pdfAccessToken,
         emailSent: delivery.emailSent,
         emailSkipped: delivery.emailSkipped,
-        emailError: delivery.emailError,
+        emailError: publicBookingEmailError(delivery.emailError),
         adminEmailSent: delivery.adminEmailSent,
         adminEmailSkipped: delivery.adminEmailSkipped,
         adminEmailError: delivery.adminEmailError,
