@@ -7,7 +7,7 @@
     "build": "node scripts/write-route-slug-manifest.mjs && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node scripts/booking-scheduler-selftest.mjs && node scripts/booking-number-selftest.mjs && node scripts/booking-pricing-selftest.mjs && node scripts/booking-email-provider-selftest.mjs && node scripts/booking-email-target-selftest.mjs && node scripts/booking-public-error-selftest.mjs && node scripts/booking-pdf-filename-selftest.mjs && node scripts/booking-pdf-selftest.mjs && node scripts/booking-config-selftest.mjs && node scripts/route-slug-manifest-selftest.mjs",
+    "test": "node scripts/booking-scheduler-selftest.mjs && node scripts/booking-number-selftest.mjs && node scripts/booking-pricing-selftest.mjs && node scripts/booking-email-provider-selftest.mjs && node scripts/booking-email-target-selftest.mjs && node scripts/booking-public-error-selftest.mjs && node scripts/booking-pdf-filename-selftest.mjs && node scripts/booking-pdf-selftest.mjs && node scripts/booking-email-isolated-selftest.mjs && node scripts/booking-config-selftest.mjs && node scripts/route-slug-manifest-selftest.mjs",
     "verify:env": "node scripts/go-live-check.mjs",
     "verify:mail": "node scripts/smtp-verify.mjs",
     "verify:test-email": "node scripts/test-booking-email.mjs",

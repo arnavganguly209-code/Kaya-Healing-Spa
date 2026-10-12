@@ -8,6 +8,15 @@ import { bookingNotificationEmail, smtpFromEmail, spaPublicUrl } from "@/lib/spa
 import { readOrbitContent } from "@/lib/orbit-store";
 import { sendSmtpMail, type SmtpSendResult } from "@/lib/smtp-mail";
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function endTimeLabel(booking: SpaBooking): string {
   const start = timeToMinutes(booking.appointmentTime);
   if (start < 0) return "—";
@@ -35,9 +44,9 @@ export function buildBookingConfirmationHtml(booking: SpaBooking): string {
   const mapUrl = site.social.google;
 
   const row = (label: string, value: string) =>
-    `<tr><td style="padding:8px 12px;color:#8a8175;font-size:13px;border-bottom:1px solid #efe8e0;width:38%">${label}</td><td style="padding:8px 12px;color:#141210;font-size:13px;font-weight:600;border-bottom:1px solid #efe8e0">${value}</td></tr>`;
+    `<tr><td style="padding:8px 12px;color:#8a8175;font-size:13px;border-bottom:1px solid #efe8e0;width:38%">${escapeHtml(label)}</td><td style="padding:8px 12px;color:#141210;font-size:13px;font-weight:600;border-bottom:1px solid #efe8e0">${escapeHtml(value)}</td></tr>`;
 
-  const greeting = `Dear ${booking.name},`;
+  const greeting = `Dear ${escapeHtml(booking.name)},`;
 
   const bodyText = `
 Thank you for choosing Kaya Healing Spa. We appreciate your reservation and look forward to welcoming you.
@@ -57,7 +66,7 @@ Please retain your booking reference and present it when you arrive.`;
   <tr><td style="padding:8px 32px 0;text-align:center">
   <h1 style="margin:0;font-size:22px;color:#141210">${statusHeadline(booking)}</h1>
   <p style="margin:12px 0 0;font-size:15px;color:#4a453e">${greeting}</p>
-  <p style="margin:20px 0 0;display:inline-block;padding:12px 20px;background:#fff7f0;border:2px solid #F47B20;border-radius:12px;font-size:20px;font-weight:bold;color:#F47B20">${number}</p>
+  <p style="margin:20px 0 0;display:inline-block;padding:12px 20px;background:#fff7f0;border:2px solid #F47B20;border-radius:12px;font-size:20px;font-weight:bold;color:#F47B20">${escapeHtml(number)}</p>
   </td></tr>
   <tr><td style="padding:20px 32px 0;font-size:14px;line-height:1.65;color:#4a453e;white-space:pre-line">${bodyText.trim()}</td></tr>
   <tr><td style="padding:24px 32px">
@@ -98,20 +107,20 @@ export function buildAdminBookingNotificationHtml(booking: SpaBooking): string {
   const created = new Date(booking.createdAt).toLocaleString("en-NP", { timeZone: "Asia/Kathmandu" });
 
   return `<!DOCTYPE html><html><body style="font-family:Georgia,serif;color:#141210;padding:24px">
-  <h1 style="color:#F47B20;font-size:20px">New spa booking — ${number}</h1>
-  <p><strong>Status:</strong> ${booking.status} · <strong>Payment:</strong> ${booking.paymentStatus ?? "unpaid"}</p>
+  <h1 style="color:#F47B20;font-size:20px">New spa booking — ${escapeHtml(number)}</h1>
+  <p><strong>Status:</strong> ${escapeHtml(booking.status)} · <strong>Payment:</strong> ${escapeHtml(booking.paymentStatus ?? "unpaid")}</p>
   <table cellpadding="6" style="border-collapse:collapse;font-size:14px">
-  <tr><td>Customer</td><td><strong>${booking.name}</strong></td></tr>
-  <tr><td>Email</td><td>${booking.email}</td></tr>
-  <tr><td>Phone</td><td>${booking.phone}</td></tr>
-  <tr><td>Service</td><td>${booking.serviceName || booking.packageName || "—"}</td></tr>
-  <tr><td>When</td><td>${booking.appointmentDate} ${booking.appointmentTime} · ${booking.durationMinutes} min · ${booking.guests ?? 1} guest(s)</td></tr>
+  <tr><td>Customer</td><td><strong>${escapeHtml(booking.name)}</strong></td></tr>
+  <tr><td>Email</td><td>${escapeHtml(booking.email)}</td></tr>
+  <tr><td>Phone</td><td>${escapeHtml(booking.phone)}</td></tr>
+  <tr><td>Service</td><td>${escapeHtml(booking.serviceName || booking.packageName || "—")}</td></tr>
+  <tr><td>When</td><td>${escapeHtml(`${booking.appointmentDate} ${booking.appointmentTime} · ${booking.durationMinutes} min · ${booking.guests ?? 1} guest(s)`)}</td></tr>
   <tr><td>Total</td><td>${total > 0 ? formatNpr(total) : "TBC"}</td></tr>
   <tr><td>Paid / due</td><td>${formatNpr(paid)} / ${total > 0 ? formatNpr(due) : "—"}</td></tr>
   <tr><td>Created</td><td>${created}</td></tr>
-  ${booking.notes ? `<tr><td>Notes</td><td>${booking.notes}</td></tr>` : ""}
+  ${booking.notes ? `<tr><td>Notes</td><td>${escapeHtml(booking.notes)}</td></tr>` : ""}
   </table>
-  <p style="margin-top:20px"><a href="${adminUrl}" style="color:#F47B20">Open admin dashboard</a> (sign in required) and locate booking <strong>${number}</strong>.</p>
+  <p style="margin-top:20px"><a href="${adminUrl}" style="color:#F47B20">Open admin dashboard</a> (sign in required) and locate booking <strong>${escapeHtml(number)}</strong>.</p>
   </body></html>`;
 }
 
