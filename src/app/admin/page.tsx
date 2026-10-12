@@ -18,6 +18,7 @@ export default async function AdminPage() {
         footerBrand: c.footerBrand,
         footerText: c.footerText,
         footerBottom: c.footerBottom,
+        externalReviewLinks: c.externalReviewLinks,
         phone: c.phone,
         whatsapp: c.whatsapp,
         email: c.email,

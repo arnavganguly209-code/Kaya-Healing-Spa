@@ -2,6 +2,7 @@
 
 import type { BlogPost } from "@/lib/blog-store";
 import type { AdminInquiry } from "@/lib/admin-store";
+import type { SpaBooking } from "@/lib/booking-types";
 import type { OrbitContent, OrbitAdminSectionFlags } from "@/lib/orbit-store";
 import {
   AdminCategoriesEditor,
@@ -34,11 +35,12 @@ type AdminData = {
   categories: string[];
   packageCategories: string[];
   gallery: OrbitContent["gallery"];
+  externalReviewLinks: OrbitContent["externalReviewLinks"];
   adminSectionFlags: OrbitAdminSectionFlags;
   homePage: OrbitContent["homePage"];
 };
 
-const allSections = ["Dashboard", "Home page", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Blog", "Inquiries", "Reviews", "Account"] as const;
+const allSections = ["Dashboard", "Home page", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Bookings", "Blog", "Inquiries", "Reviews", "Account"] as const;
 
 const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSectionFlags | null> = {
   Dashboard: null,
@@ -49,6 +51,7 @@ const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSecti
   Packages: "packages",
   Gallery: "gallery",
   Therapists: "therapists",
+  Bookings: "inquiries",
   Blog: "blog",
   Inquiries: "inquiries",
   Reviews: "reviews",
@@ -89,6 +92,8 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [inquiries, setInquiries] = useState<AdminInquiry[]>([]);
+  const [bookings, setBookings] = useState<SpaBooking[]>([]);
+  const [bookingSettings, setBookingSettings] = useState<{ timezone: string; blocks: unknown[] } | null>(null);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [postIndex, setPostIndex] = useState(0);
   const [account, setAccount] = useState({ username: "kaya", currentPassword: "", password: "", password2: "" });
@@ -101,6 +106,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
 
   useEffect(() => {
     if (section === "Inquiries") void loadInquiries();
+    if (section === "Bookings") void loadBookings();
     if (section === "Blog") void loadPosts();
     if (section === "Account") {
       void fetch("/api/admin/credentials", { credentials: "same-origin" })
@@ -110,6 +116,17 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
         });
     }
   }, [section]);
+
+  async function loadBookings() {
+    const [bookRes, settingsRes] = await Promise.all([
+      fetch("/api/admin/bookings", { credentials: "same-origin" }),
+      fetch("/api/admin/booking-settings", { credentials: "same-origin" }),
+    ]);
+    const body = await bookRes.json().catch(() => ({}));
+    if (bookRes.ok) setBookings(body.data || []);
+    const settingsBody = await settingsRes.json().catch(() => ({}));
+    if (settingsRes.ok) setBookingSettings(settingsBody.data || null);
+  }
 
   async function loadInquiries() {
     const res = await fetch("/api/admin/inquiries", { credentials: "same-origin" });
@@ -263,6 +280,16 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#6B6B6B]">
                 Edit services, packages, categories, gallery, hero, footer, therapists, blog, reviews, and booking inquiries. Full site design lives in Orbit at /orbit.
               </p>
+              {(!content.email?.trim() ||
+                content.email.includes("example.com") ||
+                content.phone?.includes("9800000000")) && (
+                <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950" role="status">
+                  <p className="font-semibold">Production contact setup incomplete</p>
+                  <p className="mt-1">
+                    Replace demo phone, email, or WhatsApp placeholders in Footer before marking the site production-ready. Review links are under Footer → Reviews &amp; external links.
+                  </p>
+                </div>
+              )}
               <ul className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <li className="rounded-2xl bg-gradient-to-br from-[#fff7f0] to-white p-5 ring-1 ring-[#efe8e0]">
                   <p className="text-3xl font-bold text-[#F47B20]">{content.services.length}</p>
@@ -370,6 +397,17 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
               <Field label="Developer lead-in" value={content.footerBottom.developerLead} onChange={(v) => setContent({ ...content, footerBottom: { ...content.footerBottom, developerLead: v } })} />
               <Field label="Developer name (golden link)" value={content.footerBottom.developerName} onChange={(v) => setContent({ ...content, footerBottom: { ...content.footerBottom, developerName: v } })} />
               <Field label="Developer URL" value={content.footerBottom.developerUrl} onChange={(v) => setContent({ ...content, footerBottom: { ...content.footerBottom, developerUrl: v } })} />
+              <p className="mt-8 text-sm font-semibold">Reviews & external links</p>
+              <Field
+                label="Google reviews URL"
+                value={content.externalReviewLinks.googleReviewsUrl}
+                onChange={(v) => setContent({ ...content, externalReviewLinks: { ...content.externalReviewLinks, googleReviewsUrl: v } })}
+              />
+              <Field
+                label="TripAdvisor URL"
+                value={content.externalReviewLinks.tripadvisorUrl}
+                onChange={(v) => setContent({ ...content, externalReviewLinks: { ...content.externalReviewLinks, tripadvisorUrl: v } })}
+              />
               {content.footerBottom.legalLinks.map((link, index) => (
                 <div key={index} className="mt-3 rounded-xl border p-4">
                   <Field label="Legal link label" value={link.label} onChange={(v) => {
@@ -450,6 +488,48 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                   })} />
                 </div>
               ))}
+            </>
+          )}
+
+          {section === "Bookings" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">Structured appointment requests with reference numbers. Update status after reception confirms.</p>
+              {bookingSettings && (
+                <div className="mt-4 rounded-xl border border-[#efe8e0] bg-[#faf8f5] p-4 text-sm">
+                  <p className="font-semibold">Availability (read-only summary)</p>
+                  <p className="mt-1 text-[#6B6B6B]">
+                    Timezone {bookingSettings.timezone} · 8:00 AM–11:45 PM starts · 15-minute intervals · {bookingSettings.blocks?.length || 0} blocked period(s)
+                  </p>
+                  <p className="mt-1 text-xs text-[#8a8175]">Full block editor and hour exceptions: use API /api/admin/booking-settings or extend this panel next.</p>
+                </div>
+              )}
+              {!bookings.length && <p className="mt-4 text-sm">No bookings yet.</p>}
+              <ul className="mt-6 space-y-4">
+                {bookings.map((b) => (
+                  <li key={b.id} className="rounded-2xl border border-[#efe8e0] p-4">
+                    <p className="font-semibold">{b.reference} · {b.status}</p>
+                    <p className="text-sm text-[#6B6B6B]">{b.name} · {b.email} · {b.phone}</p>
+                    <p className="text-sm">{b.serviceName || b.packageName} · {b.appointmentDate} {b.appointmentTime} · {b.durationMinutes} min</p>
+                    <select
+                      value={b.status}
+                      className="mt-3 rounded-lg border px-3 py-2 text-sm"
+                      onChange={async (e) => {
+                        await fetch("/api/admin/bookings", {
+                          method: "PATCH",
+                          credentials: "same-origin",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ id: b.id, status: e.target.value }),
+                        });
+                        loadBookings();
+                      }}
+                    >
+                      {["pending", "confirmed", "rejected", "cancelled", "completed", "no_show"].map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </li>
+                ))}
+              </ul>
             </>
           )}
 

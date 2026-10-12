@@ -41,6 +41,8 @@ public/hero/reference-hero.jpg
 /data/admin-auth.json
 /data/admin-inquiries.json
 /data/blog-posts.json
+/data/spa-bookings.json
+/data/booking-settings.json
 /public/uploads
 
 # vercel

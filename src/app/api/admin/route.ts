@@ -15,6 +15,7 @@ export async function GET() {
       footerBrand: c.footerBrand,
       footerText: c.footerText,
       footerBottom: c.footerBottom,
+      externalReviewLinks: c.externalReviewLinks,
       phone: c.phone,
       whatsapp: c.whatsapp,
       email: c.email,
@@ -40,6 +41,7 @@ export async function PUT(request: Request) {
   const bodyHome = body.homePage as typeof current.homePage | undefined;
   const bodyGallery = body.gallery as OrbitContent["gallery"] | undefined;
   const bodyFooterBottom = body.footerBottom as OrbitContent["footerBottom"] | undefined;
+  const bodyExternal = body.externalReviewLinks as OrbitContent["externalReviewLinks"] | undefined;
   writeOrbitContent({
     ...current,
     hero: (body.hero as typeof current.hero) || current.hero,
@@ -49,6 +51,9 @@ export async function PUT(request: Request) {
     footerBrand: (body.footerBrand as string) ?? current.footerBrand,
     footerText: (body.footerText as string) ?? current.footerText,
     footerBottom: bodyFooterBottom ? normalizeFooterBottom(bodyFooterBottom, current.footerBottom) : current.footerBottom,
+    externalReviewLinks: bodyExternal
+      ? { ...current.externalReviewLinks, ...bodyExternal }
+      : current.externalReviewLinks,
     phone: (body.phone as string) ?? current.phone,
     whatsapp: (body.whatsapp as string) ?? current.whatsapp,
     email: (body.email as string) ?? current.email,

@@ -1,4 +1,9 @@
-import { CATALOG_COMING_SOON_ALT, CATALOG_COMING_SOON_IMAGE } from "@/lib/catalog-images";
+import {
+  CATALOG_COMING_SOON_ALT,
+  CATALOG_COMING_SOON_IMAGE,
+  packageImagePath,
+  serviceImagePath,
+} from "@/lib/catalog-images";
 import { packages, site } from "@/lib/content";
 import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
 import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
@@ -175,6 +180,11 @@ export type OrbitFooterBottom = {
   legalLinks: OrbitFooterLegalLink[];
 };
 
+export type OrbitExternalReviewLinks = {
+  googleReviewsUrl: string;
+  tripadvisorUrl: string;
+};
+
 export type OrbitContent = {
   phone: string;
   whatsapp: string;
@@ -182,6 +192,7 @@ export type OrbitContent = {
   footerText: string;
   footerBrand: string;
   footerBottom: OrbitFooterBottom;
+  externalReviewLinks: OrbitExternalReviewLinks;
   socialLinks: OrbitSocialLink[];
   extraSocialLinks: OrbitExtraSocialLink[];
   hero: OrbitHero;
@@ -271,6 +282,22 @@ function normalizeExtraSocialLinks(list: OrbitExtraSocialLink[] | undefined): Or
       enabled: item.enabled !== false,
     }))
     .filter((item) => item.label);
+}
+
+function defaultExternalReviewLinks(): OrbitExternalReviewLinks {
+  return {
+    googleReviewsUrl: site.social.google || "",
+    tripadvisorUrl: site.social.tripadvisor || "",
+  };
+}
+
+function normalizeExternalReviewLinks(raw: Partial<OrbitExternalReviewLinks> | undefined): OrbitExternalReviewLinks {
+  const d = defaultExternalReviewLinks();
+  if (!raw) return d;
+  return {
+    googleReviewsUrl: raw.googleReviewsUrl?.trim() ?? d.googleReviewsUrl,
+    tripadvisorUrl: raw.tripadvisorUrl?.trim() ?? d.tripadvisorUrl,
+  };
 }
 
 function defaultFooterBottom(): OrbitFooterBottom {
@@ -521,19 +548,33 @@ function normalizeAboutPage(raw: Partial<OrbitAboutPage> | undefined): OrbitAbou
   };
 }
 
+function catalogImageForService(service: Service): { image: string; imageAlt: string } {
+  const custom = service.image?.trim();
+  if (custom && custom !== CATALOG_COMING_SOON_IMAGE && !custom.endsWith("coming-soon.webp")) {
+    return { image: custom, imageAlt: service.imageAlt || `${service.name} at Kaya Healing Spa` };
+  }
+  return {
+    image: serviceImagePath(service.slug),
+    imageAlt: service.imageAlt && service.imageAlt !== CATALOG_COMING_SOON_ALT ? service.imageAlt : `${service.name} at Kaya Healing Spa`,
+  };
+}
+
+function catalogImageForPackage(pkg: SpaPackage): { image: string; imageAlt: string } {
+  const custom = pkg.image?.trim();
+  if (custom && custom !== CATALOG_COMING_SOON_IMAGE && !custom.endsWith("coming-soon.webp")) {
+    return { image: custom, imageAlt: pkg.imageAlt || `${pkg.name} at Kaya Healing Spa` };
+  }
+  return {
+    image: packageImagePath(pkg.slug),
+    imageAlt: pkg.imageAlt && pkg.imageAlt !== CATALOG_COMING_SOON_ALT ? pkg.imageAlt : `${pkg.name} at Kaya Healing Spa`,
+  };
+}
+
 function applyMenuCatalogImages(content: OrbitContent): OrbitContent {
   return {
     ...content,
-    services: content.services.map((service) => ({
-      ...service,
-      image: CATALOG_COMING_SOON_IMAGE,
-      imageAlt: CATALOG_COMING_SOON_ALT,
-    })),
-    packages: content.packages.map((pkg) => ({
-      ...pkg,
-      image: CATALOG_COMING_SOON_IMAGE,
-      imageAlt: CATALOG_COMING_SOON_ALT,
-    })),
+    services: content.services.map((service) => ({ ...service, ...catalogImageForService(service) })),
+    packages: content.packages.map((pkg) => ({ ...pkg, ...catalogImageForPackage(pkg) })),
   };
 }
 
@@ -599,6 +640,7 @@ export function defaultOrbitContent(): OrbitContent {
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
     footerBrand: "Kaya Healing Spa",
     footerBottom: defaultFooterBottom(),
+    externalReviewLinks: defaultExternalReviewLinks(),
     socialLinks: defaultSocialLinks(),
     extraSocialLinks: [],
     hero: {
@@ -908,6 +950,7 @@ function loadOrbitContentFromDisk(): OrbitContent {
       packageCategories: merged.packageCategories?.length ? merged.packageCategories : defaults.packageCategories,
       footerBrand: merged.footerBrand || defaults.footerBrand,
       footerBottom: normalizeFooterBottom(merged.footerBottom, defaults.footerBottom),
+      externalReviewLinks: normalizeExternalReviewLinks(merged.externalReviewLinks),
       whatsapp: merged.whatsapp?.trim() || defaults.whatsapp,
       socialLinks: normalizeSocialLinks(merged.socialLinks),
       extraSocialLinks: normalizeExtraSocialLinks(merged.extraSocialLinks),
@@ -933,6 +976,7 @@ export function writeOrbitContent(content: OrbitContent) {
     socialLinks: normalizeSocialLinks(content.socialLinks),
     extraSocialLinks: normalizeExtraSocialLinks(content.extraSocialLinks),
     footerBottom: normalizeFooterBottom(content.footerBottom, defaultFooterBottom()),
+    externalReviewLinks: normalizeExternalReviewLinks(content.externalReviewLinks),
     gallery: sanitizeGalleryForStorage(content.gallery),
   };
   writeJsonFileAtomic(filePath, payload);

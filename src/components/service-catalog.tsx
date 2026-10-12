@@ -137,10 +137,10 @@ export function ServiceCatalog({
                       View details
                     </Link>
                     <Link
-                      href={`/contact?service=${service.slug}`}
+                      href={`/services/${service.slug}#book`}
                       className="text-xs font-bold tracking-[0.14em] text-[#F47B20] uppercase hover:text-[#e06d12]"
                     >
-                      Book now →
+                      Book this service →
                     </Link>
                   </div>
                 </div>

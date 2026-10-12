@@ -46,11 +46,14 @@ export const packagePhotoIds: Record<string, string> = {
   "full-day-escape": "photo-1519824145371-296894a0daa9",
 };
 
-export function serviceImagePath(_slug?: string) {
+/** Local catalog asset per slug; falls back when file is missing on disk. */
+export function serviceImagePath(slug?: string) {
+  if (slug) return `/catalog/services/${slug}.jpg`;
   return CATALOG_COMING_SOON_IMAGE;
 }
 
-export function packageImagePath(_slug?: string) {
+export function packageImagePath(slug?: string) {
+  if (slug) return `/catalog/packages/${slug}.jpg`;
   return CATALOG_COMING_SOON_IMAGE;
 }
 
