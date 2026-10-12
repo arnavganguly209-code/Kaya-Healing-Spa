@@ -1,5 +1,3 @@
-const iconClass = "h-5 w-5";
-
 export function resolveSocialIconUrl(src: string) {
   const path = src.trim();
   if (!path) return "";
@@ -9,7 +7,8 @@ export function resolveSocialIconUrl(src: string) {
   return path;
 }
 
-export function SocialIcon({ id, iconSrc }: { id: string; iconSrc?: string }) {
+export function SocialIcon({ id, iconSrc, large }: { id: string; iconSrc?: string; large?: boolean }) {
+  const iconClass = large ? "h-7 w-7" : "h-5 w-5";
   const custom = iconSrc?.trim();
   if (custom) {
     const src = resolveSocialIconUrl(custom);

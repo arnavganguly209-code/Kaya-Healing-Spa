@@ -10,14 +10,19 @@ import {
   AdminServicesEditor,
   type CatalogAdminSlice,
 } from "@/components/admin-catalog-sections";
+import { AdminHomeEditor, type AdminHomeSlice } from "@/components/admin-home-editor";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 type AdminData = {
   hero: OrbitContent["hero"];
+  therapies: OrbitContent["therapies"];
+  whyKaya: OrbitContent["whyKaya"];
+  homeAbout: OrbitContent["homeAbout"];
   footerBrand: string;
   footerText: string;
+  footerBottom: OrbitContent["footerBottom"];
   phone: string;
   whatsapp: string;
   email: string;
@@ -33,11 +38,11 @@ type AdminData = {
   homePage: OrbitContent["homePage"];
 };
 
-const allSections = ["Dashboard", "Hero", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Blog", "Inquiries", "Reviews", "Account"] as const;
+const allSections = ["Dashboard", "Home page", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Blog", "Inquiries", "Reviews", "Account"] as const;
 
 const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSectionFlags | null> = {
   Dashboard: null,
-  Hero: "hero",
+  "Home page": "home",
   Footer: "footer",
   Categories: "categories",
   Services: "services",
@@ -49,6 +54,16 @@ const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSecti
   Reviews: "reviews",
   Account: null,
 };
+
+function homeSlice(c: AdminData): AdminHomeSlice {
+  return {
+    hero: c.hero,
+    therapies: c.therapies,
+    whyKaya: c.whyKaya,
+    homeAbout: c.homeAbout,
+    homePage: c.homePage,
+  };
+}
 
 function catalogSlice(c: AdminData): CatalogAdminSlice {
   return {
@@ -148,7 +163,18 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
     publish(mergeCatalog(next));
   }
 
+  function publishHome(next: AdminHomeSlice) {
+    publish({ ...contentRef.current, ...next });
+  }
+
+  function setHome(next: AdminHomeSlice) {
+    const merged = { ...contentRef.current, ...next };
+    setContent(merged);
+    contentRef.current = merged;
+  }
+
   const catalog = catalogSlice(content);
+  const home = homeSlice(content);
 
   async function upload(file: File, apply: (path: string) => void) {
     const form = new FormData();
@@ -183,7 +209,6 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
   }
 
   const unread = inquiries.filter((i) => !i.read).length;
-  const hero = content.hero;
 
   return (
     <div className="min-h-[100svh] bg-gradient-to-b from-[#f8f4ee] to-[#fffdf9] text-[#171717]">
@@ -270,61 +295,28 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
             </>
           )}
 
-          {section === "Hero" && (
+          {section === "Home page" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Home hero image, titles, and the four feature boxes.</p>
-              {hero.slides.map((slide, index) => (
-                <div key={index} className="mt-6 rounded-2xl border border-[#efe8e0] p-4">
-                  <Field label="Slide image path" value={slide.src} onChange={(v) => {
-                    const slides = [...hero.slides];
-                    slides[index] = { ...slides[index], src: v };
-                    publish({ ...content, hero: { ...hero, slides, image: slides[0]?.src || hero.image } });
-                  }} />
-                  <MediaField label="Upload slide" src={slide.src} onUpload={(f) => upload(f, (path) => {
-                    const slides = [...hero.slides];
-                    slides[index] = { ...slides[index], src: path };
-                    publish({ ...content, hero: { ...hero, slides, image: slides[0]?.src || hero.image } });
-                  })} />
-                </div>
-              ))}
-              <Field label="Title (orange)" value={hero.titleOrange} onChange={(v) => setContent({ ...content, hero: { ...hero, titleOrange: v } })} />
-              <Field label="Title (dark)" value={hero.titleDark} onChange={(v) => setContent({ ...content, hero: { ...hero, titleDark: v } })} />
-              <Area label="Subtitle" value={hero.subtitle} onChange={(v) => setContent({ ...content, hero: { ...hero, subtitle: v } })} />
-              <p className="mt-6 font-semibold">Feature boxes</p>
-              {hero.features.map((f, i) => (
-                <div key={i} className="mt-3 rounded-xl border border-[#efe8e0] p-4">
-                  <Field label="Title" value={f.title} onChange={(v) => {
-                    const features = hero.features.map((x, j) => (j === i ? { ...x, title: v } : x));
-                    setContent({ ...content, hero: { ...hero, features } });
-                  }} />
-                  <Field label="Text" value={f.text} onChange={(v) => {
-                    const features = hero.features.map((x, j) => (j === i ? { ...x, text: v } : x));
-                    setContent({ ...content, hero: { ...hero, features } });
-                  }} />
-                </div>
-              ))}
-              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
-                {saving ? "Saving…" : "Save hero to live site"}
-              </button>
+              <h2 className="font-serif text-2xl">Home page</h2>
+              <AdminHomeEditor slice={home} setSlice={setHome} publish={publishHome} upload={upload} />
             </>
           )}
 
           {section === "Footer" && (
             <>
-              <p className="mb-4 rounded-xl border border-[#efe8e0] bg-[#fff7f0] px-4 py-3 text-sm text-[#6B6B6B]">
-                Copyright line, “Developed by” credit, and legal links at the bottom of the site are edited in <strong>Orbit → Footer</strong> only — not here.
-              </p>
               <Field label="Brand name" value={content.footerBrand} onChange={(v) => setContent({ ...content, footerBrand: v })} />
               <Area label="Footer description" value={content.footerText} onChange={(v) => setContent({ ...content, footerText: v })} />
               <Field label="Phone" value={content.phone} onChange={(v) => setContent({ ...content, phone: v })} />
               <Field label="WhatsApp" value={content.whatsapp} onChange={(v) => setContent({ ...content, whatsapp: v })} />
               <Field label="Email" value={content.email} onChange={(v) => setContent({ ...content, email: v })} />
               <p className="mt-6 font-semibold">Social & review icons</p>
-              <p className="text-sm text-[#6B6B6B]">Upload a custom icon per platform or add extra footer links.</p>
+              <p className="text-sm text-[#6B6B6B]">
+                Paste full https links. <strong>Google</strong> URL also powers the contact page “Google reviews” line. Upload a clear PNG/SVG (square) if built-in icons look soft.
+              </p>
               {content.socialLinks.map((link, index) => (
                 <div key={link.id} className="mt-3 rounded-xl border border-[#efe8e0] p-4">
-                  <div className="flex items-center gap-3">
-                    <SocialIcon id={link.id} iconSrc={link.iconSrc} />
+                  <div className="flex items-center gap-3 rounded-lg bg-[#1a1512] p-3">
+                    <SocialIcon id={link.id} iconSrc={link.iconSrc} large />
                     <p className="text-sm font-semibold">{socialPlatformLabels[link.id]}</p>
                   </div>
                   <Field label="URL" value={link.url} onChange={(v) => {
@@ -370,6 +362,24 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                   })}>
                     Remove
                   </button>
+                </div>
+              ))}
+              <p className="mt-10 text-sm font-semibold">Bottom bar (copyright · developer · legal)</p>
+              <Field label="Copyright name" value={content.footerBottom.copyrightName} onChange={(v) => setContent({ ...content, footerBottom: { ...content.footerBottom, copyrightName: v } })} />
+              <Field label="Rights line" value={content.footerBottom.rightsLine} onChange={(v) => setContent({ ...content, footerBottom: { ...content.footerBottom, rightsLine: v } })} />
+              <Field label="Developer lead-in" value={content.footerBottom.developerLead} onChange={(v) => setContent({ ...content, footerBottom: { ...content.footerBottom, developerLead: v } })} />
+              <Field label="Developer name (golden link)" value={content.footerBottom.developerName} onChange={(v) => setContent({ ...content, footerBottom: { ...content.footerBottom, developerName: v } })} />
+              <Field label="Developer URL" value={content.footerBottom.developerUrl} onChange={(v) => setContent({ ...content, footerBottom: { ...content.footerBottom, developerUrl: v } })} />
+              {content.footerBottom.legalLinks.map((link, index) => (
+                <div key={index} className="mt-3 rounded-xl border p-4">
+                  <Field label="Legal link label" value={link.label} onChange={(v) => {
+                    const legalLinks = content.footerBottom.legalLinks.map((item, i) => (i === index ? { ...item, label: v } : item));
+                    setContent({ ...content, footerBottom: { ...content.footerBottom, legalLinks } });
+                  }} />
+                  <Field label="Path or URL" value={link.href} onChange={(v) => {
+                    const legalLinks = content.footerBottom.legalLinks.map((item, i) => (i === index ? { ...item, href: v } : item));
+                    setContent({ ...content, footerBottom: { ...content.footerBottom, legalLinks } });
+                  }} />
                 </div>
               ))}
               <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>

@@ -12,8 +12,12 @@ export default async function AdminPage() {
     <AdminPanel
       initial={{
         hero: c.hero,
+        therapies: c.therapies,
+        whyKaya: c.whyKaya,
+        homeAbout: c.homeAbout,
         footerBrand: c.footerBrand,
         footerText: c.footerText,
+        footerBottom: c.footerBottom,
         phone: c.phone,
         whatsapp: c.whatsapp,
         email: c.email,

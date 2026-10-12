@@ -1087,7 +1087,8 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <p className="text-sm text-[#6B6B6B]">Turn off sections staff should not edit in /admin. Dashboard and Account stay available.</p>
               {(
                 [
-                  ["hero", "Hero"],
+                  ["hero", "Hero (legacy)"],
+                  ["home", "Home page"],
                   ["footer", "Footer"],
                   ["categories", "Categories"],
                   ["services", "Services"],

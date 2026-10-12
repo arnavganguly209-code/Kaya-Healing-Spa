@@ -1,5 +1,5 @@
 import { isAdminAuthed } from "@/lib/admin-auth";
-import { readOrbitContent, writeOrbitContent, type OrbitContent } from "@/lib/orbit-store";
+import { readOrbitContent, writeOrbitContent, normalizeFooterBottom, type OrbitContent } from "@/lib/orbit-store";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
@@ -9,8 +9,12 @@ export async function GET() {
   return NextResponse.json({
     data: {
       hero: c.hero,
+      therapies: c.therapies,
+      whyKaya: c.whyKaya,
+      homeAbout: c.homeAbout,
       footerBrand: c.footerBrand,
       footerText: c.footerText,
+      footerBottom: c.footerBottom,
       phone: c.phone,
       whatsapp: c.whatsapp,
       email: c.email,
@@ -35,11 +39,16 @@ export async function PUT(request: Request) {
   const current = readOrbitContent();
   const bodyHome = body.homePage as typeof current.homePage | undefined;
   const bodyGallery = body.gallery as OrbitContent["gallery"] | undefined;
+  const bodyFooterBottom = body.footerBottom as OrbitContent["footerBottom"] | undefined;
   writeOrbitContent({
     ...current,
     hero: (body.hero as typeof current.hero) || current.hero,
+    therapies: (body.therapies as typeof current.therapies) || current.therapies,
+    whyKaya: (body.whyKaya as typeof current.whyKaya) || current.whyKaya,
+    homeAbout: (body.homeAbout as typeof current.homeAbout) || current.homeAbout,
     footerBrand: (body.footerBrand as string) ?? current.footerBrand,
     footerText: (body.footerText as string) ?? current.footerText,
+    footerBottom: bodyFooterBottom ? normalizeFooterBottom(bodyFooterBottom, current.footerBottom) : current.footerBottom,
     phone: (body.phone as string) ?? current.phone,
     whatsapp: (body.whatsapp as string) ?? current.whatsapp,
     email: (body.email as string) ?? current.email,

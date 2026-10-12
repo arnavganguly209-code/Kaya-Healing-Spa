@@ -127,6 +127,7 @@ export type OrbitHomePage = {
 
 export type OrbitAdminSectionFlags = {
   hero: boolean;
+  home: boolean;
   footer: boolean;
   services: boolean;
   packages: boolean;
@@ -315,6 +316,7 @@ function normalizeFooterBottomInternal(raw: Partial<OrbitFooterBottom> | undefin
 function defaultAdminSectionFlags(): OrbitAdminSectionFlags {
   return {
     hero: true,
+    home: true,
     footer: true,
     services: true,
     packages: true,
@@ -427,6 +429,7 @@ function normalizeAdminSectionFlags(raw: Partial<OrbitAdminSectionFlags> | undef
   if (!raw) return d;
   return {
     hero: raw.hero !== false,
+    home: raw.home !== false && raw.hero !== false,
     footer: raw.footer !== false,
     services: raw.services !== false,
     packages: raw.packages !== false,

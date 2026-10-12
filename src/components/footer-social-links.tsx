@@ -20,8 +20,8 @@ function IconButton({
   dimmed?: boolean;
 }) {
   const className =
-    "inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/10 transition hover:border-[#F47B20]/60 hover:bg-white/15";
-  const inner = <SocialIcon id={id} iconSrc={iconSrc} />;
+    "inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-white/20 shadow-sm transition hover:border-[#F47B20]/70 hover:bg-white/30";
+  const inner = <SocialIcon id={id} iconSrc={iconSrc} large />;
   if (href && !dimmed) {
     return (
       <a href={href} target="_blank" rel="noreferrer noopener" aria-label={label} title={label} className={className}>

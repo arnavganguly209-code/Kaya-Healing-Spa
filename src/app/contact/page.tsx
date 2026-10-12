@@ -55,7 +55,10 @@ export default async function ContactPage({
           }}
         />
         <div className="space-y-8">
-          <CompanyContactCard phone={orbit.phone || site.phone} />
+          <CompanyContactCard
+            phone={orbit.phone || site.phone}
+            googleReviewsUrl={orbit.socialLinks.find((l) => l.id === "google")?.url || site.social.google}
+          />
           <div className="rounded-2xl border border-[#e6dfd4] bg-white p-6">
             <h3 className="font-serif text-2xl">Send a message</h3>
             <p className="prose-quiet mt-2 text-sm">Questions that are not a booking request.</p>

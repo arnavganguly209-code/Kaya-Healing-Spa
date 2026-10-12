@@ -1,9 +1,11 @@
 import { site } from "@/lib/content";
 import Link from "next/link";
 
-export function CompanyContactCard({ phone }: { phone?: string }) {
+export function CompanyContactCard({ phone, googleReviewsUrl }: { phone?: string; googleReviewsUrl?: string }) {
   const tel = phone || site.phone;
   const href = tel.startsWith("+") ? tel.replace(/\s/g, "") : site.phoneTel.replace(/\s/g, "");
+  const reviewsUrl = (googleReviewsUrl || site.social.google).trim();
+  const reviewsLinkReady = reviewsUrl.startsWith("http://") || reviewsUrl.startsWith("https://");
   return (
     <aside className="rounded-2xl border border-[#e6dfd4] bg-[#f6f1e8] p-8">
       <p className="text-[11px] font-semibold tracking-[0.22em] text-[#F47B20] uppercase">Visit us</p>
@@ -15,8 +17,21 @@ export function CompanyContactCard({ phone }: { phone?: string }) {
           {tel}
         </a>
       </p>
-      <p className="mt-2 text-sm text-[#2f8f45]">
-        {site.googleRating} ★ · {site.googleReviewCount.toLocaleString()} Google reviews
+      <p className="mt-2 text-sm">
+        {reviewsLinkReady ? (
+          <a
+            href={reviewsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-[#2f8f45] underline decoration-[#2f8f45]/40 underline-offset-2 hover:text-[#1e6b32]"
+          >
+            {site.googleRating} ★ · {site.googleReviewCount.toLocaleString()} Google reviews
+          </a>
+        ) : (
+          <span className="text-[#2f8f45]">
+            {site.googleRating} ★ · {site.googleReviewCount.toLocaleString()} Google reviews
+          </span>
+        )}
       </p>
       <ul className="mt-6 space-y-2 text-sm">
         {site.hours.map((row) => (
