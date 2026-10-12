@@ -48,7 +48,7 @@ export function bookingPdfSecret(): string {
   loadRuntimeEnvFiles();
   const explicit = runtimeEnv("BOOKING_PDF_SECRET");
   if (explicit) return explicit;
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== "phase-production-build") {
     throw new Error("BOOKING_PDF_SECRET is required in production");
   }
   const fallback = runtimeEnv("ORBIT_PASSKEY");

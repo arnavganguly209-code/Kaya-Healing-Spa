@@ -18,4 +18,6 @@ jobs:
       - run: npm ci --include=dev
       - run: npm test
       - run: npm run build
+        env:
+          BOOKING_PDF_SECRET: ci-build-placeholder-not-used-for-mail
       - run: node scripts/service-slug-local-http-selftest.mjs
