@@ -61,8 +61,8 @@ export function HomePage() {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0806]/70 via-[#0a0806]/20 to-transparent lg:from-[#0a0806]/62 lg:via-[#0a0806]/28 lg:to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-[#0a0806]/88 via-[#0a0806]/55 to-transparent md:h-[38%] md:from-[#0a0806]/50 md:via-[#0a0806]/20 lg:hidden" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0806]/55 via-transparent to-transparent lg:from-[#0a0806]/62 lg:via-[#0a0806]/28 lg:to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-[32%] bg-gradient-to-t from-[#0a0806]/55 to-transparent md:h-[38%] md:from-[#0a0806]/50 lg:hidden" />
           <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#fafafa] to-transparent md:h-28 md:via-[#fafafa]/80" />
         </div>
 
@@ -70,13 +70,13 @@ export function HomePage() {
           <h1 className="sr-only">
             {hero.titleOrange} {hero.titleDark} — {site.name}
           </h1>
-          <div className="hero-copy-panel relative z-20 mb-3 max-w-xl text-white sm:mb-6">
-            {hero.eyebrow ? <p className="text-[11px] font-semibold tracking-[0.22em] text-white/90 uppercase drop-shadow-[0_1px_8px_rgba(0,0,0,0.65)]">{hero.eyebrow}</p> : null}
-            <p className="display mt-2 text-[1.85rem] leading-[1.15] text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] sm:text-4xl md:text-5xl">
+          <div className="hero-copy-panel relative z-20 mb-0 max-w-xl text-white md:mb-6">
+            {hero.eyebrow ? <p className="hidden text-[11px] font-semibold tracking-[0.22em] text-white/90 uppercase drop-shadow-[0_1px_8px_rgba(0,0,0,0.65)] md:block">{hero.eyebrow}</p> : null}
+            <p className="display mt-2 hidden text-[1.85rem] leading-[1.15] text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] md:block md:text-5xl">
               <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
             </p>
-            {hero.subtitle ? <p className="mt-2 text-sm leading-relaxed text-white/95 drop-shadow-[0_1px_10px_rgba(0,0,0,0.65)] sm:text-base">{hero.subtitle}</p> : null}
-            <div className="mt-4 flex w-full flex-col gap-2 sm:max-w-md sm:flex-row">
+            {hero.subtitle ? <p className="mt-2 hidden text-sm leading-relaxed text-white/95 drop-shadow-[0_1px_10px_rgba(0,0,0,0.65)] md:block md:text-base">{hero.subtitle}</p> : null}
+            <div className="flex w-full flex-col gap-2.5 md:mt-4 md:max-w-md md:flex-row">
               <Link href="/contact" className="btn-primary rounded-full">
                 {hero.book || "Book Appointment"}
               </Link>
@@ -85,7 +85,7 @@ export function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="relative z-20 w-full min-w-0 shrink-0">
+          <div className="relative z-20 hidden w-full min-w-0 shrink-0 md:block">
             <div className="hero-feature-glass relative z-20 w-full min-w-0 shrink-0">
             <ul className="grid grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
