@@ -61,25 +61,26 @@ export function HomePage() {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,8,6,0.62)_0%,rgba(10,8,6,0.28)_22%,rgba(10,8,6,0.08)_45%,transparent_62%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#fafafa] via-[#fafafa]/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0806]/70 via-[#0a0806]/20 to-transparent lg:from-[#0a0806]/62 lg:via-[#0a0806]/28 lg:to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-[#0a0806]/88 via-[#0a0806]/55 to-transparent md:h-[38%] md:from-[#0a0806]/50 md:via-[#0a0806]/20 lg:hidden" />
+          <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#fafafa] to-transparent md:h-28 md:via-[#fafafa]/80" />
         </div>
 
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1440px] flex-col justify-end px-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] pt-[calc(64px+env(safe-area-inset-top,0px))] sm:px-8 sm:pt-[68px] md:px-10 lg:px-12 lg:pt-[108px] lg:pb-4 xl:px-14">
+        <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1440px] flex-col justify-end px-4 pb-[max(5.75rem,calc(1.25rem+env(safe-area-inset-bottom,0px)))] pt-[calc(64px+env(safe-area-inset-top,0px))] sm:px-8 sm:pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] sm:pt-[68px] md:px-10 lg:h-full lg:px-12 lg:pt-[108px] lg:pb-4 xl:px-14">
           <h1 className="sr-only">
             {hero.titleOrange} {hero.titleDark} — {site.name}
           </h1>
-          <div className="relative z-20 mb-4 max-w-xl text-white sm:mb-6">
-            {hero.eyebrow ? <p className="text-[11px] font-semibold tracking-[0.22em] text-white/80 uppercase">{hero.eyebrow}</p> : null}
-            <p className="display mt-2 text-[1.85rem] leading-tight text-white sm:text-4xl md:text-5xl">
+          <div className="hero-copy-panel relative z-20 mb-3 max-w-xl text-white sm:mb-6">
+            {hero.eyebrow ? <p className="text-[11px] font-semibold tracking-[0.22em] text-white/90 uppercase drop-shadow-[0_1px_8px_rgba(0,0,0,0.65)]">{hero.eyebrow}</p> : null}
+            <p className="display mt-2 text-[1.85rem] leading-[1.15] text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] sm:text-4xl md:text-5xl">
               <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
             </p>
-            {hero.subtitle ? <p className="mt-2 text-sm leading-relaxed text-white/85 sm:text-base">{hero.subtitle}</p> : null}
+            {hero.subtitle ? <p className="mt-2 text-sm leading-relaxed text-white/95 drop-shadow-[0_1px_10px_rgba(0,0,0,0.65)] sm:text-base">{hero.subtitle}</p> : null}
             <div className="mt-4 flex w-full flex-col gap-2 sm:max-w-md sm:flex-row">
               <Link href="/contact" className="btn-primary rounded-full">
                 {hero.book || "Book Appointment"}
               </Link>
-              <Link href="/services" className="btn-ghost rounded-full">
+              <Link href="/services" className="hero-explore btn-ghost rounded-full">
                 {hero.explore || "Explore Treatments"}
               </Link>
             </div>
@@ -92,12 +93,12 @@ export function HomePage() {
                 return (
                   <li
                     key={feature.title}
-                    className="flex min-w-0 items-center gap-2 px-2.5 py-2.5 sm:gap-4 sm:px-6 sm:py-5 [&:nth-child(n+3)]:border-t [&:nth-child(n+3)]:border-[#f47b20]/10 lg:[&:nth-child(n+3)]:border-t-0 lg:[&:not(:first-child)]:border-l lg:[&:not(:first-child)]:border-[#f47b20]/15"
+                    className="flex min-w-0 items-start gap-2 px-2.5 py-2.5 sm:items-center sm:gap-4 sm:px-6 sm:py-5 [&:nth-child(n+3)]:border-t [&:nth-child(n+3)]:border-[#f47b20]/10 lg:[&:nth-child(n+3)]:border-t-0 lg:[&:not(:first-child)]:border-l lg:[&:not(:first-child)]:border-[#f47b20]/15"
                   >
-                    <Icon className="shrink-0 text-[#F47B20]" size={22} strokeWidth={1.3} />
+                    <Icon className="mt-0.5 shrink-0 text-[#F47B20] sm:mt-0" size={20} strokeWidth={1.3} />
                     <span className="min-w-0">
-                      <span className="block text-[13px] font-bold leading-snug text-[#1a1512] sm:text-[15px]">{feature.title}</span>
-                      <span className="block text-[11px] font-medium leading-snug text-[#5c534a] sm:text-[13px]">{feature.text}</span>
+                      <span className="block text-[12px] font-bold leading-tight text-[#1a1512] sm:text-[15px] sm:leading-snug">{feature.title}</span>
+                      <span className="mt-0.5 block text-[10px] font-medium leading-snug text-[#5c534a] sm:text-[13px]">{feature.text}</span>
                     </span>
                   </li>
                 );

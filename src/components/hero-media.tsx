@@ -35,7 +35,7 @@ function SlideVisual({
       <video
         key={slide.src}
         src={slide.src}
-        className={`absolute inset-0 h-full w-full object-cover ${mirror}`}
+        className={`hero-media-visual absolute inset-0 h-full w-full object-cover ${mirror}`}
         style={{ objectPosition }}
         autoPlay
         muted
@@ -52,7 +52,7 @@ function SlideVisual({
       fill
       priority={priority}
       unoptimized={fullQuality}
-      className={`object-cover contrast-[1.04] saturate-[1.06] ${mirror}`}
+      className={`hero-media-visual object-cover contrast-[1.04] saturate-[1.06] ${mirror}`}
       style={{ objectPosition }}
       sizes={sizes}
     />
