@@ -247,3 +247,47 @@ textarea:focus-visible {
 .img-zoom:hover img {
   transform: scale(1.05);
 }
+
+@keyframes orbit-gold-shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.orbit-gold-link {
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background-image: linear-gradient(
+    110deg,
+    #b8892b 0%,
+    #f5e6a8 22%,
+    #e8c547 40%,
+    #fff6d0 50%,
+    #e8c547 60%,
+    #f5e6a8 78%,
+    #b8892b 100%
+  );
+  background-size: 220% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: orbit-gold-shimmer 3.6s linear infinite;
+  text-decoration: none;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.orbit-gold-link:hover {
+  filter: brightness(1.18);
+  transform: translateY(-1px);
+}
+
+.orbit-gold-link:focus-visible {
+  outline: 2px solid #e8c547;
+  outline-offset: 4px;
+  border-radius: 4px;
+}

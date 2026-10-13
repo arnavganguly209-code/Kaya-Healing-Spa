@@ -39,7 +39,7 @@ export function SiteFooter() {
           <p className="mt-5 font-serif text-2xl text-white">{brand}</p>
           <p className="mt-2 text-xs tracking-[0.22em] uppercase text-[#F47B20]">{site.tagline}</p>
           <p className="mt-5 max-w-xs text-sm leading-7 text-white/65">{orbit.footerText}</p>
-          <p className="mt-4 max-w-xs text-sm text-white/55">{site.addressLine}</p>
+          <p className="mt-4 max-w-xs text-sm text-white/55">{orbit.addressLine || site.addressLine}</p>
         </div>
         <div>
           <p className="text-[11px] font-semibold tracking-[0.24em] text-[#F47B20] uppercase">Explore</p>

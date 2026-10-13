@@ -60,6 +60,8 @@ export async function PUT(request: Request) {
     phone: body.phone ?? current.phone,
     whatsapp: body.whatsapp?.trim() ?? current.whatsapp,
     email: body.email ?? current.email,
+    addressLine: body.addressLine?.trim() || current.addressLine,
+    mapEmbedQuery: body.mapEmbedQuery?.trim() || current.mapEmbedQuery,
     footerText: body.footerText ?? current.footerText,
     footerBottom: body.footerBottom
       ? normalizeFooterBottom(body.footerBottom, current.footerBottom)

@@ -84,6 +84,17 @@ export function createBooking(
   });
 }
 
+export function deleteBooking(id: string) {
+  return withDataFileLock("booking-data", () => {
+    const list = readBookings();
+    const index = list.findIndex((b) => b.id === id);
+    if (index < 0) return null;
+    const [removed] = list.splice(index, 1);
+    writeBookings(list);
+    return removed;
+  });
+}
+
 export function updateBookingStatus(id: string, status: BookingStatus, note?: string) {
   return withDataFileLock("booking-data", () => {
   const list = readBookings();

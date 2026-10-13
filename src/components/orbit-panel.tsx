@@ -1,6 +1,10 @@
 "use client";
 
+import { AboutPageFields } from "@/components/about-page-fields";
+import { ContactPageFields } from "@/components/contact-page-fields";
 import type { OrbitContent, OrbitPageCovers } from "@/lib/orbit-store";
+import { displayBookingNumber } from "@/lib/booking-number";
+import type { SpaBooking } from "@/lib/booking-types";
 import { SERVICES_MENU_VERSION } from "@/lib/services-menu-version";
 import { defaultServiceCategories, defaultServices } from "@/lib/default-services";
 import { site } from "@/lib/content";
@@ -9,7 +13,7 @@ import { CategoryManager } from "@/components/category-manager";
 import { GalleryCategoryBank } from "@/components/gallery-category-bank";
 import { useEffect, useRef, useState } from "react";
 
-const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home page", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Admin portal", "Footer"] as const;
+const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home page", "Home about", "About page", "Contact page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Bookings", "Admin portal", "Footer"] as const;
 
 type MediaItem = { path: string; name: string; kind: "image" | "video" | "pdf"; size: number };
 
@@ -22,7 +26,8 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   const [library, setLibrary] = useState<MediaItem[]>([]);
   const [picker, setPicker] = useState<((path: string, kind: "image" | "video") => void) | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-  const [adminLogin, setAdminLogin] = useState({ username: "kaya", password: "" });
+  const [adminLogin, setAdminLogin] = useState({ username: "kaya", password: "", password2: "" });
+  const [orbitBookings, setOrbitBookings] = useState<SpaBooking[]>([]);
   const contentRef = useRef(content);
   contentRef.current = content;
 
@@ -31,6 +36,13 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   }, []);
 
   useEffect(() => {
+    if (section === "Bookings") {
+      void fetch("/api/orbit/bookings", { credentials: "same-origin" })
+        .then((r) => r.json().then((body) => ({ ok: r.ok, body })))
+        .then(({ ok, body }) => {
+          if (ok) setOrbitBookings(body.data || []);
+        });
+    }
     if (section !== "Admin portal") return;
     void fetch("/api/admin/credentials", { credentials: "same-origin" })
       .then((r) => r.json().then((body) => ({ ok: r.ok, body })))
@@ -700,70 +712,52 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "About page" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Story, owner, and partners on /about. The top orange banner is edited under Page covers → About page.</p>
-              <Field label="Company tagline" value={content.aboutPage.companyTagline} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, companyTagline: value } })} />
-              <Field label="Google rating" value={String(content.aboutPage.googleRating)} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, googleRating: Number(value) || 0 } })} />
-              <Field label="Google review count" value={String(content.aboutPage.googleReviewCount)} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, googleReviewCount: Number(value) || 0 } })} />
-              {content.aboutPage.story.map((paragraph, index) => (
-                <Area
-                  key={index}
-                  label={`Story paragraph ${index + 1}`}
-                  value={paragraph}
-                  onChange={(value) => {
-                    const story = [...content.aboutPage.story];
-                    story[index] = value;
-                    setContent({ ...content, aboutPage: { ...content.aboutPage, story } });
-                  }}
-                />
-              ))}
-              <button
-                type="button"
-                className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
-                onClick={() => setContent({ ...content, aboutPage: { ...content.aboutPage, story: [...content.aboutPage.story, ""] } })}
-              >
-                Add story paragraph
-              </button>
-              <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
-                <p className="text-sm font-semibold">Owner / director</p>
-                <Field label="Name" value={content.aboutPage.owner.name} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, name: value } } })} />
-                <Field label="Role" value={content.aboutPage.owner.role} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, role: value } } })} />
-                <Field label="Experience" value={content.aboutPage.owner.experience} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, experience: value } } })} />
-                <Area label="Description" value={content.aboutPage.owner.description} onChange={(value) => setContent({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, description: value } } })} />
-                <MediaField
-                  label="Photo"
-                  src={content.aboutPage.owner.photo}
-                  onUpload={(file) => upload(file, (photo: string) => publish({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, photo } } }))}
-                  onLibrary={() => setPicker((photo: string) => publish({ ...content, aboutPage: { ...content.aboutPage, owner: { ...content.aboutPage.owner, photo } } }))}
-                />
-              </div>
-              {content.aboutPage.logos.map((logo, index) => (
-                <div key={index} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
-                  <p className="text-sm font-semibold">Logo / partner {index + 1}</p>
-                  <Field label="Name" value={logo.name} onChange={(value) => {
-                    const logos = content.aboutPage.logos.map((item, i) => (i === index ? { ...item, name: value } : item));
-                    setContent({ ...content, aboutPage: { ...content.aboutPage, logos } });
-                  }} />
-                  <Area label="Description" value={logo.description} onChange={(value) => {
-                    const logos = content.aboutPage.logos.map((item, i) => (i === index ? { ...item, description: value } : item));
-                    setContent({ ...content, aboutPage: { ...content.aboutPage, logos } });
-                  }} />
-                  <MediaField
-                    label="Image"
-                    src={logo.image}
-                    onUpload={(file) => upload(file, (image: string) => {
-                      const logos = content.aboutPage.logos.map((item, i) => (i === index ? { ...item, image } : item));
-                      publish({ ...content, aboutPage: { ...content.aboutPage, logos } });
-                    })}
-                    onLibrary={() => setPicker((image: string) => {
-                      const logos = content.aboutPage.logos.map((item, i) => (i === index ? { ...item, image } : item));
-                      publish({ ...content, aboutPage: { ...content.aboutPage, logos } });
-                    })}
-                  />
-                </div>
-              ))}
-              <button type="button" className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm" onClick={() => setContent({ ...content, aboutPage: { ...content.aboutPage, logos: [...content.aboutPage.logos, { name: "Partner", description: "", image: "/brand/kaya-logo-hd.webp", imageAlt: "" }] } })}>
-                Add logo
-              </button>
+              <p className="text-sm text-[#6B6B6B]">Full /about text and images. Upload replaces the photo shown on the live page.</p>
+              <AboutPageFields
+                about={content.aboutPage}
+                cover={content.pageCovers.about}
+                onAbout={(aboutPage) => setContent({ ...content, aboutPage })}
+                onCover={(about) => setContent({ ...content, pageCovers: { ...content.pageCovers, about } })}
+                onUpload={(file, apply) => upload(file, apply)}
+              />
+            </>
+          )}
+          {section === "Contact page" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">Contact banner, address, map, Google, and TripAdvisor. Same fields also appear in Footer.</p>
+              <ContactPageFields
+                cover={content.pageCovers.contact}
+                location={{
+                  phone: content.phone,
+                  whatsapp: content.whatsapp,
+                  email: content.email,
+                  addressLine: content.addressLine,
+                  mapEmbedQuery: content.mapEmbedQuery,
+                  googleReviewsUrl: content.externalReviewLinks.googleReviewsUrl,
+                  tripadvisorUrl: content.externalReviewLinks.tripadvisorUrl,
+                }}
+                onCover={(contact) => setContent({ ...content, pageCovers: { ...content.pageCovers, contact } })}
+                onLocation={(location) =>
+                  setContent({
+                    ...content,
+                    phone: location.phone,
+                    whatsapp: location.whatsapp,
+                    email: location.email,
+                    addressLine: location.addressLine,
+                    mapEmbedQuery: location.mapEmbedQuery,
+                    externalReviewLinks: {
+                      ...content.externalReviewLinks,
+                      googleReviewsUrl: location.googleReviewsUrl,
+                      tripadvisorUrl: location.tripadvisorUrl,
+                    },
+                    socialLinks: content.socialLinks.map((link) => {
+                      if (link.id === "google") return { ...link, url: location.googleReviewsUrl || link.url };
+                      if (link.id === "tripadvisor") return { ...link, url: location.tripadvisorUrl || link.url };
+                      return link;
+                    }),
+                  })
+                }
+              />
             </>
           )}
           {section === "Therapists" && (
@@ -1041,6 +1035,46 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               ))}
             </>
           )}
+          {section === "Bookings" && (
+            <>
+              <p className="text-sm text-[#6B6B6B]">
+                Remove a booking only here in Orbit. Staff in /admin can confirm and complete requests but cannot delete them.
+              </p>
+              <ul className="mt-6 space-y-3">
+                {orbitBookings.map((b) => (
+                  <li key={b.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#efe8e0] bg-white p-4 text-sm">
+                    <div>
+                      <p className="font-semibold">{displayBookingNumber(b)} · {b.name}</p>
+                      <p className="text-[#6B6B6B]">{b.appointmentDate} {b.appointmentTime} · {b.serviceName || b.packageName || "Visit"} · {b.status}</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="rounded-full border border-red-200 px-4 py-2 text-xs font-semibold text-red-700"
+                      onClick={async () => {
+                        if (!window.confirm(`Remove ${displayBookingNumber(b)} permanently?`)) return;
+                        const res = await fetch("/api/orbit/bookings", {
+                          method: "DELETE",
+                          credentials: "same-origin",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ id: b.id }),
+                        });
+                        if (!res.ok) {
+                          const body = await res.json().catch(() => ({}));
+                          setError(body.message || "Could not remove booking.");
+                          return;
+                        }
+                        setOrbitBookings((list) => list.filter((row) => row.id !== b.id));
+                        setMessage("Booking removed.");
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+                {!orbitBookings.length && <p className="text-sm text-[#6B6B6B]">No bookings yet.</p>}
+              </ul>
+            </>
+          )}
           {section === "Admin portal" && (
             <>
               <p className="text-sm text-[#6B6B6B]">
@@ -1057,13 +1091,24 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <Field
                 label="New admin password (leave blank to keep current)"
                 value={adminLogin.password}
+                type="password"
                 onChange={(value) => setAdminLogin({ ...adminLogin, password: value })}
+              />
+              <Field
+                label="Confirm new password"
+                value={adminLogin.password2}
+                type="password"
+                onChange={(value) => setAdminLogin({ ...adminLogin, password2: value })}
               />
               <button
                 type="button"
                 className="mt-4 rounded-full bg-[#171717] px-5 py-2.5 text-sm font-medium text-white"
                 onClick={async () => {
                   setError("");
+                  if (adminLogin.password && adminLogin.password !== adminLogin.password2) {
+                    setError("Passwords do not match.");
+                    return;
+                  }
                   const response = await fetch("/api/admin/credentials", {
                     method: "PUT",
                     credentials: "same-origin",
@@ -1079,7 +1124,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                     return;
                   }
                   setMessage("Admin login updated.");
-                  setAdminLogin((prev) => ({ ...prev, password: "" }));
+                  setAdminLogin((prev) => ({ ...prev, password: "", password2: "" }));
                 }}
               >
                 Save admin login
@@ -1090,6 +1135,8 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 [
                   ["hero", "Hero (legacy)"],
                   ["home", "Home page"],
+                  ["about", "About page"],
+                  ["contact", "Contact page"],
                   ["footer", "Footer"],
                   ["categories", "Categories"],
                   ["services", "Services"],
@@ -1128,6 +1175,8 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               />
               <p className="text-xs text-[#6B6B6B]">Used for the floating WhatsApp button and mobile menu. Digits only, e.g. 9803038823.</p>
               <Field label="Email" value={content.email} onChange={(value) => setContent({ ...content, email: value })} />
+              <Area label="Address" value={content.addressLine} onChange={(value) => setContent({ ...content, addressLine: value })} />
+              <Area label="Map location (Google Maps URL or place name)" value={content.mapEmbedQuery} onChange={(value) => setContent({ ...content, mapEmbedQuery: value })} />
               <Area label="Footer description" value={content.footerText} onChange={(value) => setContent({ ...content, footerText: value })} />
               <p className="mt-6 text-sm font-semibold">Social & review icons (footer)</p>
               <p className="text-sm text-[#6B6B6B]">
@@ -1446,11 +1495,11 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   }
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function Field({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (value: string) => void; type?: string }) {
   return (
     <label className="mt-3 block text-sm">
       {label}
-      <input value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full rounded-xl border border-[#efe8e0] bg-white px-3 py-3" />
+      <input type={type} value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full rounded-xl border border-[#efe8e0] bg-white px-3 py-3" />
     </label>
   );
 }

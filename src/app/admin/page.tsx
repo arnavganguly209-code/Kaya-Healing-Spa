@@ -35,6 +35,10 @@ export default async function AdminPage() {
         servicesMenuPdf: c.servicesMenuPdf || "",
         packagesMenuPdf: c.packagesMenuPdf || "",
         brandLogo: c.brandLogo || "",
+        aboutPage: c.aboutPage,
+        pageCovers: c.pageCovers,
+        addressLine: c.addressLine || "",
+        mapEmbedQuery: c.mapEmbedQuery || "",
       }}
     />
   );

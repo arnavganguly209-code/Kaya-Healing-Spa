@@ -14,17 +14,8 @@ export const metadata: Metadata = {
   openGraph: { title: `About ${site.name}`, description: "Wellness with intention in Kathmandu." },
 };
 
-const values = [
-  ["Care", "Guests are greeted as people with a day behind them, not as a timetable."],
-  ["Quality", "Treatments are simple, skilled, and finished properly."],
-  ["Calm", "Rooms, voices, and pacing stay low."],
-  ["Authenticity", "Ayurvedic and body rituals are offered plainly, without costume."],
-  ["Professionalism", "Draping, hygiene, and timekeeping are part of the craft."],
-];
-
 function pageImage(src: string | undefined) {
   if (!src?.trim()) return CATALOG_COMING_SOON_IMAGE;
-  if (src.startsWith("http://") || src.startsWith("https://")) return CATALOG_COMING_SOON_IMAGE;
   return src;
 }
 
@@ -32,8 +23,13 @@ export default function AboutPage() {
   const orbit = readOrbitContent();
   const about = orbit.aboutPage;
   const storyParagraphs = about.story?.length ? about.story : [site.tagline];
-  const storyImage = pageImage(orbit.homeAbout.image);
+  const storyImage = pageImage(about.storyImage || orbit.homeAbout.image);
+  const storyAlt = about.storyImageAlt || orbit.homeAbout.imageAlt;
   const ownerPhoto = pageImage(about.owner.photo);
+  const address = orbit.addressLine || site.addressLine;
+  const values = about.values?.length
+    ? about.values
+    : [{ title: "Care", text: "Guests are greeted as people with a day behind them, not as a timetable." }];
 
   return (
     <>
@@ -59,7 +55,7 @@ export default function AboutPage() {
           <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-[#8a8175]">Address</dt>
-              <dd className="mt-1 leading-relaxed">{site.addressLine}</dd>
+              <dd className="mt-1 leading-relaxed">{address}</dd>
             </div>
             <div>
               <dt className="text-[#8a8175]">Phone</dt>
@@ -85,8 +81,8 @@ export default function AboutPage() {
 
       <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-8 md:px-8 lg:grid-cols-2 lg:py-16">
         <Reveal>
-          <p className="eyebrow">Our story</p>
-          <h2 className="display mt-4 text-5xl">Hospitality, then the treatment</h2>
+          <p className="eyebrow">{about.storyEyebrow || "Our story"}</p>
+          <h2 className="display mt-4 text-5xl">{about.storyTitle || "Hospitality, then the treatment"}</h2>
           <div className="prose-quiet mt-6 space-y-4">
             {storyParagraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 48)}>{paragraph}</p>
@@ -96,7 +92,7 @@ export default function AboutPage() {
         <div className="relative min-h-[420px] overflow-hidden rounded-2xl">
           <Image
             src={storyImage}
-            alt={orbit.homeAbout.imageAlt}
+            alt={storyAlt}
             fill
             className="object-cover"
             sizes="(min-width: 1024px) 50vw, 100vw"
@@ -128,8 +124,8 @@ export default function AboutPage() {
       </section>
 
       <section className="mx-auto max-w-[1440px] px-5 py-20 md:px-8">
-        <h2 className="display text-4xl md:text-5xl">Partners & standards</h2>
-        <p className="prose-quiet mt-4 max-w-2xl text-sm">Marks and programmes that shape how we host guests at Northfield.</p>
+        <h2 className="display text-4xl md:text-5xl">{about.partnersTitle || "Partners & standards"}</h2>
+        <p className="prose-quiet mt-4 max-w-2xl text-sm">{about.partnersLead}</p>
         <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {(about.logos?.length ? about.logos : []).map((logo) => (
             <li key={logo.name} className="flex flex-col rounded-2xl border border-[#e6dfd4] bg-white p-6">
@@ -153,10 +149,10 @@ export default function AboutPage() {
         <div className="mx-auto max-w-[1440px] px-5 py-20 md:px-8">
           <h2 className="display text-5xl">Brand values</h2>
           <ul className="mt-10 grid gap-6 md:grid-cols-5">
-            {values.map(([title, text]) => (
-              <li key={title} className="border-t border-[#e6dfd4] pt-4">
-                <p className="text-xs tracking-[0.18em] uppercase text-[#2f8f45]">{title}</p>
-                <p className="prose-quiet mt-3 text-sm">{text}</p>
+            {values.map((item) => (
+              <li key={item.title} className="border-t border-[#e6dfd4] pt-4">
+                <p className="text-xs tracking-[0.18em] uppercase text-[#2f8f45]">{item.title}</p>
+                <p className="prose-quiet mt-3 text-sm">{item.text}</p>
               </li>
             ))}
           </ul>
@@ -168,9 +164,9 @@ export default function AboutPage() {
           Service categories on the menu: {orbit.categories.map((c) => labelForCategory(c)).join(" · ")}
         </p>
         <div className="mt-12 bg-[#141210] px-8 py-14 text-white md:px-14">
-          <h2 className="display text-4xl md:text-5xl">Come when you can stay a while.</h2>
-          <Link href="/contact" className="btn-primary mt-8">
-            Book an appointment
+          <h2 className="display text-4xl md:text-5xl">{about.ctaTitle || "Come when you can stay a while."}</h2>
+          <Link href={about.ctaHref || "/contact"} className="btn-primary mt-8">
+            {about.ctaLabel || "Book an appointment"}
           </Link>
         </div>
       </section>

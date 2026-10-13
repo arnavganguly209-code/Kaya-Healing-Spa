@@ -6,6 +6,7 @@ import { Reveal } from "@/components/reveal";
 import { TherapiesSection } from "@/components/therapies-section";
 import { WhyKayaSection } from "@/components/why-kaya-section";
 import { formatNpr, site } from "@/lib/content";
+import { mapEmbedUrl } from "@/lib/map-embed";
 import { readOrbitContent } from "@/lib/orbit-store";
 import { Flower2, Leaf, Sparkles } from "lucide-react";
 import Image from "next/image";
@@ -204,8 +205,13 @@ export function HomePage() {
         eyebrow={homePage.reviewsEyebrow}
         title={homePage.reviewsTitle}
         disclaimer={homePage.reviewsDisclaimer}
+        aside={homePage.reviewsAside}
+        ctaLabel={homePage.reviewsCtaLabel}
+        ctaHref={homePage.reviewsCtaHref}
         reviews={homePage.reviews}
-        googleUrl={site.social.google}
+        googleUrl={orbit.externalReviewLinks.googleReviewsUrl || orbit.socialLinks.find((l) => l.id === "google")?.url || site.social.google}
+        googleRating={orbit.aboutPage.googleRating || site.googleRating}
+        googleReviewCount={orbit.aboutPage.googleReviewCount || site.googleReviewCount}
       />
 
       {preview.length > 0 ? (
@@ -261,13 +267,13 @@ export function HomePage() {
         <div>
           <p className="eyebrow">Visit</p>
           <h2 className="display mt-3 text-5xl">{site.name}</h2>
-          <p className="mt-4 text-lg leading-relaxed">{site.addressLine}</p>
+          <p className="mt-4 text-lg leading-relaxed">{orbit.addressLine || site.addressLine}</p>
           <p className="mt-2 text-sm">
             <a href={`tel:${site.phoneTel}`} className="font-semibold hover:text-[#F47B20]">
               {orbit.phone || site.phone}
             </a>
           </p>
-          <p className="prose-quiet mt-2 text-sm">{site.placeType} · {site.googleRating}★ on Google</p>
+          <p className="prose-quiet mt-2 text-sm">{site.placeType} · {orbit.aboutPage.googleRating || site.googleRating}★ on Google</p>
           <ul className="mt-6 space-y-2 text-sm">
             {site.hours.map((row) => (
               <li key={row.day}>{row.day}: {row.hours}</li>
@@ -282,7 +288,7 @@ export function HomePage() {
             className="h-full min-h-[320px] w-full grayscale"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            src={`https://maps.google.com/maps?q=${site.mapEmbedQuery}&z=15&output=embed`}
+            src={mapEmbedUrl(orbit.mapEmbedQuery || site.mapEmbedQuery)}
           />
         </div>
       </section>

@@ -1,4 +1,5 @@
 import { site } from "@/lib/content";
+import { mapEmbedUrl } from "@/lib/map-embed";
 import Link from "next/link";
 
 function normalizeWhatsAppHref(number: string) {
@@ -18,12 +19,16 @@ export function CompanyContactCard({
   whatsapp,
   googleReviewsUrl,
   tripadvisorUrl,
+  addressLine,
+  mapEmbedQuery,
 }: {
   phone?: string;
   email?: string;
   whatsapp?: string;
   googleReviewsUrl?: string;
   tripadvisorUrl?: string;
+  addressLine?: string;
+  mapEmbedQuery?: string;
 }) {
   const tel = phone || site.phone;
   const digits = tel.replace(/\D/g, "");
@@ -46,7 +51,7 @@ export function CompanyContactCard({
       <p className="text-[11px] font-semibold tracking-[0.22em] text-[#F47B20] uppercase">Visit us</p>
       <h2 className="mt-2 font-serif text-3xl">{site.name}</h2>
       <p className="mt-1 text-sm text-[#6B6B6B]">{site.placeType}</p>
-      <p className="mt-4 text-sm leading-relaxed">{site.addressLine}</p>
+      <p className="mt-4 text-sm leading-relaxed">{addressLine || site.addressLine}</p>
       <p className="mt-4 text-sm">
         <span className="text-[#8a8175]">Phone: </span>
         <a href={`tel:${telHref}`} className="text-lg font-semibold text-[#171717] hover:text-[#F47B20]">
@@ -137,7 +142,7 @@ export function CompanyContactCard({
           className="h-64 w-full"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          src={`https://maps.google.com/maps?q=${site.mapEmbedQuery}&z=15&output=embed`}
+          src={mapEmbedUrl(mapEmbedQuery || site.mapEmbedQuery)}
         />
       </div>
     </aside>

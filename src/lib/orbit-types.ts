@@ -32,14 +32,29 @@ export type OrbitExtraSocialLink = {
   enabled: boolean;
 };
 
+export type OrbitAboutValue = {
+  title: string;
+  text: string;
+};
+
 export type OrbitAboutPage = {
   introEyebrow: string;
   introTitle: string;
   introLead: string;
+  storyEyebrow: string;
+  storyTitle: string;
+  storyImage: string;
+  storyImageAlt: string;
   story: string[];
   companyTagline: string;
   googleRating: number;
   googleReviewCount: number;
+  partnersTitle: string;
+  partnersLead: string;
+  values: OrbitAboutValue[];
+  ctaTitle: string;
+  ctaLabel: string;
+  ctaHref: string;
   owner: {
     name: string;
     role: string;

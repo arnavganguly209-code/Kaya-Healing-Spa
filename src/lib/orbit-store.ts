@@ -125,6 +125,9 @@ export type OrbitHomePage = {
   reviewsEyebrow: string;
   reviewsTitle: string;
   reviewsDisclaimer: string;
+  reviewsAside: string;
+  reviewsCtaLabel: string;
+  reviewsCtaHref: string;
   reviews: OrbitHomeReview[];
   benefits: OrbitWhyItem[];
   journey: OrbitHomeJourneyStep[];
@@ -134,6 +137,8 @@ export type OrbitAdminSectionFlags = {
   hero: boolean;
   home: boolean;
   footer: boolean;
+  about: boolean;
+  contact: boolean;
   services: boolean;
   packages: boolean;
   categories: boolean;
@@ -189,6 +194,8 @@ export type OrbitContent = {
   phone: string;
   whatsapp: string;
   email: string;
+  addressLine: string;
+  mapEmbedQuery: string;
   footerText: string;
   footerBrand: string;
   footerBottom: OrbitFooterBottom;
@@ -351,6 +358,8 @@ function defaultAdminSectionFlags(): OrbitAdminSectionFlags {
     hero: true,
     home: true,
     footer: true,
+    about: true,
+    contact: true,
     services: true,
     packages: true,
     categories: true,
@@ -394,6 +403,9 @@ function defaultHomePage(): OrbitHomePage {
     reviewsTitle: "Stories of relaxation",
     reviewsDisclaimer:
       "Guest feedback shown here is managed in Orbit. Connect your Google listing link below for live public reviews.",
+    reviewsAside: "Swipe or use arrows to browse guest stories.",
+    reviewsCtaLabel: "Read more reviews",
+    reviewsCtaHref: "/contact#reviews",
     reviews: [
       {
         id: "rev-1",
@@ -464,6 +476,8 @@ function normalizeAdminSectionFlags(raw: Partial<OrbitAdminSectionFlags> | undef
     hero: raw.hero !== false,
     home: raw.home !== false && raw.hero !== false,
     footer: raw.footer !== false,
+    about: raw.about !== false,
+    contact: raw.contact !== false,
     services: raw.services !== false,
     packages: raw.packages !== false,
     categories: raw.categories !== false,
@@ -538,11 +552,15 @@ function normalizeAboutPage(raw: Partial<OrbitAboutPage> | undefined): OrbitAbou
   if (!raw) return d;
   const story = Array.isArray(raw.story) && raw.story.length ? raw.story : d.story;
   const logos = Array.isArray(raw.logos) && raw.logos.length ? raw.logos : d.logos;
+  const values = Array.isArray(raw.values) && raw.values.length ? raw.values : d.values;
   return {
     ...d,
     ...raw,
     story,
     logos,
+    values,
+    storyImage: raw.storyImage?.trim() || d.storyImage,
+    storyImageAlt: raw.storyImageAlt?.trim() || d.storyImageAlt,
     owner: {
       ...d.owner,
       ...raw.owner,
@@ -590,6 +608,10 @@ function defaultAboutPage(): OrbitAboutPage {
     introTitle: "Kaya Healing Spa at Hotel Northfield",
     introLead:
       "A massage spa in Kathmandu trusted by hundreds of guests — skilled therapists, quiet rooms, and treatments paced so you leave rested, not rushed.",
+    storyEyebrow: "Our story",
+    storyTitle: "Hospitality, then the treatment",
+    storyImage: "",
+    storyImageAlt: "Treatment room at Kaya Healing Spa",
     story: [
       `${site.name} sits in Chaksibari, inside Hotel Northfield, a short ride from Thamel and the city’s main travel hubs. Guests find us when they want professional massage, Ayurvedic oil work, and half-day rituals without the noise of a mall or a rushed turnover.`,
       "We built the house around hospitality first: greet, listen, adjust pressure and scent, then finish with time to dress and drink tea before stepping back into Kathmandu. That rhythm is the same whether you book a single treatment or a full package.",
@@ -599,6 +621,18 @@ function defaultAboutPage(): OrbitAboutPage {
     companyTagline: site.placeType,
     googleRating: site.googleRating,
     googleReviewCount: site.googleReviewCount,
+    partnersTitle: "Partners & standards",
+    partnersLead: "Marks and programmes that shape how we host guests at Northfield.",
+    values: [
+      { title: "Care", text: "Guests are greeted as people with a day behind them, not as a timetable." },
+      { title: "Quality", text: "Treatments are simple, skilled, and finished properly." },
+      { title: "Calm", text: "Rooms, voices, and pacing stay low." },
+      { title: "Authenticity", text: "Ayurvedic and body rituals are offered plainly, without costume." },
+      { title: "Professionalism", text: "Draping, hygiene, and timekeeping are part of the craft." },
+    ],
+    ctaTitle: "Come when you can stay a while.",
+    ctaLabel: "Book an appointment",
+    ctaHref: "/contact",
     owner: {
       name: "Kaya Healing Spa Leadership",
       role: "Founder & spa director",
@@ -642,6 +676,8 @@ export function defaultOrbitContent(): OrbitContent {
     phone: site.phone,
     whatsapp: site.whatsapp,
     email: site.email,
+    addressLine: site.addressLine,
+    mapEmbedQuery: site.mapEmbedQuery,
     footerText:
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
     footerBrand: "Kaya Healing Spa",
@@ -967,6 +1003,8 @@ function loadOrbitContentFromDisk(): OrbitContent {
           : merged.whatsapp.trim(),
       email:
         !merged.email?.trim() || merged.email.includes("example.com") ? defaults.email : merged.email.trim(),
+      addressLine: merged.addressLine?.trim() || defaults.addressLine,
+      mapEmbedQuery: merged.mapEmbedQuery?.trim() || defaults.mapEmbedQuery,
       brandLogo: typeof merged.brandLogo === "string" && merged.brandLogo.trim() ? merged.brandLogo.trim() : defaults.brandLogo,
       servicesMenuPdf: typeof merged.servicesMenuPdf === "string" ? merged.servicesMenuPdf : defaults.servicesMenuPdf,
       packagesMenuPdf: typeof merged.packagesMenuPdf === "string" ? merged.packagesMenuPdf : defaults.packagesMenuPdf,
@@ -986,7 +1024,7 @@ export function writeOrbitContent(content: OrbitContent) {
     hero: normalizeHero(content.hero),
     therapies: normalizeTherapies(content.therapies),
     whyKaya: normalizeWhyKaya(content.whyKaya),
-    aboutPage: { ...defaultAboutPage(), ...content.aboutPage },
+    aboutPage: normalizeAboutPage(content.aboutPage),
     homePage: normalizeHomePage(content.homePage),
     adminSectionFlags: normalizeAdminSectionFlags(content.adminSectionFlags),
     therapists: content.therapists?.length ? content.therapists : defaultTherapists(),

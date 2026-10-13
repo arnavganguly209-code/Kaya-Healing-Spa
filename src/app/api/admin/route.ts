@@ -1,5 +1,5 @@
 import { isAdminAuthed } from "@/lib/admin-auth";
-import { readOrbitContent, writeOrbitContent, normalizeFooterBottom, type OrbitContent } from "@/lib/orbit-store";
+import { readOrbitContent, writeOrbitContent, normalizeFooterBottom, normalizePageCovers, type OrbitContent } from "@/lib/orbit-store";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
@@ -32,6 +32,10 @@ export async function GET() {
       servicesMenuPdf: c.servicesMenuPdf || "",
       packagesMenuPdf: c.packagesMenuPdf || "",
       brandLogo: c.brandLogo || "",
+      aboutPage: c.aboutPage,
+      pageCovers: c.pageCovers,
+      addressLine: c.addressLine || "",
+      mapEmbedQuery: c.mapEmbedQuery || "",
     },
   });
 }
@@ -45,6 +49,8 @@ export async function PUT(request: Request) {
   const bodyGallery = body.gallery as OrbitContent["gallery"] | undefined;
   const bodyFooterBottom = body.footerBottom as OrbitContent["footerBottom"] | undefined;
   const bodyExternal = body.externalReviewLinks as OrbitContent["externalReviewLinks"] | undefined;
+  const bodyAbout = body.aboutPage as OrbitContent["aboutPage"] | undefined;
+  const bodyCovers = body.pageCovers as OrbitContent["pageCovers"] | undefined;
   writeOrbitContent({
     ...current,
     hero: (body.hero as typeof current.hero) || current.hero,
@@ -78,11 +84,25 @@ export async function PUT(request: Request) {
     servicesMenuPdf: typeof body.servicesMenuPdf === "string" ? body.servicesMenuPdf : current.servicesMenuPdf,
     packagesMenuPdf: typeof body.packagesMenuPdf === "string" ? body.packagesMenuPdf : current.packagesMenuPdf,
     brandLogo: typeof body.brandLogo === "string" && body.brandLogo.trim() ? body.brandLogo.trim() : current.brandLogo,
+    aboutPage: bodyAbout
+      ? {
+          ...current.aboutPage,
+          ...bodyAbout,
+          owner: { ...current.aboutPage.owner, ...bodyAbout.owner },
+          logos: Array.isArray(bodyAbout.logos) ? bodyAbout.logos : current.aboutPage.logos,
+          values: Array.isArray(bodyAbout.values) ? bodyAbout.values : current.aboutPage.values,
+          story: Array.isArray(bodyAbout.story) ? bodyAbout.story : current.aboutPage.story,
+        }
+      : current.aboutPage,
+    pageCovers: bodyCovers ? normalizePageCovers({ ...current.pageCovers, ...bodyCovers }) : current.pageCovers,
+    addressLine: typeof body.addressLine === "string" && body.addressLine.trim() ? body.addressLine.trim() : current.addressLine,
+    mapEmbedQuery: typeof body.mapEmbedQuery === "string" && body.mapEmbedQuery.trim() ? body.mapEmbedQuery.trim() : current.mapEmbedQuery,
   });
   revalidatePath("/", "layout");
   revalidatePath("/services");
   revalidatePath("/packages");
   revalidatePath("/gallery");
   revalidatePath("/contact");
+  revalidatePath("/about");
   return NextResponse.json({ success: true });
 }

@@ -31,14 +31,24 @@ export function HomeReviewsSlider({
   eyebrow,
   title,
   disclaimer,
+  aside,
+  ctaLabel,
+  ctaHref,
   reviews,
   googleUrl,
+  googleRating,
+  googleReviewCount,
 }: {
   eyebrow: string;
   title: string;
   disclaimer: string;
+  aside?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
   reviews: OrbitHomeReview[];
   googleUrl: string;
+  googleRating?: number;
+  googleReviewCount?: number;
 }) {
   const [index, setIndex] = useState(0);
   const count = reviews.length;
@@ -61,15 +71,15 @@ export function HomeReviewsSlider({
             <p className="eyebrow">{eyebrow}</p>
             <h2 className="display mt-3 text-5xl">{title}</h2>
           </div>
-          <Link href="/contact#reviews" className="btn-line">
-            Read more reviews
+          <Link href={ctaHref || "/contact#reviews"} className="btn-line">
+            {ctaLabel || "Read more reviews"}
           </Link>
         </div>
         <p className="mt-4 max-w-2xl text-sm text-[#6d665e]">{disclaimer}</p>
         <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
           <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold text-[#141210] shadow-sm">
             <GoogleMark />
-            {site.googleRating} ★ · {site.googleReviewCount.toLocaleString()} on Google
+            {(googleRating || site.googleRating)} ★ · {(googleReviewCount || site.googleReviewCount).toLocaleString()} on Google
           </span>
           {googleUrl.startsWith("https://") ? (
             <a href={googleUrl} target="_blank" rel="noreferrer" className="btn-line">
@@ -94,7 +104,7 @@ export function HomeReviewsSlider({
             </div>
             <div className="flex flex-col justify-between gap-6 border-t border-[#efe8e0] pt-6 md:border-t-0 md:border-l md:pl-8 md:pt-0">
               <p className="text-xs leading-relaxed text-[#8a8175]">
-                Swipe or use arrows to browse guest stories. Edit every quote and name in Orbit → Home page or Admin → Reviews.
+                {aside || "Swipe or use arrows to browse guest stories."}
               </p>
               <div className="flex items-center justify-between gap-3">
                 <button

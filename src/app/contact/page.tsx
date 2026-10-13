@@ -60,7 +60,9 @@ export default async function ContactPage({
             email={orbit.email || site.email}
             whatsapp={orbit.whatsapp || site.whatsapp}
             googleReviewsUrl={orbit.externalReviewLinks.googleReviewsUrl || orbit.socialLinks.find((l) => l.id === "google")?.url}
-            tripadvisorUrl={orbit.externalReviewLinks.tripadvisorUrl}
+            tripadvisorUrl={orbit.externalReviewLinks.tripadvisorUrl || orbit.socialLinks.find((l) => l.id === "tripadvisor")?.url}
+            addressLine={orbit.addressLine || site.addressLine}
+            mapEmbedQuery={orbit.mapEmbedQuery || site.mapEmbedQuery}
           />
           <div className="rounded-2xl border border-[#e6dfd4] bg-white p-6">
             <h3 className="font-serif text-2xl">Send a message</h3>
@@ -90,12 +92,12 @@ export default async function ContactPage({
       <section id="reviews" className="mx-auto max-w-[900px] px-5 py-16">
         <h2 className="font-serif text-3xl">Google reviews</h2>
         <p className="mt-3 text-sm text-[#2f8f45]">
-          {site.googleRating} average from {site.googleReviewCount.toLocaleString()} reviews on Google.
+          {(orbit.aboutPage.googleRating || site.googleRating)} average from {(orbit.aboutPage.googleReviewCount || site.googleReviewCount).toLocaleString()} reviews on Google.
         </p>
         <ul className="mt-6 space-y-4">
-          {reviews.map((review) => (
+          {(orbit.homePage.reviews.length ? orbit.homePage.reviews : reviews).map((review) => (
             <li key={review.id} className="border border-[#e6dfd4] p-5 text-sm">
-              {review.text}
+              {"text" in review ? review.text : ""}
             </li>
           ))}
         </ul>

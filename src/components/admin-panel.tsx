@@ -12,7 +12,10 @@ import {
   AdminServicesEditor,
   type CatalogAdminSlice,
 } from "@/components/admin-catalog-sections";
+import { AdminDeveloperCredit } from "@/components/admin-developer-credit";
+import { AboutPageFields } from "@/components/about-page-fields";
 import { AdminHomeEditor, type AdminHomeSlice } from "@/components/admin-home-editor";
+import { ContactPageFields } from "@/components/contact-page-fields";
 import { Logo } from "@/components/logo";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import Link from "next/link";
@@ -43,13 +46,19 @@ type AdminData = {
   servicesMenuPdf?: string;
   packagesMenuPdf?: string;
   brandLogo?: string;
+  aboutPage: OrbitContent["aboutPage"];
+  pageCovers: OrbitContent["pageCovers"];
+  addressLine: string;
+  mapEmbedQuery: string;
 };
 
-const allSections = ["Dashboard", "Home page", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Bookings", "Blog", "Inquiries", "Reviews", "Account"] as const;
+const allSections = ["Dashboard", "Home page", "About", "Contact", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Bookings", "Blog", "Inquiries", "Reviews", "Account"] as const;
 
 const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSectionFlags | null> = {
   Dashboard: null,
   "Home page": "home",
+  About: "about",
+  Contact: "contact",
   Footer: "footer",
   Categories: "categories",
   Services: "services",
@@ -250,7 +259,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
   const todayBookings = bookings.filter((b) => b.appointmentDate === todayKey);
 
   return (
-    <div className="min-h-[100svh] bg-gradient-to-b from-[#f8f4ee] to-[#fffdf9] text-[#171717]">
+    <div className="flex min-h-[100svh] flex-col bg-gradient-to-b from-[#f8f4ee] to-[#fffdf9] text-[#171717]">
       <header className="sticky top-0 z-40 border-b border-[#e8dfd4] bg-[#1a1512]/95 text-white backdrop-blur-md">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <div>
@@ -259,6 +268,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
               <div>
                 <p className="text-[11px] font-semibold tracking-[0.28em] text-[#ffb366] uppercase">Kaya Healing Spa</p>
                 <p className="font-serif text-2xl md:text-3xl">Admin dashboard</p>
+                <AdminDeveloperCredit variant="header" />
               </div>
             </div>
           </div>
@@ -276,7 +286,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 lg:grid-cols-[240px_1fr] lg:gap-8 lg:px-8 lg:py-10">
+      <div className="mx-auto grid w-full max-w-[1600px] flex-1 gap-6 px-4 py-6 lg:grid-cols-[240px_1fr] lg:gap-8 lg:px-8 lg:py-10">
         <nav className="flex flex-row flex-wrap gap-2 lg:sticky lg:top-28 lg:max-h-[calc(100svh-8rem)] lg:flex-col lg:gap-1 lg:overflow-y-auto lg:pr-1">
           {navSections(content.adminSectionFlags).map((item) => (
             <button
@@ -382,6 +392,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                   A payment card will appear here for paid bookings once the gateway is connected. Inquiries and manual booking stay available until then.
                 </p>
               </div>
+              <AdminDeveloperCredit variant="dashboard" />
             </>
           )}
 
@@ -389,6 +400,66 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
             <>
               <h2 className="font-serif text-2xl">Home page</h2>
               <AdminHomeEditor slice={home} setSlice={setHome} publish={publishHome} upload={upload} />
+            </>
+          )}
+
+          {section === "About" && (
+            <>
+              <h2 className="font-serif text-2xl">About page</h2>
+              <p className="mt-1 text-sm text-[#6B6B6B]">Every line and image on /about. Upload replaces the current photo.</p>
+              <AboutPageFields
+                about={content.aboutPage}
+                cover={content.pageCovers.about}
+                onAbout={(aboutPage) => setContent({ ...content, aboutPage })}
+                onCover={(about) => setContent({ ...content, pageCovers: { ...content.pageCovers, about } })}
+                onUpload={upload}
+              />
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
+                {saving ? "Saving…" : "Save about page"}
+              </button>
+            </>
+          )}
+
+          {section === "Contact" && (
+            <>
+              <h2 className="font-serif text-2xl">Contact page</h2>
+              <p className="mt-1 text-sm text-[#6B6B6B]">Banner, phone, address, map, Google, and TripAdvisor used on /contact and the footer map card.</p>
+              <ContactPageFields
+                cover={content.pageCovers.contact}
+                location={{
+                  phone: content.phone,
+                  whatsapp: content.whatsapp,
+                  email: content.email,
+                  addressLine: content.addressLine,
+                  mapEmbedQuery: content.mapEmbedQuery,
+                  googleReviewsUrl: content.externalReviewLinks.googleReviewsUrl,
+                  tripadvisorUrl: content.externalReviewLinks.tripadvisorUrl,
+                }}
+                onCover={(contact) => setContent({ ...content, pageCovers: { ...content.pageCovers, contact } })}
+                onLocation={(location) =>
+                  setContent({
+                    ...content,
+                    phone: location.phone,
+                    whatsapp: location.whatsapp,
+                    email: location.email,
+                    addressLine: location.addressLine,
+                    mapEmbedQuery: location.mapEmbedQuery,
+                    externalReviewLinks: {
+                      ...content.externalReviewLinks,
+                      googleReviewsUrl: location.googleReviewsUrl,
+                      tripadvisorUrl: location.tripadvisorUrl,
+                    },
+                    socialLinks: content.socialLinks.map((link) => {
+                      if (link.id === "google") return { ...link, url: location.googleReviewsUrl || link.url };
+                      if (link.id === "tripadvisor") return { ...link, url: location.tripadvisorUrl || link.url };
+                      return link;
+                    }),
+                  })
+                }
+              />
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
+                {saving ? "Saving…" : "Save contact page"}
+              </button>
             </>
           )}
 
@@ -406,6 +477,8 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
               <Field label="Phone" value={content.phone} onChange={(v) => setContent({ ...content, phone: v })} />
               <Field label="WhatsApp" value={content.whatsapp} onChange={(v) => setContent({ ...content, whatsapp: v })} />
               <Field label="Email" value={content.email} onChange={(v) => setContent({ ...content, email: v })} />
+              <Area label="Address" value={content.addressLine} onChange={(v) => setContent({ ...content, addressLine: v })} />
+              <Area label="Map location (Google Maps URL or place name)" value={content.mapEmbedQuery} onChange={(v) => setContent({ ...content, mapEmbedQuery: v })} />
               <p className="mt-6 font-semibold">Social & review icons</p>
               <p className="text-sm text-[#6B6B6B]">
                 Paste full https links. <strong>Google</strong> URL also powers the contact page “Google reviews” line. Upload a clear PNG/SVG (square) if built-in icons look soft.
@@ -662,7 +735,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
 
           {section === "Reviews" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Home page Google-style review slider. Edit guest names, quotes, and labels.</p>
+              <p className="text-sm text-[#6B6B6B]">Home page “Stories of relaxation” slider — heading, Google badge, aside text, and every guest quote.</p>
               <Field
                 label="Reviews eyebrow"
                 value={content.homePage.reviewsEyebrow}
@@ -677,6 +750,42 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                 label="Reviews disclaimer"
                 value={content.homePage.reviewsDisclaimer}
                 onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsDisclaimer: v } })}
+              />
+              <Area
+                label="Slider aside (right-hand hint)"
+                value={content.homePage.reviewsAside}
+                onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsAside: v } })}
+              />
+              <Field
+                label="Read more button label"
+                value={content.homePage.reviewsCtaLabel}
+                onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsCtaLabel: v } })}
+              />
+              <Field
+                label="Read more button link"
+                value={content.homePage.reviewsCtaHref}
+                onChange={(v) => setContent({ ...content, homePage: { ...content.homePage, reviewsCtaHref: v } })}
+              />
+              <Field
+                label="Google rating (badge)"
+                value={String(content.aboutPage.googleRating)}
+                onChange={(v) => setContent({ ...content, aboutPage: { ...content.aboutPage, googleRating: Number(v) || 0 } })}
+              />
+              <Field
+                label="Google review count"
+                value={String(content.aboutPage.googleReviewCount)}
+                onChange={(v) => setContent({ ...content, aboutPage: { ...content.aboutPage, googleReviewCount: Number(v) || 0 } })}
+              />
+              <Field
+                label="Google reviews URL"
+                value={content.externalReviewLinks.googleReviewsUrl}
+                onChange={(v) =>
+                  setContent({
+                    ...content,
+                    externalReviewLinks: { ...content.externalReviewLinks, googleReviewsUrl: v },
+                    socialLinks: content.socialLinks.map((link) => (link.id === "google" ? { ...link, url: v } : link)),
+                  })
+                }
               />
               <button
                 type="button"
@@ -757,11 +866,11 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
 
           {section === "Account" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Change your Admin login. Orbit owners can also change this under Orbit → Admin portal.</p>
+              <p className="text-sm text-[#6B6B6B]">Change your Admin login. The owner can also reset this in Orbit → Admin portal without the current password.</p>
               <Field label="User ID" value={account.username} onChange={(v) => setAccount({ ...account, username: v })} />
-              <Field label="Current password" value={account.currentPassword} onChange={(v) => setAccount({ ...account, currentPassword: v })} />
-              <Field label="New password" value={account.password} onChange={(v) => setAccount({ ...account, password: v })} />
-              <Field label="Confirm new password" value={account.password2} onChange={(v) => setAccount({ ...account, password2: v })} />
+              <Field label="Current password" value={account.currentPassword} onChange={(v) => setAccount({ ...account, currentPassword: v })} type="password" />
+              <Field label="New password" value={account.password} onChange={(v) => setAccount({ ...account, password: v })} type="password" />
+              <Field label="Confirm new password" value={account.password2} onChange={(v) => setAccount({ ...account, password2: v })} type="password" />
               <button type="button" className="mt-4 rounded-full bg-[#F47B20] px-5 py-2 text-sm text-white" onClick={async () => {
                 if (account.password && account.password !== account.password2) {
                   setError("Passwords do not match.");
@@ -783,15 +892,16 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
           )}
         </section>
       </div>
+      <AdminDeveloperCredit variant="footer" />
     </div>
   );
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function Field({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (value: string) => void; type?: string }) {
   return (
     <label className="mt-3 block text-sm">
       {label}
-      <input value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 w-full rounded-xl border border-[#efe8e0] px-3 py-3" />
+      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 w-full rounded-xl border border-[#efe8e0] px-3 py-3" />
     </label>
   );
 }
