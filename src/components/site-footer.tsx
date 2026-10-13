@@ -33,7 +33,7 @@ export function SiteFooter() {
     <footer className="relative overflow-hidden bg-[#12100e] text-[#f6f1e8]">
       <OrangeLotusBackground idSuffix="footer" intensity={0.2} showWatermark={false} />
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-[#F47B20]/80 to-transparent" />
-      <div className="relative z-[2] mx-auto grid max-w-[1440px] gap-10 px-5 py-12 sm:py-16 md:grid-cols-2 md:gap-12 md:px-10 md:py-20 lg:grid-cols-4 lg:gap-14">
+      <div className="relative z-[2] mx-auto grid max-w-[1440px] gap-10 px-4 py-12 sm:py-16 md:grid-cols-2 md:gap-12 md:px-10 md:py-20 lg:grid-cols-4 lg:gap-14">
         <div>
           <Logo src={orbit.brandLogo} />
           <p className="mt-5 font-serif text-2xl text-white">{brand}</p>

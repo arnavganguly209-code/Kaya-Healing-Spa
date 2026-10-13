@@ -48,7 +48,7 @@ export function HomePage() {
 
   return (
     <>
-      <section className="relative isolate h-[100svh] min-h-[540px] max-h-[100svh] overflow-hidden bg-[#0a0a0a]">
+      <section className="relative isolate min-h-[100svh] overflow-hidden bg-[#0a0a0a] lg:h-[100svh]">
         <div className="pointer-events-none absolute inset-0 z-0">
           <HeroMedia
             slides={hero.slides}
@@ -65,24 +65,39 @@ export function HomePage() {
           <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#fafafa] via-[#fafafa]/80 to-transparent" />
         </div>
 
-        <div className="relative z-10 mx-auto flex h-full max-h-[100svh] w-full max-w-[1440px] flex-col justify-end px-5 pb-3 pt-[64px] sm:px-8 sm:pt-[68px] md:px-10 lg:px-12 lg:pt-[108px] lg:pb-4 xl:px-14">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1440px] flex-col justify-end px-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] pt-[calc(64px+env(safe-area-inset-top,0px))] sm:px-8 sm:pt-[68px] md:px-10 lg:px-12 lg:pt-[108px] lg:pb-4 xl:px-14">
           <h1 className="sr-only">
             {hero.titleOrange} {hero.titleDark} — {site.name}
           </h1>
-          <div className="relative z-20 w-full shrink-0">
-            <div className="hero-feature-glass relative z-20 w-full shrink-0">
+          <div className="relative z-20 mb-4 max-w-xl text-white sm:mb-6">
+            {hero.eyebrow ? <p className="text-[11px] font-semibold tracking-[0.22em] text-white/80 uppercase">{hero.eyebrow}</p> : null}
+            <p className="display mt-2 text-[1.85rem] leading-tight text-white sm:text-4xl md:text-5xl">
+              <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
+            </p>
+            {hero.subtitle ? <p className="mt-2 text-sm leading-relaxed text-white/85 sm:text-base">{hero.subtitle}</p> : null}
+            <div className="mt-4 flex w-full flex-col gap-2 sm:max-w-md sm:flex-row">
+              <Link href="/contact" className="btn-primary rounded-full">
+                {hero.book || "Book Appointment"}
+              </Link>
+              <Link href="/services" className="btn-ghost rounded-full">
+                {hero.explore || "Explore Treatments"}
+              </Link>
+            </div>
+          </div>
+          <div className="relative z-20 w-full min-w-0 shrink-0">
+            <div className="hero-feature-glass relative z-20 w-full min-w-0 shrink-0">
             <ul className="grid grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];
                 return (
                   <li
                     key={feature.title}
-                    className="flex items-center gap-2 px-3 py-3 sm:gap-4 sm:px-6 sm:py-5 [&:nth-child(n+3)]:border-t [&:nth-child(n+3)]:border-[#f47b20]/10 lg:[&:nth-child(n+3)]:border-t-0 lg:[&:not(:first-child)]:border-l lg:[&:not(:first-child)]:border-[#f47b20]/15"
+                    className="flex min-w-0 items-center gap-2 px-2.5 py-2.5 sm:gap-4 sm:px-6 sm:py-5 [&:nth-child(n+3)]:border-t [&:nth-child(n+3)]:border-[#f47b20]/10 lg:[&:nth-child(n+3)]:border-t-0 lg:[&:not(:first-child)]:border-l lg:[&:not(:first-child)]:border-[#f47b20]/15"
                   >
-                    <Icon className="shrink-0 text-[#F47B20]" size={28} strokeWidth={1.3} />
+                    <Icon className="shrink-0 text-[#F47B20]" size={22} strokeWidth={1.3} />
                     <span className="min-w-0">
-                      <span className="block text-[14px] font-bold leading-snug text-[#1a1512] sm:text-[15px]">{feature.title}</span>
-                      <span className="text-[12px] font-medium leading-snug text-[#5c534a] sm:text-[13px]">{feature.text}</span>
+                      <span className="block text-[13px] font-bold leading-snug text-[#1a1512] sm:text-[15px]">{feature.title}</span>
+                      <span className="block text-[11px] font-medium leading-snug text-[#5c534a] sm:text-[13px]">{feature.text}</span>
                     </span>
                   </li>
                 );
@@ -106,8 +121,8 @@ export function HomePage() {
       <WhyKayaSection data={whyKaya} />
 
       <section className="bg-[#f6f1e8]">
-        <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-20 md:px-8 lg:grid-cols-2 lg:py-28">
-          <Reveal className="relative min-h-[240px] sm:min-h-[420px]">
+        <div className="mx-auto grid max-w-[1440px] items-center gap-8 px-4 py-14 md:px-8 md:gap-10 lg:grid-cols-2 lg:py-28">
+          <Reveal className="relative aspect-[4/5] overflow-hidden rounded-2xl sm:min-h-[420px] sm:aspect-auto">
             <Image
               src={homeAbout.image}
               alt={homeAbout.imageAlt}
@@ -119,7 +134,7 @@ export function HomePage() {
           </Reveal>
           <Reveal>
             <p className="eyebrow">{homeAbout.eyebrow}</p>
-            <h2 className="display mt-4 text-5xl md:text-6xl">{homeAbout.title}</h2>
+            <h2 className="display mt-4 text-[1.85rem] sm:text-5xl md:text-6xl">{homeAbout.title}</h2>
             <div className="prose-quiet mt-6 space-y-4">
               <p>{homeAbout.paragraph1}</p>
               <p>{homeAbout.paragraph2}</p>
@@ -131,11 +146,11 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <div>
+      <section className="mx-auto max-w-[1440px] px-4 py-14 md:px-8 md:py-24">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
             <p className="eyebrow">{homePage.servicesEyebrow}</p>
-            <h2 className="display mt-3 text-5xl md:text-6xl">{homePage.servicesTitle}</h2>
+            <h2 className="display mt-3 text-[1.85rem] sm:text-5xl md:text-6xl">{homePage.servicesTitle}</h2>
           </div>
           <Link href="/services" className="btn-line">View all services</Link>
         </div>
@@ -159,13 +174,13 @@ export function HomePage() {
 
       <HomeVisitSection visit={homePage.visit} />
 
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
+      <section className="mx-auto max-w-[1440px] px-4 py-14 md:px-8 md:py-24">
         <p className="eyebrow">{homePage.packagesEyebrow}</p>
-        <h2 className="display mt-3 text-5xl md:text-6xl">{homePage.packagesTitle}</h2>
+        <h2 className="display mt-3 text-[1.85rem] sm:text-5xl md:text-6xl">{homePage.packagesTitle}</h2>
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           {orbit.packages.slice(0, 4).map((item) => (
             <article key={item.slug} className="grid overflow-hidden border border-[#e6dfd4] bg-white md:grid-cols-5">
-              <div className="relative min-h-56 md:col-span-2">
+              <div className="relative min-h-48 md:col-span-2 md:min-h-56">
                 <CatalogPhoto src={item.image} alt={item.imageAlt} className="object-cover" sizes="40vw" />
               </div>
               <div className="p-6 md:col-span-3">
@@ -187,9 +202,9 @@ export function HomePage() {
         <Link href="/packages" className="btn-line mt-10">All packages</Link>
       </section>
 
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
+      <section className="mx-auto max-w-[1440px] px-4 py-14 md:px-8 md:py-24">
         <p className="eyebrow">The visit</p>
-        <h2 className="display mt-3 text-5xl">A wellness journey</h2>
+        <h2 className="display mt-3 text-[1.85rem] sm:text-5xl">A wellness journey</h2>
         <ol className="mt-12 grid gap-8 md:grid-cols-4">
           {homePage.journey.map((step) => (
             <li key={step.step} className="border-t border-[#e6dfd4] pt-6">
@@ -215,9 +230,9 @@ export function HomePage() {
       />
 
       {preview.length > 0 ? (
-      <section className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
-        <div className="flex items-end justify-between gap-4">
-          <h2 className="display text-5xl">{homePage.galleryTitle}</h2>
+      <section className="mx-auto max-w-[1440px] px-4 py-14 md:px-8 md:py-24">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h2 className="display text-[1.85rem] sm:text-5xl">{homePage.galleryTitle}</h2>
           <Link href="/gallery" className="btn-line">Explore our gallery</Link>
         </div>
         <div className="mt-10 columns-1 gap-4 sm:columns-2 lg:columns-3">
@@ -249,8 +264,8 @@ export function HomePage() {
           className="object-cover opacity-30"
           unoptimized={homePage.cta.backgroundImage.startsWith("/uploads/")}
         />
-        <div className="relative mx-auto max-w-3xl px-5 py-28 text-center md:py-36">
-          <h2 className="display text-5xl md:text-6xl">{homePage.cta.title}</h2>
+        <div className="relative mx-auto max-w-3xl px-4 py-16 text-center sm:px-5 md:py-36">
+          <h2 className="display text-[1.85rem] sm:text-5xl md:text-6xl">{homePage.cta.title}</h2>
           <p className="mt-6 text-white/75">{homePage.cta.text}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href={homePage.cta.primaryHref} className="btn-primary">
@@ -263,10 +278,10 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-[1440px] gap-10 px-5 py-24 md:px-8 lg:grid-cols-2">
-        <div>
+      <section className="mx-auto grid max-w-[1440px] gap-8 px-4 py-14 md:px-8 md:gap-10 md:py-24 lg:grid-cols-2">
+        <div className="min-w-0">
           <p className="eyebrow">Visit</p>
-          <h2 className="display mt-3 text-5xl">{site.name}</h2>
+          <h2 className="display mt-3 text-[1.85rem] sm:text-5xl">{site.name}</h2>
           <p className="mt-4 text-lg leading-relaxed">{orbit.addressLine || site.addressLine}</p>
           <p className="mt-2 text-sm">
             <a href={`tel:${site.phoneTel}`} className="font-semibold hover:text-[#F47B20]">
@@ -282,10 +297,10 @@ export function HomePage() {
           <p className="mt-3 text-xs text-[#8a8175]">{site.hoursNote}</p>
           <Link href="/contact" className="btn-primary mt-8">Request a time</Link>
         </div>
-        <div className="min-h-[320px] bg-[#f6f1e8]">
+        <div className="min-h-[240px] overflow-hidden rounded-2xl bg-[#f6f1e8] sm:min-h-[320px]">
           <iframe
             title={`Map — ${site.name}`}
-            className="h-full min-h-[320px] w-full grayscale"
+            className="h-full min-h-[240px] w-full grayscale sm:min-h-[320px]"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             src={mapEmbedUrl(orbit.mapEmbedQuery || site.mapEmbedQuery)}

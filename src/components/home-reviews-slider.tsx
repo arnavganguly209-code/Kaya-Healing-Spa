@@ -65,11 +65,11 @@ export function HomeReviewsSlider({
 
   return (
     <section className="bg-[#f6f1e8]">
-      <div className="mx-auto max-w-[1440px] px-5 py-24 md:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 py-14 md:px-8 md:py-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <p className="eyebrow">{eyebrow}</p>
-            <h2 className="display mt-3 text-5xl">{title}</h2>
+            <h2 className="display mt-3 text-[1.85rem] sm:text-5xl">{title}</h2>
           </div>
           <Link href={ctaHref || "/contact#reviews"} className="btn-line">
             {ctaLabel || "Read more reviews"}
@@ -90,14 +90,14 @@ export function HomeReviewsSlider({
 
         <div className="relative mt-12 overflow-hidden rounded-[1.75rem] border border-[#e6dfd4] bg-white shadow-[0_24px_60px_rgba(20,18,16,0.08)]">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#4285F4] via-[#FBBC04] to-[#34A853]" />
-          <div className="grid gap-8 p-8 md:grid-cols-[1fr_auto] md:p-12 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="grid gap-6 p-5 sm:gap-8 sm:p-8 md:grid-cols-[1fr_auto] md:p-12 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="min-h-[200px]">
               <div className="flex flex-wrap items-center gap-3">
                 <GoogleMark />
                 <Stars rating={review.rating} />
                 <span className="text-xs font-semibold tracking-wide text-[#8a8175] uppercase">{review.dateLabel}</span>
               </div>
-              <blockquote className="mt-6 font-serif text-2xl leading-snug text-[#141210] md:text-[1.65rem]">
+              <blockquote className="mt-6 font-serif text-[1.2rem] leading-snug text-[#141210] sm:text-2xl md:text-[1.65rem]">
                 “{review.text}”
               </blockquote>
               <p className="mt-6 text-sm font-semibold text-[#141210]">{review.name}</p>

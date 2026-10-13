@@ -45,7 +45,7 @@ export default async function PackageDetail({ params }: Props) {
   const expect = item.expect?.filter(Boolean) ?? [];
 
   return (
-    <article className="pb-20">
+    <article className="pb-28">
       <PageCoverArt
         eyebrow="Package"
         title={item.name}
@@ -57,7 +57,7 @@ export default async function PackageDetail({ params }: Props) {
           { label: item.name },
         ]}
       />
-      <div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-12 md:px-8 md:py-16 lg:grid-cols-[1.4fr_0.8fr]">
+      <div className="mx-auto flex max-w-[1440px] flex-col-reverse gap-8 px-4 py-10 md:px-8 md:py-16 lg:grid lg:grid-cols-[1.4fr_0.8fr] lg:gap-12">
         <div>
           <div className="relative mb-8 aspect-[16/9] overflow-hidden rounded-3xl bg-[#f4eee6] sm:mb-10">
             <CatalogPhoto src={item.image} alt={item.imageAlt} className="object-cover" sizes="70vw" />
@@ -94,7 +94,7 @@ export default async function PackageDetail({ params }: Props) {
               </ul>
             </>
           ) : null}
-          <p className="mt-8 font-serif text-4xl">{formatNpr(item.priceNpr)}</p>
+          <p className="mt-8 font-serif text-3xl sm:text-4xl">{formatNpr(item.priceNpr)}</p>
           {item.compareAtNpr ? (
             <p className="mt-1 text-sm text-[#8a8175] line-through">{formatNpr(item.compareAtNpr)}</p>
           ) : null}

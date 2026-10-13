@@ -17,7 +17,7 @@ export function TherapistStrip({
 
   return (
     <section className="border-t border-[#e6dfd4] bg-[#faf7f3]">
-      <div className="mx-auto max-w-[1440px] px-5 py-14 md:px-8 md:py-16">
+      <div className="mx-auto max-w-[1440px] px-4 py-14 md:px-8 md:py-16">
         <p className="eyebrow">{title}</p>
         <p className="prose-quiet mt-3 max-w-2xl text-sm">{intro}</p>
         <TherapistCarousel ariaLabel="therapists">

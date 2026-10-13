@@ -27,7 +27,7 @@ export default function BlogPage() {
         text={cover.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]}
       />
-      <section className="mx-auto grid max-w-[1100px] gap-8 px-5 py-16 md:px-8">
+      <section className="mx-auto grid max-w-[1100px] gap-8 px-4 py-14 pb-28 md:px-8 md:py-16">
         {posts.map((post) => (
           <article key={post.slug} className="border-t border-[#e6dfd4] pt-6">
             <Link href={`/blog/${post.slug}`} className="group block">

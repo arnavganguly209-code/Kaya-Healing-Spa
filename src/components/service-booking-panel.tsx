@@ -110,7 +110,7 @@ export function ServiceBookingPanel({
   }
 
   return (
-    <aside id="book" className="h-fit scroll-mt-28 rounded-2xl border border-[#e6dfd4] bg-[#fffdfb] p-6 shadow-[0_16px_48px_rgba(20,18,16,0.08)] lg:sticky lg:top-28">
+    <aside id="book" className="h-fit scroll-mt-28 rounded-2xl border border-[#e6dfd4] bg-[#fffdfb] p-4 shadow-[0_16px_48px_rgba(20,18,16,0.08)] sm:p-6 lg:sticky lg:top-28">
       <p className="text-xs font-semibold tracking-[0.18em] text-[#F47B20] uppercase">{eyebrow}</p>
       <h2 className="mt-2 font-serif text-2xl text-[#141210]">{title}</h2>
 
@@ -120,11 +120,11 @@ export function ServiceBookingPanel({
           <select
             value={durationMinutes}
             onChange={(e) => setDurationMinutes(Number(e.target.value))}
-            className="mt-1 w-full rounded-xl border border-[#e6dfd4] px-3 py-3"
+            className="mt-1 w-full rounded-xl border border-[#e6dfd4] px-3 py-3 text-base"
           >
             {durationOptions.map((o) => (
               <option key={o.minutes} value={o.minutes}>
-                {o.label} — {priceLabel(o)}
+                {/NPR|Rs\.?|रू/i.test(o.label) ? o.label : `${o.label} — ${priceLabel(o)}`}
               </option>
             ))}
           </select>
@@ -133,7 +133,7 @@ export function ServiceBookingPanel({
         {therapists.length > 0 && (
           <label className="block text-sm font-medium">
             Therapist
-            <select value={therapistSlug} onChange={(e) => setTherapistSlug(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-3">
+            <select value={therapistSlug} onChange={(e) => setTherapistSlug(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-3 text-base">
               <option value="">Any available therapist</option>
               {therapists.map((t) => (
                 <option key={t.slug} value={t.slug}>{t.name}</option>
@@ -144,12 +144,12 @@ export function ServiceBookingPanel({
 
         <label className="block text-sm font-medium">
           Date
-          <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-3" />
+          <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-3 text-base" />
         </label>
 
         <label className="block text-sm font-medium">
           Time
-          <select required value={time} onChange={(e) => setTime(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-3" disabled={!slots.length}>
+          <select required value={time} onChange={(e) => setTime(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-3 text-base" disabled={!slots.length}>
             <option value="">{slots.length ? "Select a time" : "Choose a date first"}</option>
             {slots.map((slot, i) => (
               <option key={slot} value={slot}>{slotLabels[i] || slot}</option>
@@ -163,7 +163,7 @@ export function ServiceBookingPanel({
         <Field label="Email" value={email} onChange={setEmail} required type="email" />
         <label className="block text-sm font-medium">
           Message (optional)
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="mt-1 w-full rounded-xl border px-3 py-3" />
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="mt-1 w-full rounded-xl border px-3 py-3 text-base" />
         </label>
         <label className="flex gap-2 text-xs text-[#6B6B6B]">
           <input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} required />
@@ -200,7 +200,7 @@ function Field({
   return (
     <label className="block text-sm font-medium">
       {label}
-      <input type={type} required={required} value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-3" />
+      <input type={type} required={required} value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 w-full rounded-xl border px-3 py-3 text-base" />
     </label>
   );
 }

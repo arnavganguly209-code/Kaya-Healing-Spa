@@ -51,7 +51,7 @@ export function TherapistCarousel({
         aria-label={`Previous ${ariaLabel}`}
         disabled={!canPrev}
         onClick={() => scrollByPage(-1)}
-        className="absolute left-0 top-[42%] z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#e6dfd4] bg-white text-[#171717] shadow-lg transition hover:border-[#F47B20] hover:text-[#F47B20] disabled:pointer-events-none disabled:opacity-30 sm:h-12 sm:w-12"
+        className="absolute left-0 top-[42%] z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#e6dfd4] bg-white text-[#171717] shadow-lg transition hover:border-[#F47B20] hover:text-[#F47B20] disabled:pointer-events-none disabled:opacity-30 sm:flex sm:h-12 sm:w-12"
       >
         <ChevronLeft size={22} strokeWidth={2.2} />
       </button>
@@ -60,13 +60,13 @@ export function TherapistCarousel({
         aria-label={`Next ${ariaLabel}`}
         disabled={!canNext}
         onClick={() => scrollByPage(1)}
-        className="absolute right-0 top-[42%] z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#e6dfd4] bg-white text-[#171717] shadow-lg transition hover:border-[#F47B20] hover:text-[#F47B20] disabled:pointer-events-none disabled:opacity-30 sm:h-12 sm:w-12"
+        className="absolute right-0 top-[42%] z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#e6dfd4] bg-white text-[#171717] shadow-lg transition hover:border-[#F47B20] hover:text-[#F47B20] disabled:pointer-events-none disabled:opacity-30 sm:flex sm:h-12 sm:w-12"
       >
         <ChevronRight size={22} strokeWidth={2.2} />
       </button>
       <div
         ref={trackRef}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-12 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-5 sm:px-14 [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-2 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-5 sm:px-14 [&::-webkit-scrollbar]:hidden"
       >
         {children}
       </div>

@@ -63,11 +63,11 @@ export function ServiceCatalog({
   return (
     <section className="relative bg-[#fffcf8] pb-20 pt-4 md:pb-24">
       <CatalogPageIntro title={catalogTitle} subtitle={catalogSubtitle} />
-      <div className="mx-auto mt-6 max-w-[1440px] px-5 md:px-8">
+      <div className="mx-auto mt-6 max-w-[1440px] px-4 md:px-8">
         <MenuDownloadButton href={menuPdfHref} label="Download menu" />
       </div>
 
-      <div className="mx-auto mt-10 max-w-[1440px] px-5 md:px-8">
+      <div className="mx-auto mt-10 max-w-[1440px] px-4 md:px-8">
         <div className="flex flex-col items-center gap-6">
           <FilterChips
             label="Service categories"

@@ -31,7 +31,7 @@ export function ContactBookingHub({ services, packages, therapists, initial }: P
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Booking type">
+      <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap" role="tablist" aria-label="Booking type">
         {(
           [
             ["service", "Book a treatment"],
@@ -45,7 +45,7 @@ export function ContactBookingHub({ services, packages, therapists, initial }: P
             role="tab"
             aria-selected={mode === key}
             onClick={() => setMode(key)}
-            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+            className={`min-h-12 rounded-full px-5 py-3 text-sm font-semibold transition ${
               mode === key ? "bg-[#F47B20] text-white" : "border border-[#e6dfd4] bg-white text-[#171717]"
             }`}
           >
@@ -234,7 +234,7 @@ function BookingPanel({
   );
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-5 rounded-2xl border border-[#e6dfd4] bg-white p-6 md:p-8" noValidate>
+    <form onSubmit={onSubmit} className="grid min-w-0 gap-5 rounded-2xl border border-[#e6dfd4] bg-white p-4 sm:p-6 md:p-8" noValidate>
       <div>
         <h2 className="font-serif text-3xl">{title}</h2>
         <p className="prose-quiet mt-2 text-sm">
@@ -445,7 +445,7 @@ function Field({
         required={required}
         defaultValue={defaultValue}
         min={type === "number" ? 1 : undefined}
-        className="mt-1 w-full rounded-xl border border-[#e6dfd4] px-3 py-3"
+        className="mt-1 w-full rounded-xl border border-[#e6dfd4] px-3 py-3 text-base"
       />
     </label>
   );

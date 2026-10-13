@@ -35,7 +35,7 @@ export function GalleryGrid({ items }: { items: GalleryImage[] }) {
   }, [active, images.length]);
 
   return (
-    <div className="mx-auto max-w-[1440px] px-5 py-14 md:px-8">
+    <div className="mx-auto max-w-[1440px] px-4 py-14 pb-28 md:px-8">
       <div className="flex flex-wrap gap-2">
         {categories.map((item) => (
           <button

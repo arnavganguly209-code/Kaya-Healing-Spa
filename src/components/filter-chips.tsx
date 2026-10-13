@@ -14,9 +14,9 @@ export function FilterChips({
   label: string;
 }) {
   return (
-    <div className="relative -mx-5 md:mx-0">
+    <div className="relative -mx-4 md:mx-0">
       <div
-        className="flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain px-5 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] md:flex-wrap md:justify-center md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] md:flex-wrap md:justify-center md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden"
         role="tablist"
         aria-label={label}
       >

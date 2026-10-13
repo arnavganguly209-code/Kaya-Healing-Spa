@@ -37,14 +37,14 @@ export default async function BookingConfirmedPage({
   const pdfHref = token ? `/api/bookings/pdf?ref=${encodeURIComponent(number)}&token=${encodeURIComponent(token)}` : null;
 
   return (
-    <div className="mx-auto max-w-2xl px-5 py-20 md:py-28">
+    <div className="mx-auto max-w-2xl px-4 py-16 pb-28 md:px-8 md:py-28">
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#e8f5e9] text-2xl text-[#2f8f45]" aria-hidden>
         ✓
       </div>
       <p className="mt-6 text-xs font-semibold tracking-[0.2em] text-[#F47B20] uppercase">
         {booking.status === "confirmed" ? "Booking confirmed" : booking.status.replace(/_/g, " ")}
       </p>
-      <h1 className="mt-3 font-serif text-4xl text-[#141210]">{statusHeading(booking.status)}</h1>
+      <h1 className="mt-3 font-serif text-[1.85rem] leading-snug text-[#141210] sm:text-4xl">{statusHeading(booking.status)}</h1>
       <p className="mt-6 text-sm leading-7 text-[#4a453e]">
         {booking.status === "pending"
           ? "We have received your request. Our team will review availability and contact you if anything needs to change. Payment will be collected at the spa when your appointment is confirmed."

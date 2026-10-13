@@ -33,11 +33,11 @@ export function SiteChrome({
         logoSrc={logoSrc}
       />
       <main
-        className={
+        className={`min-w-0 overflow-x-hidden ${
           pathname === "/"
             ? ""
             : "pt-[calc(64px+env(safe-area-inset-top,0px))] sm:pt-[calc(68px+env(safe-area-inset-top,0px))] lg:pt-[calc(108px+env(safe-area-inset-top,0px))]"
-        }
+        }`}
       >
         {children}
       </main>

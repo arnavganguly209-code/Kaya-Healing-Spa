@@ -41,14 +41,14 @@ export default function AboutPage() {
         crumbs={[{ label: "Home", href: "/" }, { label: "About" }]}
       />
 
-      <section className="mx-auto max-w-[900px] px-5 py-12 text-center md:px-8">
+      <section className="mx-auto max-w-[900px] px-4 py-10 text-center md:px-8 md:py-12">
         <p className="eyebrow">{about.introEyebrow || "About us"}</p>
-        <h2 className="display mt-3 text-4xl md:text-5xl">{about.introTitle || orbit.pageCovers.about.title}</h2>
+        <h2 className="display mt-3 text-[1.85rem] sm:text-4xl md:text-5xl">{about.introTitle || orbit.pageCovers.about.title}</h2>
         <p className="prose-quiet mx-auto mt-5 max-w-2xl text-base">{about.introLead || orbit.pageCovers.about.text}</p>
       </section>
 
-      <section className="mx-auto max-w-[900px] px-5 py-16 md:px-8">
-        <div className="rounded-2xl border border-[#e6dfd4] bg-[#f6f1e8] p-8 md:p-10">
+      <section className="mx-auto max-w-[900px] px-4 py-10 md:px-8 md:py-16">
+        <div className="rounded-2xl border border-[#e6dfd4] bg-[#f6f1e8] p-5 md:p-10">
           <p className="text-[11px] font-semibold tracking-[0.22em] text-[#F47B20] uppercase">Company details</p>
           <h2 className="mt-2 font-serif text-3xl">{site.name}</h2>
           <p className="mt-1 text-sm text-[#6B6B6B]">{about.companyTagline || site.placeType}</p>
@@ -79,17 +79,17 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-8 md:px-8 lg:grid-cols-2 lg:py-16">
+      <section className="mx-auto grid max-w-[1440px] gap-8 px-4 py-8 md:px-8 lg:grid-cols-2 lg:gap-12 lg:py-16">
         <Reveal>
           <p className="eyebrow">{about.storyEyebrow || "Our story"}</p>
-          <h2 className="display mt-4 text-5xl">{about.storyTitle || "Hospitality, then the treatment"}</h2>
+          <h2 className="display mt-4 text-[1.85rem] sm:text-5xl">{about.storyTitle || "Hospitality, then the treatment"}</h2>
           <div className="prose-quiet mt-6 space-y-4">
             {storyParagraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 48)}>{paragraph}</p>
             ))}
           </div>
         </Reveal>
-        <div className="relative min-h-[420px] overflow-hidden rounded-2xl">
+        <div className="relative min-h-[240px] overflow-hidden rounded-2xl sm:min-h-[420px]">
           <Image
             src={storyImage}
             alt={storyAlt}
@@ -102,7 +102,7 @@ export default function AboutPage() {
       </section>
 
       <section className="bg-[#141210] text-white">
-        <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-16 md:grid-cols-[0.9fr_1.1fr] md:px-8">
+        <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-4 py-14 md:grid-cols-[0.9fr_1.1fr] md:px-8 md:py-16">
           <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl">
             <Image
               src={ownerPhoto}
@@ -115,7 +115,7 @@ export default function AboutPage() {
           </div>
           <div>
             <p className="text-[11px] tracking-[0.22em] text-[#F47B20] uppercase">Leadership</p>
-            <h2 className="display mt-3 text-4xl md:text-5xl">{about.owner.name}</h2>
+            <h2 className="display mt-3 text-[1.85rem] sm:text-4xl md:text-5xl">{about.owner.name}</h2>
             <p className="mt-2 text-sm text-white/70">{about.owner.role}</p>
             <p className="mt-2 text-sm font-medium text-[#F47B20]">{about.owner.experience}</p>
             <p className="prose-quiet mt-6 text-white/80">{about.owner.description}</p>
@@ -123,8 +123,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1440px] px-5 py-20 md:px-8">
-        <h2 className="display text-4xl md:text-5xl">{about.partnersTitle || "Partners & standards"}</h2>
+      <section className="mx-auto max-w-[1440px] px-4 py-14 md:px-8 md:py-20">
+        <h2 className="display text-[1.85rem] sm:text-4xl md:text-5xl">{about.partnersTitle || "Partners & standards"}</h2>
         <p className="prose-quiet mt-4 max-w-2xl text-sm">{about.partnersLead}</p>
         <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {(about.logos?.length ? about.logos : []).map((logo) => (
@@ -146,8 +146,8 @@ export default function AboutPage() {
       </section>
 
       <section className="bg-[#f6f1e8]">
-        <div className="mx-auto max-w-[1440px] px-5 py-20 md:px-8">
-          <h2 className="display text-5xl">Brand values</h2>
+        <div className="mx-auto max-w-[1440px] px-4 py-14 md:px-8 md:py-20">
+          <h2 className="display text-[1.85rem] sm:text-5xl">Brand values</h2>
           <ul className="mt-10 grid gap-6 md:grid-cols-5">
             {values.map((item) => (
               <li key={item.title} className="border-t border-[#e6dfd4] pt-4">
@@ -159,12 +159,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1440px] px-5 py-16 md:px-8">
+      <section className="mx-auto max-w-[1440px] px-4 py-14 pb-28 md:px-8 md:py-16">
         <p className="text-sm text-[#8a8175]">
           Service categories on the menu: {orbit.categories.map((c) => labelForCategory(c)).join(" · ")}
         </p>
-        <div className="mt-12 bg-[#141210] px-8 py-14 text-white md:px-14">
-          <h2 className="display text-4xl md:text-5xl">{about.ctaTitle || "Come when you can stay a while."}</h2>
+        <div className="mt-12 bg-[#141210] px-5 py-10 text-white sm:px-8 sm:py-14 md:px-14">
+          <h2 className="display text-[1.85rem] sm:text-4xl md:text-5xl">{about.ctaTitle || "Come when you can stay a while."}</h2>
           <Link href={about.ctaHref || "/contact"} className="btn-primary mt-8">
             {about.ctaLabel || "Book an appointment"}
           </Link>

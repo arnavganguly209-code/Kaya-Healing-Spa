@@ -9,7 +9,7 @@ export function HomeVisitSection({ visit }: { visit: OrbitHomePage["visit"] }) {
   return (
     <section className="relative isolate overflow-hidden bg-[#c45e0a]">
       <OrangeLotusBackground idSuffix="home-massage" intensity={1} />
-      <div className="relative z-[1] mx-auto max-w-[1440px] px-5 py-20 md:px-8 lg:py-28">
+      <div className="relative z-[1] mx-auto max-w-[1440px] px-4 py-14 md:px-8 lg:py-28">
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="relative lg:col-span-7">
             <div className="relative aspect-[4/5] max-h-[620px] w-full overflow-hidden rounded-[2rem] shadow-[0_32px_80px_rgba(0,0,0,0.35)] ring-1 ring-white/40 ring-offset-4 ring-offset-[#e06d12]/30 md:rounded-[2.25rem]">
@@ -26,7 +26,7 @@ export function HomeVisitSection({ visit }: { visit: OrbitHomePage["visit"] }) {
           </div>
 
           <div className="lg:col-span-5 lg:-ml-8 xl:-ml-14">
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/50 bg-[#fffcf8] p-9 shadow-[0_28px_70px_rgba(20,12,8,0.28)] md:p-11">
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/50 bg-[#fffcf8] p-5 shadow-[0_28px_70px_rgba(20,12,8,0.28)] sm:p-9 md:p-11">
               <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#F47B20] via-[#ffd4b0] to-[#F47B20]" />
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#fff3e8] text-[#F47B20] shadow-inner">
                 <Flower2 strokeWidth={1.35} size={22} />

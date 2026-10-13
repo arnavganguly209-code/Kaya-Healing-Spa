@@ -163,7 +163,9 @@ body {
   font-family: var(--font-serif), Georgia, serif;
   font-weight: 500;
   letter-spacing: -0.03em;
-  line-height: 0.96;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .eyebrow {
@@ -199,6 +201,7 @@ textarea:focus-visible {
   font-size: 0.82rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  min-height: 48px;
   transition: background 0.3s ease, transform 0.3s ease;
 }
 
@@ -239,6 +242,23 @@ textarea:focus-visible {
 .btn-line:hover {
   color: var(--color-kaya-deep);
   border-color: var(--color-kaya-deep);
+}
+
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .btn-primary,
+  .btn-ghost {
+    width: 100%;
+  }
+
+  .btn-ghost {
+    min-height: 48px;
+  }
 }
 
 .header-solid {

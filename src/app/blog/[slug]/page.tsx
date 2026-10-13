@@ -48,7 +48,7 @@ export default async function BlogPostPage({ params }: Props) {
         text=""
         crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blog" }, { label: post.title }]}
       />
-      <article className="mx-auto max-w-[760px] px-5 py-12 md:px-8">
+      <article className="mx-auto max-w-[760px] px-4 py-12 pb-28 md:px-8">
         {post.featuredImage ? (
           <img
             src={post.featuredImage}

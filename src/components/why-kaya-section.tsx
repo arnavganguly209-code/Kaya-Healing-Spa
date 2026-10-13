@@ -45,7 +45,7 @@ export function WhyKayaSection({ data }: { data: OrbitWhyKaya }) {
               <span className="hidden h-px w-10 bg-[#dccfc4] lg:block" />
             </p>
             <h2
-              className="mt-5 text-center text-[38px] leading-[0.95] font-semibold tracking-[-0.03em] sm:text-[44px] lg:text-left lg:text-[52px]"
+              className="mt-5 text-center text-[1.85rem] leading-[1.12] font-semibold tracking-[-0.03em] sm:text-[44px] lg:text-left lg:text-[52px]"
               style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
             >
               <span className="text-[#F47B20]">{data.titleOrange}</span>

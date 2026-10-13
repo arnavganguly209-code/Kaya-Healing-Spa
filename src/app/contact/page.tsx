@@ -42,7 +42,7 @@ export default async function ContactPage({
         text={orbit.pageCovers.contact.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Contact" }]}
       />
-      <section className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 md:px-8 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 pb-28 md:px-8 md:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
         <ContactBookingHub
           services={orbit.services}
           packages={orbit.packages}
@@ -77,20 +77,20 @@ export default async function ContactPage({
         </div>
       </section>
       <section className="bg-[#f6f1e8]">
-        <div className="mx-auto max-w-[900px] px-5 py-16 md:px-8">
-          <h2 className="display text-4xl">Before you visit</h2>
+        <div className="mx-auto max-w-[900px] px-4 py-14 md:px-8 md:py-16">
+          <h2 className="display text-[1.85rem] sm:text-4xl">Before you visit</h2>
           <div className="mt-8 divide-y divide-[#e6dfd4]">
             {faqs.map((faq) => (
               <details key={faq.question} className="py-4">
-                <summary className="cursor-pointer font-serif text-2xl">{faq.question}</summary>
+                <summary className="cursor-pointer font-serif text-xl sm:text-2xl">{faq.question}</summary>
                 <p className="prose-quiet mt-2 text-sm">{faq.answer}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
-      <section id="reviews" className="mx-auto max-w-[900px] px-5 py-16">
-        <h2 className="font-serif text-3xl">Google reviews</h2>
+      <section id="reviews" className="mx-auto max-w-[900px] px-4 py-14 pb-28 md:px-8 md:py-16">
+        <h2 className="font-serif text-[1.85rem] sm:text-3xl">Google reviews</h2>
         <p className="mt-3 text-sm text-[#2f8f45]">
           {(orbit.aboutPage.googleRating || site.googleRating)} average from {(orbit.aboutPage.googleReviewCount || site.googleReviewCount).toLocaleString()} reviews on Google.
         </p>

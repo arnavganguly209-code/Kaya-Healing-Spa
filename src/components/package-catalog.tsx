@@ -67,13 +67,13 @@ export function PackageCatalog({
   }
 
   return (
-    <section className="relative bg-[#fffcf8] pb-20 pt-4 md:pb-24">
+    <section className="relative bg-[#fffcf8] px-0 pb-20 pt-4 md:pb-24">
       <CatalogPageIntro title={catalogTitle} subtitle={catalogSubtitle} />
-      <div className="mx-auto mt-6 max-w-[1440px] px-5 md:px-8">
+      <div className="mx-auto mt-6 max-w-[1440px] px-4 md:px-8">
         <MenuDownloadButton href={menuPdfHref} label="Download menu" />
       </div>
 
-      <div className="mx-auto mt-10 max-w-[1440px] px-5 md:px-8">
+      <div className="mx-auto mt-10 max-w-[1440px] px-4 md:px-8">
         <FilterChips
           label="Package categories"
           value={category}
@@ -92,17 +92,17 @@ export function PackageCatalog({
               Featured
             </span>
           </div>
-          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-14">
+          <div className="flex flex-col justify-center p-5 sm:p-8 md:p-12 lg:p-14">
             <p className="text-[11px] font-bold tracking-[0.2em] text-[#F47B20] uppercase">
               {labelForCategory(featured.category || "signature")}
             </p>
-            <h2 className="display mt-3 text-4xl md:text-5xl">{featured.name}</h2>
+            <h2 className="display mt-3 text-[1.85rem] md:text-5xl">{featured.name}</h2>
             <p className="mt-4 text-sm leading-relaxed text-white/78 md:text-base">{featured.description}</p>
             <p className="mt-4 text-sm font-medium text-white/55">{featured.durationLabel}</p>
-            <p className="mt-6 font-serif text-4xl text-white">{formatNpr(featured.priceNpr)}</p>
+            <p className="mt-6 font-serif text-3xl text-white sm:text-4xl">{formatNpr(featured.priceNpr)}</p>
             <Link
               href={`/contact?package=${featured.slug}&mode=package`}
-              className="btn-primary mt-8 w-fit rounded-full px-8"
+              className="btn-primary mt-8 w-full rounded-full px-8 sm:w-fit"
             >
               Book this package
             </Link>

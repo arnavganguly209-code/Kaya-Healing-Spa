@@ -18,7 +18,7 @@ export function PageCoverArt({ eyebrow, title, tagline, text, crumbs, children }
       <OrangeLotusBackground idSuffix="cover" intensity={1} />
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
-      <div className="relative z-[2] mx-auto flex min-h-[min(36svh,320px)] max-w-[920px] flex-col items-center justify-center px-5 py-14 text-center sm:min-h-[min(42svh,380px)] sm:py-16 md:min-h-[min(52svh,480px)] md:px-8 md:py-24">
+      <div className="relative z-[2] mx-auto flex min-h-0 max-w-[920px] flex-col items-center justify-center px-4 py-12 text-center sm:min-h-[min(42svh,380px)] sm:px-5 sm:py-16 md:min-h-[min(52svh,480px)] md:px-8 md:py-24">
         {eyebrow ? (
           <p className="text-[11px] font-bold tracking-[0.32em] text-white uppercase drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]">{eyebrow}</p>
         ) : null}
@@ -27,11 +27,11 @@ export function PageCoverArt({ eyebrow, title, tagline, text, crumbs, children }
           <span className="h-1.5 w-1.5 rotate-45 border border-white/60 bg-white/20" />
           <span className="h-px w-10 bg-white/50" />
         </div>
-        <h1 className="display mt-5 text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.06] text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.35)]">
+        <h1 className="display mt-5 max-w-full break-words text-[clamp(1.7rem,7vw,3.75rem)] leading-[1.15] text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.35)]">
           {title}
         </h1>
         {tagline ? (
-          <p className="mt-5 max-w-2xl font-serif text-lg leading-relaxed text-white drop-shadow-[0_1px_12px_rgba(0,0,0,0.3)] md:text-[1.35rem]">
+          <p className="mt-5 max-w-2xl font-serif text-base leading-relaxed text-white drop-shadow-[0_1px_12px_rgba(0,0,0,0.3)] sm:text-lg md:text-[1.35rem]">
             {tagline}
           </p>
         ) : null}

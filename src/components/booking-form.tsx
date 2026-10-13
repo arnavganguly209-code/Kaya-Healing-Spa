@@ -180,7 +180,7 @@ function Field({
         required={required}
         defaultValue={defaultValue}
         min={type === "number" ? 1 : undefined}
-        className="mt-1 w-full border border-[#e6dfd4] px-3 py-3"
+        className="mt-1 w-full border border-[#e6dfd4] px-3 py-3 text-base"
       />
     </label>
   );

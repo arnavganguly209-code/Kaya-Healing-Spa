@@ -30,7 +30,7 @@ function TherapySlideCard({
   const unoptimized = card.image.startsWith("/uploads/");
 
   return (
-    <article className="flex h-full min-h-[380px] w-[min(100%,280px)] shrink-0 snap-start flex-col overflow-hidden rounded-[22px] border border-[#f0ece8] bg-white shadow-[0_12px_40px_rgba(40,24,8,0.07)] sm:w-[300px] lg:w-[calc((100%-3rem)/4)] lg:min-w-[240px] lg:max-w-[300px]">
+    <article className="flex h-full min-h-[340px] w-[min(82vw,300px)] shrink-0 snap-start flex-col overflow-hidden rounded-[22px] border border-[#f0ece8] bg-white shadow-[0_12px_40px_rgba(40,24,8,0.07)] sm:min-h-[380px] sm:w-[300px] lg:w-[calc((100%-3rem)/4)] lg:min-w-[240px] lg:max-w-[300px]">
       <div className="relative h-[168px] sm:h-[180px]">
         <Image
           src={card.image}
@@ -111,7 +111,7 @@ export function TherapiesSection({
             <span className="h-px w-16 bg-[#F47B20]" />
           </p>
           <h2
-            className="mt-4 text-[40px] leading-[0.95] font-semibold tracking-[-0.03em] sm:text-5xl lg:text-[56px]"
+            className="mt-4 text-[1.85rem] leading-[1.12] font-semibold tracking-[-0.03em] sm:text-5xl lg:text-[56px]"
             style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
           >
             <span className="text-[#F47B20]">{titleOrange}</span>{" "}
