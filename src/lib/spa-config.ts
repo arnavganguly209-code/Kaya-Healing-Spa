@@ -57,3 +57,4 @@ export function bookingPdfSecret(): string {
 }
 
 export const SPA_BOOKING_PHONE = "01-5355882";
+export const SPA_BOOKING_WHATSAPP = "9803038823";

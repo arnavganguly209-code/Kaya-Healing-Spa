@@ -3,14 +3,18 @@ import { minutesToTime12, timeToMinutes } from "@/lib/booking-scheduler";
 import { displayBookingNumber } from "@/lib/booking-number";
 import { bookingAmountDueNpr, bookingAmountPaidNpr, bookingGrandTotalNpr } from "@/lib/booking-pricing";
 import type { SpaBooking } from "@/lib/booking-types";
-import { smtpFromEmail, SPA_BOOKING_PHONE, spaPublicUrl } from "@/lib/spa-config";
-import { readOrbitContent } from "@/lib/orbit-store";
+import { smtpFromEmail, SPA_BOOKING_PHONE, SPA_BOOKING_WHATSAPP, spaPublicUrl } from "@/lib/spa-config";
 import { embedBrandLogo } from "@/lib/pdf-brand";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
-const ORANGE = rgb(0.957, 0.482, 0.125);
-const DARK = rgb(0.08, 0.07, 0.06);
-const MUTED = rgb(0.42, 0.4, 0.37);
+const GOLD = rgb(0.957, 0.482, 0.125);
+const GOLD_SOFT = rgb(0.93, 0.78, 0.55);
+const INK = rgb(0.09, 0.08, 0.07);
+const MUTED = rgb(0.42, 0.39, 0.35);
+const CREAM = rgb(0.992, 0.976, 0.96);
+const CARD = rgb(1, 0.997, 0.992);
+const RULE = rgb(0.89, 0.84, 0.78);
+const IVORY = rgb(0.98, 0.95, 0.91);
 
 function endTimeLabel(booking: SpaBooking): string {
   const start = timeToMinutes(booking.appointmentTime);
@@ -32,148 +36,282 @@ function pdfText(value: string, max = 96): string {
     .slice(0, max);
 }
 
+function centerX(pageWidth: number, text: string, size: number, font: PDFFont): number {
+  return (pageWidth - font.widthOfTextAtSize(text, size)) / 2;
+}
+
+function drawCentered(
+  page: PDFPage,
+  text: string,
+  y: number,
+  size: number,
+  font: PDFFont,
+  color: ReturnType<typeof rgb>,
+  pageWidth: number,
+) {
+  const safe = pdfText(text, 90);
+  page.drawText(safe, { x: centerX(pageWidth, safe, size, font), y, size, font, color });
+}
+
 export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Array> {
-  const orbit = readOrbitContent();
-  const phone = orbit.phone || SPA_BOOKING_PHONE;
   const doc = await PDFDocument.create();
   const number = displayBookingNumber(booking);
   doc.setTitle(`Kaya Healing Spa Booking ${number}`);
   doc.setSubject(number);
   doc.setCreator("Kaya Healing Spa");
+
   const page = doc.addPage([595.28, 841.89]);
   const { width, height } = page.getSize();
-  const margin = 42;
+  const margin = 40;
   const contentWidth = width - margin * 2;
+  const times = await doc.embedFont(StandardFonts.TimesRoman);
+  const timesBold = await doc.embedFont(StandardFonts.TimesRomanBold);
+  const timesItalic = await doc.embedFont(StandardFonts.TimesRomanItalic);
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
 
-  let y = height - margin;
+  page.drawRectangle({ x: 0, y: 0, width, height, color: CREAM });
+  page.drawRectangle({ x: 0, y: height - 10, width, height: 10, color: GOLD });
+  page.drawRectangle({ x: 0, y: 0, width, height: 10, color: GOLD });
+  page.drawRectangle({
+    x: 18,
+    y: 18,
+    width: width - 36,
+    height: height - 36,
+    borderColor: GOLD_SOFT,
+    borderWidth: 0.8,
+    color: CREAM,
+  });
+
+  let y = height - 46;
   const logo = await embedBrandLogo(doc);
   if (logo) {
-    const logoW = 120;
+    const logoW = 168;
     const logoH = (logo.height / logo.width) * logoW;
-    page.drawImage(logo, { x: margin, y: y - logoH, width: logoW, height: logoH });
-    y -= logoH + 12;
+    page.drawImage(logo, {
+      x: (width - logoW) / 2,
+      y: y - logoH,
+      width: logoW,
+      height: logoH,
+    });
+    y -= logoH + 10;
   }
 
-  page.drawText(pdfText("Kaya Healing Spa"), { x: margin, y, size: 18, font: fontBold, color: DARK });
+  drawCentered(page, "KAYA HEALING SPA", y, 18, timesBold, INK, width);
+  y -= 16;
+  drawCentered(page, site.tagline, y, 10, timesItalic, GOLD, width);
   y -= 14;
-  const address = site.addressLine;
-  const addressLines = address.length > 52 ? [address.slice(0, 52), address.slice(52).trim()] : [address];
-  for (const line of addressLines.filter(Boolean)) {
-    page.drawText(pdfText(line, 80), { x: margin, y, size: 8, font, color: MUTED });
-    y -= 11;
-  }
-  page.drawText(pdfText(phone, 48), { x: margin, y, size: 9, font, color: MUTED });
+  drawCentered(page, site.addressLine, y, 8, font, MUTED, width);
+  y -= 13;
+  drawCentered(page, `Phone: ${SPA_BOOKING_PHONE}    WhatsApp: ${SPA_BOOKING_WHATSAPP}`, y, 9, fontBold, INK, width);
   y -= 12;
-  const contactEmail = smtpFromEmail();
-  page.drawText(pdfText(contactEmail, 64), { x: margin, y, size: 9, font, color: MUTED });
-  y -= 12;
-  page.drawText(pdfText(spaPublicUrl(), 72), { x: margin, y, size: 9, font, color: MUTED });
+  drawCentered(page, `${smtpFromEmail()}  ·  kayahealingspa.com.np`, y, 8, font, MUTED, width);
+  y -= 16;
 
-  const title = "BOOKING CONFIRMATION";
-  page.drawText(title, { x: margin, y: y - 28, size: 14, font: fontBold, color: ORANGE });
-  y -= 52;
+  page.drawLine({
+    start: { x: margin + 48, y },
+    end: { x: width - margin - 48, y },
+    thickness: 0.7,
+    color: GOLD,
+  });
+  y -= 22;
 
-  page.drawText(pdfText(`Booking No. ${number}`, 40), { x: margin, y, size: 16, font: fontBold, color: DARK });
+  drawCentered(page, "BOOKING CONFIRMATION", y, 13, timesBold, GOLD, width);
   y -= 28;
 
-  const drawSection = (label: string) => {
-    page.drawText(pdfText(label, 40), { x: margin, y, size: 11, font: fontBold, color: DARK });
-    y -= 16;
+  const badgeW = 250;
+  const badgeH = 36;
+  page.drawRectangle({
+    x: (width - badgeW) / 2,
+    y: y - 10,
+    width: badgeW,
+    height: badgeH,
+    color: IVORY,
+    borderColor: GOLD,
+    borderWidth: 1.1,
+  });
+  drawCentered(page, number, y + 4, 16, timesBold, GOLD, width);
+  y -= 32;
+  drawCentered(page, "Please present this confirmation at reception", y, 8, timesItalic, MUTED, width);
+  y -= 22;
+
+  const cardGap = 12;
+  const cardW = (contentWidth - cardGap) / 2;
+  const cardH = 118;
+  const leftX = margin;
+  const rightX = margin + cardW + cardGap;
+  const cardTop = y;
+
+  const drawCard = (x: number, title: string) => {
+    page.drawRectangle({
+      x,
+      y: cardTop - cardH,
+      width: cardW,
+      height: cardH,
+      color: CARD,
+      borderColor: RULE,
+      borderWidth: 0.8,
+    });
+    page.drawRectangle({ x, y: cardTop - 18, width: cardW, height: 18, color: INK });
+    page.drawText(pdfText(title, 28), {
+      x: x + 10,
+      y: cardTop - 13,
+      size: 8,
+      font: fontBold,
+      color: rgb(1, 1, 1),
+    });
   };
 
-  const drawRow = (label: string, value: string) => {
-    page.drawText(pdfText(label, 28), { x: margin, y, size: 9, font, color: MUTED });
-    page.drawText(pdfText(value, 70), { x: margin + 140, y, size: 9, font: fontBold, color: DARK });
-    y -= 14;
+  drawCard(leftX, "GUEST");
+  drawCard(rightX, "APPOINTMENT");
+
+  const row = (x: number, rowY: number, label: string, value: string) => {
+    page.drawText(pdfText(label, 18), { x: x + 10, y: rowY, size: 7.5, font, color: MUTED });
+    page.drawText(pdfText(value, 32), { x: x + 10, y: rowY - 11, size: 9, font: fontBold, color: INK });
   };
 
-  drawSection("Customer");
-  drawRow("Name", booking.name);
-  drawRow("Email", booking.email);
-  drawRow("Phone / WhatsApp", booking.whatsapp || booking.phone);
-  y -= 8;
+  let ly = cardTop - 32;
+  row(leftX, ly, "Name", booking.name);
+  ly -= 26;
+  row(leftX, ly, "Email", booking.email);
+  ly -= 26;
+  row(leftX, ly, "Guest phone", booking.whatsapp || booking.phone);
 
-  drawSection("Appointment");
-  drawRow("Booking created", new Date(booking.createdAt).toLocaleString("en-NP", { timeZone: "Asia/Kathmandu" }));
-  drawRow("Appointment date", booking.appointmentDate);
-  drawRow("Start time", minutesToTime12(timeToMinutes(booking.appointmentTime)));
-  drawRow("End time", endTimeLabel(booking));
-  drawRow("Guests", String(booking.guests ?? 1));
-  drawRow("Service", booking.serviceName || booking.packageName || "—");
-  drawRow("Duration", `${booking.durationMinutes} minutes`);
-  if (booking.therapistName) drawRow("Therapist", booking.therapistName);
-  if (booking.notes) drawRow("Requests", booking.notes.slice(0, 80));
-  y -= 8;
+  let ry = cardTop - 32;
+  row(rightX, ry, "Date", booking.appointmentDate);
+  ry -= 26;
+  row(rightX, ry, "Time", `${minutesToTime12(timeToMinutes(booking.appointmentTime))} – ${endTimeLabel(booking)}`);
+  ry -= 26;
+  row(rightX, ry, "Duration / guests", `${booking.durationMinutes} min  ·  ${booking.guests ?? 1} guest(s)`);
 
-  drawSection("Pricing");
-  const total = bookingGrandTotalNpr(booking);
-  const paid = bookingAmountPaidNpr(booking);
-  const due = bookingAmountDueNpr(booking);
-  const guests = booking.guests ?? 1;
+  y = cardTop - cardH - 16;
 
   page.drawRectangle({
     x: margin,
-    y: y - 72,
+    y: y - 52,
     width: contentWidth,
-    height: 76,
-    borderColor: rgb(0.9, 0.9, 0.88),
-    borderWidth: 1,
-    color: rgb(0.99, 0.99, 0.98),
+    height: 52,
+    color: CARD,
+    borderColor: RULE,
+    borderWidth: 0.8,
   });
-
-  const tableY = y - 18;
-  page.drawText("Description", { x: margin + 8, y: tableY, size: 8, font: fontBold, color: MUTED });
-  page.drawText("Qty / duration", { x: margin + 200, y: tableY, size: 8, font: fontBold, color: MUTED });
-  page.drawText("Line total", { x: margin + 320, y: tableY, size: 8, font: fontBold, color: MUTED });
-  page.drawText(pdfText(booking.serviceName || booking.packageName || "Treatment", 42), {
-    x: margin + 8,
-    y: tableY - 16,
-    size: 9,
-    font,
-    color: DARK,
+  page.drawRectangle({ x: margin, y: y - 18, width: contentWidth, height: 18, color: INK });
+  page.drawText("TREATMENT", { x: margin + 10, y: y - 13, size: 8, font: fontBold, color: rgb(1, 1, 1) });
+  page.drawText(pdfText(booking.serviceName || booking.packageName || "Treatment", 56), {
+    x: margin + 10,
+    y: y - 36,
+    size: 11,
+    font: timesBold,
+    color: INK,
   });
-  page.drawText(pdfText(`${guests} guest(s) · ${booking.durationMinutes} min`, 28), { x: margin + 200, y: tableY - 16, size: 9, font, color: DARK });
-  page.drawText(pdfText(money(total), 24), { x: margin + 320, y: tableY - 16, size: 9, font: fontBold, color: DARK });
-  y -= 96;
+  if (booking.therapistName) {
+    page.drawText(pdfText(`Therapist: ${booking.therapistName}`, 48), {
+      x: margin + 10,
+      y: y - 48,
+      size: 8,
+      font,
+      color: MUTED,
+    });
+  }
+  y -= 68;
 
-  drawRow("Subtotal", money(total));
-  drawRow("Amount paid", money(paid));
-  drawRow("Remaining due", total > 0 ? money(due) : "—");
-  drawRow("Payment status", booking.paymentStatus ?? "unpaid");
-  drawRow("Payment method", "Pay at Spa");
-  drawRow("Booking status", booking.status);
-
-  y -= 6;
-  const notice =
-    "Payment is due at the spa. No online payment has been collected for this booking.";
-  page.drawText(notice, { x: margin, y, size: 9, font: fontBold, color: DARK, maxWidth: contentWidth });
-  y -= 24;
-  page.drawText("Cancellation and rescheduling: see kayahealingspa.com.np/terms or contact reception.", {
+  const total = bookingGrandTotalNpr(booking);
+  const paid = bookingAmountPaidNpr(booking);
+  const due = bookingAmountDueNpr(booking);
+  const priceH = 92;
+  page.drawRectangle({
     x: margin,
-    y,
+    y: y - priceH,
+    width: contentWidth,
+    height: priceH,
+    color: CARD,
+    borderColor: RULE,
+    borderWidth: 0.8,
+  });
+  page.drawRectangle({ x: margin, y: y - 18, width: contentWidth, height: 18, color: GOLD });
+  page.drawText("INVESTMENT  ·  PAY AT SPA", {
+    x: margin + 10,
+    y: y - 13,
+    size: 8,
+    font: fontBold,
+    color: rgb(1, 1, 1),
+  });
+
+  const col = (label: string, value: string, cx: number) => {
+    page.drawText(pdfText(label, 18), { x: cx, y: y - 36, size: 7.5, font, color: MUTED });
+    page.drawText(pdfText(value, 22), { x: cx, y: y - 50, size: 10, font: fontBold, color: INK });
+  };
+  col("Subtotal", money(total), margin + 12);
+  col("Paid", money(paid), margin + 150);
+  col("Due at spa", total > 0 ? money(due) : "—", margin + 280);
+  page.drawText(pdfText(`Status: ${booking.status}  ·  ${(booking.paymentStatus ?? "unpaid").replace(/_/g, " ")}`, 52), {
+    x: margin + 12,
+    y: y - 72,
     size: 8,
     font,
     color: MUTED,
-    maxWidth: contentWidth,
   });
-  y -= 20;
+  y -= priceH + 14;
 
-  page.drawLine({ start: { x: margin, y }, end: { x: width - margin, y }, thickness: 0.5, color: rgb(0.85, 0.83, 0.8) });
-  y -= 16;
-  page.drawText("Thank you for choosing Kaya Healing Spa. Please present this confirmation at reception.", {
+  if (booking.notes) {
+    page.drawText("Special requests", { x: margin, y, size: 8, font: fontBold, color: INK });
+    y -= 12;
+    page.drawText(pdfText(booking.notes, 92), { x: margin, y, size: 8, font, color: MUTED, maxWidth: contentWidth });
+    y -= 16;
+  }
+
+  page.drawRectangle({
     x: margin,
-    y,
-    size: 9,
+    y: y - 36,
+    width: contentWidth,
+    height: 36,
+    color: IVORY,
+    borderColor: GOLD,
+    borderWidth: 0.7,
+  });
+  page.drawText("No online payment has been collected. The remaining balance is due at the spa.", {
+    x: margin + 10,
+    y: y - 16,
+    size: 8,
+    font: fontBold,
+    color: INK,
+    maxWidth: contentWidth - 20,
+  });
+  page.drawText("Cancellation and rescheduling: kayahealingspa.com.np/terms", {
+    x: margin + 10,
+    y: y - 28,
+    size: 7.5,
     font,
     color: MUTED,
-    maxWidth: contentWidth,
   });
+  y -= 52;
 
-  const footerY = margin + 8;
-  page.drawText(pdfText(`Reference: ${number}`, 40), { x: margin, y: footerY, size: 8, font, color: MUTED });
-  page.drawText("Page 1 of 1", { x: width - margin - 52, y: footerY, size: 8, font, color: MUTED });
+  drawCentered(
+    page,
+    "Thank you for choosing Kaya Healing Spa. We look forward to welcoming you.",
+    y,
+    9,
+    timesItalic,
+    INK,
+    width,
+  );
+
+  const footerY = 28;
+  page.drawText(pdfText(`Reference ${number}`, 28), { x: margin, y: footerY, size: 7.5, font, color: MUTED });
+  page.drawText(`Phone ${SPA_BOOKING_PHONE}`, {
+    x: centerX(width, `Phone ${SPA_BOOKING_PHONE}`, 7.5, font),
+    y: footerY,
+    size: 7.5,
+    font,
+    color: MUTED,
+  });
+  page.drawText(`WhatsApp ${SPA_BOOKING_WHATSAPP}`, {
+    x: width - margin - font.widthOfTextAtSize(`WhatsApp ${SPA_BOOKING_WHATSAPP}`, 7.5),
+    y: footerY,
+    size: 7.5,
+    font,
+    color: MUTED,
+  });
 
   return doc.save();
 }

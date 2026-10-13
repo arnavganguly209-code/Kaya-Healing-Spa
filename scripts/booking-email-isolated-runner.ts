@@ -59,6 +59,9 @@ async function main(): Promise<void> {
   if (!loaded.getTitle()?.includes("KAYA02099")) throw new Error("PDF metadata missing booking reference");
   if (loaded.getSubject() !== "KAYA02099") throw new Error("PDF subject missing booking reference");
   if (loaded.getPageCount() !== 1) throw new Error("PDF should be a single page");
+  if (loaded.getPageCount() === 1 && loaded.getPage(0).getSize().width < 500) {
+    throw new Error("PDF page too small");
+  }
 
   const unicodeBooking: SpaBooking = { ...booking, name: "काया Test" };
   const unicodePdf = await generateBookingPdf(unicodeBooking);
