@@ -27,13 +27,50 @@ function money(amount: number | null | undefined): string {
   return formatNpr(amount);
 }
 
-/** Helvetica/WinAnsi cannot encode Devanagari; never throw while drawing. */
+/** Helvetica/WinAnsi: keep ASCII punctuation. Never insert "?" for unknown glyphs. */
 function pdfText(value: string, max = 96): string {
   return value
-    .replace(/[^\t\n\r\x20-\x7E]/g, "?")
+    .replace(/[–—−]/g, "-")
+    .replace(/[·•∙]/g, " | ")
+    .replace(/[’‘]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/\u00a0/g, " ")
+    .replace(/[^\t\n\r\x20-\x7E]/g, "")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, max);
+}
+
+function formatPdfDate(ymd: string): string {
+  const match = ymd.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return ymd;
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const month = months[Number(match[2]) - 1];
+  if (!month) return ymd;
+  return `${Number(match[3])} ${month} ${match[1]}`;
+}
+
+function pdfStatusLabel(status: string): string {
+  if (status === "confirmed") return "Confirmed";
+  if (status === "pending") return "Pending confirmation";
+  if (status === "completed") return "Completed";
+  if (status === "cancelled") return "Cancelled";
+  if (status === "rejected") return "Declined";
+  if (status === "no_show") return "No show";
+  return status.replace(/_/g, " ");
 }
 
 function centerX(pageWidth: number, text: string, size: number, font: PDFFont): number {
@@ -83,10 +120,10 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
     color: CREAM,
   });
 
-  let y = height - 46;
+  let y = height - 42;
   const logo = await embedBrandLogo(doc);
   if (logo) {
-    const logoW = 168;
+    const logoW = 132;
     const logoH = (logo.height / logo.width) * logoW;
     page.drawImage(logo, {
       x: (width - logoW) / 2,
@@ -94,18 +131,19 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
       width: logoW,
       height: logoH,
     });
-    y -= logoH + 10;
+    y -= logoH + 22;
   }
 
-  drawCentered(page, "KAYA HEALING SPA", y, 18, timesBold, INK, width);
-  y -= 16;
+  drawCentered(page, "KAYA HEALING SPA", y, 17, timesBold, INK, width);
+  y -= 15;
   drawCentered(page, site.tagline, y, 10, timesItalic, GOLD, width);
   y -= 14;
   drawCentered(page, site.addressLine, y, 8, font, MUTED, width);
   y -= 13;
   drawCentered(page, `Phone: ${SPA_BOOKING_PHONE}    WhatsApp: ${SPA_BOOKING_WHATSAPP}`, y, 9, fontBold, INK, width);
   y -= 12;
-  drawCentered(page, `${smtpFromEmail()}  ·  kayahealingspa.com.np`, y, 8, font, MUTED, width);
+  const mail = smtpFromEmail() || "booking@kayahealingspa.com.np";
+  drawCentered(page, `${mail}  |  www.kayahealingspa.com.np`, y, 8, font, MUTED, width);
   y -= 16;
 
   page.drawLine({
@@ -137,7 +175,7 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
 
   const cardGap = 12;
   const cardW = (contentWidth - cardGap) / 2;
-  const cardH = 118;
+  const cardH = 132;
   const leftX = margin;
   const rightX = margin + cardW + cardGap;
   const cardTop = y;
@@ -165,24 +203,26 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
   drawCard(leftX, "GUEST");
   drawCard(rightX, "APPOINTMENT");
 
-  const row = (x: number, rowY: number, label: string, value: string) => {
+  const row = (x: number, rowY: number, label: string, value: string, valueSize = 9) => {
     page.drawText(pdfText(label, 18), { x: x + 10, y: rowY, size: 7.5, font, color: MUTED });
-    page.drawText(pdfText(value, 32), { x: x + 10, y: rowY - 11, size: 9, font: fontBold, color: INK });
+    page.drawText(pdfText(value, 36), { x: x + 10, y: rowY - 13, size: valueSize, font: fontBold, color: INK });
   };
 
   let ly = cardTop - 32;
   row(leftX, ly, "Name", booking.name);
-  ly -= 26;
+  ly -= 30;
   row(leftX, ly, "Email", booking.email);
-  ly -= 26;
+  ly -= 30;
   row(leftX, ly, "Guest phone", booking.whatsapp || booking.phone);
 
+  const startLabel = minutesToTime12(timeToMinutes(booking.appointmentTime));
+  const endLabel = endTimeLabel(booking);
   let ry = cardTop - 32;
-  row(rightX, ry, "Date", booking.appointmentDate);
-  ry -= 26;
-  row(rightX, ry, "Time", `${minutesToTime12(timeToMinutes(booking.appointmentTime))} – ${endTimeLabel(booking)}`);
-  ry -= 26;
-  row(rightX, ry, "Duration / guests", `${booking.durationMinutes} min  ·  ${booking.guests ?? 1} guest(s)`);
+  row(rightX, ry, "Date", formatPdfDate(booking.appointmentDate), 10);
+  ry -= 30;
+  row(rightX, ry, "Time", `${startLabel} to ${endLabel}`, 10);
+  ry -= 30;
+  row(rightX, ry, "Duration / guests", `${booking.durationMinutes} min  |  ${booking.guests ?? 1} guest(s)`);
 
   y = cardTop - cardH - 16;
 
@@ -229,7 +269,7 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
     borderWidth: 0.8,
   });
   page.drawRectangle({ x: margin, y: y - 18, width: contentWidth, height: 18, color: GOLD });
-  page.drawText("INVESTMENT  ·  PAY AT SPA", {
+  page.drawText("INVESTMENT  |  PAY AT SPA", {
     x: margin + 10,
     y: y - 13,
     size: 8,
@@ -243,8 +283,8 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
   };
   col("Subtotal", money(total), margin + 12);
   col("Paid", money(paid), margin + 150);
-  col("Due at spa", total > 0 ? money(due) : "—", margin + 280);
-  page.drawText(pdfText(`Status: ${booking.status}  ·  ${(booking.paymentStatus ?? "unpaid").replace(/_/g, " ")}`, 52), {
+  col("Due at spa", total > 0 ? money(due) : "-", margin + 280);
+  page.drawText(pdfText(`Status: ${pdfStatusLabel(booking.status)}  |  ${(booking.paymentStatus ?? "unpaid").replace(/_/g, " ")}`, 56), {
     x: margin + 12,
     y: y - 72,
     size: 8,

@@ -120,6 +120,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           whatsapp={orbit.whatsapp?.trim() || site.whatsapp}
           serviceCategories={orbit.categories}
           packageCategories={orbit.packageCategories}
+          logoSrc={orbit.brandLogo}
           footer={<SiteFooter />}
         >
           {children}

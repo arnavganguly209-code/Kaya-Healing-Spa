@@ -195,6 +195,8 @@ export type OrbitContent = {
   externalReviewLinks: OrbitExternalReviewLinks;
   socialLinks: OrbitSocialLink[];
   extraSocialLinks: OrbitExtraSocialLink[];
+  /** Public header/footer logo path (/brand/... or /uploads/...). */
+  brandLogo?: string;
   hero: OrbitHero;
   therapies: {
     eyebrow: string;
@@ -647,6 +649,7 @@ export function defaultOrbitContent(): OrbitContent {
     externalReviewLinks: defaultExternalReviewLinks(),
     socialLinks: defaultSocialLinks(),
     extraSocialLinks: [],
+    brandLogo: "/brand/kaya-logo-hd.webp",
     servicesMenuPdf: "",
     packagesMenuPdf: "",
     hero: {
@@ -964,6 +967,7 @@ function loadOrbitContentFromDisk(): OrbitContent {
           : merged.whatsapp.trim(),
       email:
         !merged.email?.trim() || merged.email.includes("example.com") ? defaults.email : merged.email.trim(),
+      brandLogo: typeof merged.brandLogo === "string" && merged.brandLogo.trim() ? merged.brandLogo.trim() : defaults.brandLogo,
       servicesMenuPdf: typeof merged.servicesMenuPdf === "string" ? merged.servicesMenuPdf : defaults.servicesMenuPdf,
       packagesMenuPdf: typeof merged.packagesMenuPdf === "string" ? merged.packagesMenuPdf : defaults.packagesMenuPdf,
       socialLinks: normalizeSocialLinks(merged.socialLinks),

@@ -1,16 +1,30 @@
 "use client";
 
 import { formApiUrl } from "@/lib/form-api";
-import { parseServiceDurationOptions, priceLabel } from "@/lib/service-pricing";
+import { parsePackageDurationOptions, parseServiceDurationOptions, priceLabel } from "@/lib/service-pricing";
 import type { OrbitTherapist } from "@/lib/orbit-types";
-import type { Service } from "@/lib/types";
+import type { Service, SpaPackage } from "@/lib/types";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 const CONFIRMATION_PATH = "/booking/confirmed";
 
-export function ServiceBookingPanel({ service, therapists }: { service: Service; therapists: OrbitTherapist[] }) {
-  const durationOptions = useMemo(() => parseServiceDurationOptions(service), [service]);
+export function ServiceBookingPanel({
+  service,
+  pkg,
+  therapists,
+}: {
+  service?: Service;
+  pkg?: SpaPackage;
+  therapists: OrbitTherapist[];
+}) {
+  const offering = service ?? null;
+  const durationOptions = useMemo(
+    () => (pkg ? parsePackageDurationOptions(pkg) : offering ? parseServiceDurationOptions(offering) : []),
+    [pkg, offering],
+  );
+  const title = pkg?.name || offering?.name || "Booking";
+  const eyebrow = pkg ? "Book this package" : "Book this treatment";
   const [durationMinutes, setDurationMinutes] = useState(durationOptions[0]?.minutes ?? 60);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -59,8 +73,9 @@ export function ServiceBookingPanel({ service, therapists }: { service: Service;
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        bookingType: "service",
-        serviceSlug: service.slug,
+        bookingType: pkg ? "package" : "service",
+        serviceSlug: offering?.slug,
+        packageSlug: pkg?.slug,
         durationMinutes,
         priceNpr: selectedPrice,
         name,
@@ -96,8 +111,8 @@ export function ServiceBookingPanel({ service, therapists }: { service: Service;
 
   return (
     <aside id="book" className="h-fit scroll-mt-28 rounded-2xl border border-[#e6dfd4] bg-[#fffdfb] p-6 shadow-[0_16px_48px_rgba(20,18,16,0.08)] lg:sticky lg:top-28">
-      <p className="text-xs font-semibold tracking-[0.18em] text-[#F47B20] uppercase">Book this treatment</p>
-      <h2 className="mt-2 font-serif text-2xl text-[#141210]">{service.name}</h2>
+      <p className="text-xs font-semibold tracking-[0.18em] text-[#F47B20] uppercase">{eyebrow}</p>
+      <h2 className="mt-2 font-serif text-2xl text-[#141210]">{title}</h2>
 
       <form onSubmit={submit} className="mt-6 space-y-4">
         <label className="block text-sm font-medium">

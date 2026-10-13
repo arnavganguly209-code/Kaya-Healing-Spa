@@ -70,13 +70,13 @@ export function HomePage() {
           </h1>
           <div className="relative z-20 w-full shrink-0">
             <div className="hero-feature-glass relative z-20 w-full shrink-0">
-            <ul className="grid sm:grid-cols-2 lg:grid-cols-4">
+            <ul className="grid grid-cols-2 lg:grid-cols-4">
               {hero.features.map((feature, index) => {
                 const Icon = featureIcons[index % featureIcons.length];
                 return (
                   <li
                     key={feature.title}
-                    className="flex items-center gap-2.5 px-4 py-3.5 max-[900px]:py-3 sm:gap-4 sm:px-6 sm:py-5 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-[#f47b20]/10 sm:[&:not(:first-child)]:border-t-0 sm:[&:not(:first-child)]:lg:border-l sm:[&:not(:first-child)]:lg:border-[#f47b20]/15"
+                    className="flex items-center gap-2 px-3 py-3 sm:gap-4 sm:px-6 sm:py-5 [&:nth-child(n+3)]:border-t [&:nth-child(n+3)]:border-[#f47b20]/10 lg:[&:nth-child(n+3)]:border-t-0 lg:[&:not(:first-child)]:border-l lg:[&:not(:first-child)]:border-[#f47b20]/15"
                   >
                     <Icon className="shrink-0 text-[#F47B20]" size={28} strokeWidth={1.3} />
                     <span className="min-w-0">
@@ -106,7 +106,7 @@ export function HomePage() {
 
       <section className="bg-[#f6f1e8]">
         <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-20 md:px-8 lg:grid-cols-2 lg:py-28">
-          <Reveal className="relative min-h-[420px]">
+          <Reveal className="relative min-h-[240px] sm:min-h-[420px]">
             <Image
               src={homeAbout.image}
               alt={homeAbout.imageAlt}

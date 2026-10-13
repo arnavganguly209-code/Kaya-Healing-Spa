@@ -33,12 +33,17 @@ export type SpaPackage = {
   category?: string;
   summary: string;
   description: string;
+  overview?: string;
   durationLabel: string;
+  durationMinutes?: number;
+  durationOptions?: string[];
   priceNpr: number;
   compareAtNpr?: number;
   priceIsPlaceholder: true;
   featured?: boolean;
   items: PackageItem[];
+  benefits?: string[];
+  expect?: string[];
   image: string;
   imageAlt: string;
 };

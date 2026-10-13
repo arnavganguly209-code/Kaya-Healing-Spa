@@ -34,6 +34,7 @@ export default async function AdminPage() {
         gallery: c.gallery,
         servicesMenuPdf: c.servicesMenuPdf || "",
         packagesMenuPdf: c.packagesMenuPdf || "",
+        brandLogo: c.brandLogo || "",
       }}
     />
   );

@@ -11,12 +11,14 @@ export function SiteChrome({
   whatsapp = site.whatsapp,
   serviceCategories,
   packageCategories,
+  logoSrc,
   footer,
   children,
 }: {
   whatsapp?: string;
   serviceCategories?: string[];
   packageCategories?: string[];
+  logoSrc?: string;
   footer: ReactNode;
   children: ReactNode;
 }) {
@@ -28,6 +30,7 @@ export function SiteChrome({
         serviceCategories={serviceCategories}
         packageCategories={packageCategories}
         whatsappDisplay={whatsapp}
+        logoSrc={logoSrc}
       />
       <main className={pathname === "/" ? "" : "pt-[64px] sm:pt-[68px] lg:pt-[108px]"}>{children}</main>
       {footer}

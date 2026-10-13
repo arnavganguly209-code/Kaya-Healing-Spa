@@ -283,10 +283,19 @@ export function AdminPackagesEditor({ slice, setSlice, publish, upload }: Editor
                 </label>
                 <Area label="Summary" value={p.summary} onChange={(v) => patchPackage(index, { summary: v })} />
                 <Area label="Description" value={p.description} onChange={(v) => patchPackage(index, { description: v })} rows={6} />
+                <Area label="Overview (detail page)" value={p.overview || ""} onChange={(v) => patchPackage(index, { overview: v })} rows={5} />
                 <Field label="Duration label" value={p.durationLabel} onChange={(v) => patchPackage(index, { durationLabel: v })} />
+                <Field label="Duration minutes (for booking slots)" value={String(p.durationMinutes ?? "")} onChange={(v) => patchPackage(index, { durationMinutes: Number(v) || undefined })} />
+                <Area label="Duration & price lines (optional)" value={(p.durationOptions || []).join("\n")} onChange={(v) => patchPackage(index, { durationOptions: v.split("\n").map((l) => l.trim()).filter(Boolean) })} />
                 <Field label="Price (NPR)" value={String(p.priceNpr)} onChange={(v) => patchPackage(index, { priceNpr: Number(v) || 0 })} />
                 <Field label="Compare-at NPR (optional)" value={String(p.compareAtNpr ?? "")} onChange={(v) => patchPackage(index, { compareAtNpr: Number(v) || undefined })} />
                 <Area label="Items (Name | detail per line)" value={p.items.map((item) => `${item.name} | ${item.detail}`).join("\n")} onChange={(v) => patchPackage(index, { items: v.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => { const [name, detail] = line.split("|").map((x) => x.trim()); return { name: name || "Item", detail: detail || "" }; }) })} />
+                <Area label="Benefits (one per line)" value={(p.benefits || []).join("\n")} onChange={(v) => patchPackage(index, { benefits: v.split("\n").map((l) => l.trim()).filter(Boolean) })} />
+                <Area label="What to expect (one per line)" value={(p.expect || []).join("\n")} onChange={(v) => patchPackage(index, { expect: v.split("\n").map((l) => l.trim()).filter(Boolean) })} />
+                <label className="mt-3 flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={Boolean(p.featured)} onChange={(e) => patchPackage(index, { featured: e.target.checked })} />
+                  Featured on packages page
+                </label>
                 <MediaField label="Image" src={p.image} onUpload={(file) => upload(file, (image) => publish({ ...slice, packages: slice.packages.map((x, i) => (i === index ? { ...x, image } : x)) }))} />
                 <Field label="Image alt" value={p.imageAlt} onChange={(v) => patchPackage(index, { imageAlt: v })} />
                 <div className="mt-6 flex flex-wrap gap-3">

@@ -13,6 +13,7 @@ import {
   type CatalogAdminSlice,
 } from "@/components/admin-catalog-sections";
 import { AdminHomeEditor, type AdminHomeSlice } from "@/components/admin-home-editor";
+import { Logo } from "@/components/logo";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -41,6 +42,7 @@ type AdminData = {
   homePage: OrbitContent["homePage"];
   servicesMenuPdf?: string;
   packagesMenuPdf?: string;
+  brandLogo?: string;
 };
 
 const allSections = ["Dashboard", "Home page", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Bookings", "Blog", "Inquiries", "Reviews", "Account"] as const;
@@ -252,8 +254,13 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
       <header className="sticky top-0 z-40 border-b border-[#e8dfd4] bg-[#1a1512]/95 text-white backdrop-blur-md">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.28em] text-[#ffb366] uppercase">Kaya Healing Spa</p>
-            <p className="font-serif text-2xl md:text-3xl">Admin dashboard</p>
+            <div className="flex items-center gap-3">
+              <Logo src={content.brandLogo} />
+              <div>
+                <p className="text-[11px] font-semibold tracking-[0.28em] text-[#ffb366] uppercase">Kaya Healing Spa</p>
+                <p className="font-serif text-2xl md:text-3xl">Admin dashboard</p>
+              </div>
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Link href="/" className="rounded-full border border-white/20 px-4 py-2 text-sm text-white/90 hover:bg-white/10">
@@ -387,6 +394,13 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
 
           {section === "Footer" && (
             <>
+              <h2 className="font-serif text-2xl">Brand logo</h2>
+              <p className="mt-1 text-sm text-[#6B6B6B]">Shown in the header, footer, and admin. Upload a transparent PNG or WebP circle.</p>
+              <MediaField
+                label="Current logo"
+                src={content.brandLogo || ""}
+                onUpload={(file) => upload(file, (brandLogo) => publish({ ...content, brandLogo }))}
+              />
               <Field label="Brand name" value={content.footerBrand} onChange={(v) => setContent({ ...content, footerBrand: v })} />
               <Area label="Footer description" value={content.footerText} onChange={(v) => setContent({ ...content, footerText: v })} />
               <Field label="Phone" value={content.phone} onChange={(v) => setContent({ ...content, phone: v })} />

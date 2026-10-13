@@ -22,10 +22,12 @@ export function SiteHeader({
   serviceCategories,
   packageCategories,
   whatsappDisplay = site.whatsapp,
+  logoSrc,
 }: {
   serviceCategories?: string[];
   packageCategories?: string[];
   whatsappDisplay?: string;
+  logoSrc?: string;
 }) {
   const serviceMenu = serviceCategories?.length ? serviceCategories : [...serviceMenuCategories];
   const packageMenu = packageCategories?.length ? packageCategories : [...packageMenuCategories];
@@ -77,7 +79,7 @@ export function SiteHeader({
     >
       <div className="relative mx-auto flex h-[64px] w-full max-w-[1440px] items-center justify-between gap-3 px-4 sm:h-[68px] sm:px-5 md:px-8 lg:h-[108px] lg:gap-4">
         <Link href="/" className="relative z-10 shrink-0" aria-label="Kaya Healing Spa home">
-          <Logo priority />
+          <Logo src={logoSrc} priority />
         </Link>
 
         <nav

@@ -31,6 +31,7 @@ export async function GET() {
       gallery: c.gallery,
       servicesMenuPdf: c.servicesMenuPdf || "",
       packagesMenuPdf: c.packagesMenuPdf || "",
+      brandLogo: c.brandLogo || "",
     },
   });
 }
@@ -76,6 +77,7 @@ export async function PUT(request: Request) {
     gallery: Array.isArray(bodyGallery) ? bodyGallery : current.gallery,
     servicesMenuPdf: typeof body.servicesMenuPdf === "string" ? body.servicesMenuPdf : current.servicesMenuPdf,
     packagesMenuPdf: typeof body.packagesMenuPdf === "string" ? body.packagesMenuPdf : current.packagesMenuPdf,
+    brandLogo: typeof body.brandLogo === "string" && body.brandLogo.trim() ? body.brandLogo.trim() : current.brandLogo,
   });
   revalidatePath("/", "layout");
   revalidatePath("/services");

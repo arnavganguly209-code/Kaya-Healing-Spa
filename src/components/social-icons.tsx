@@ -7,7 +7,8 @@ export function resolveSocialIconUrl(src: string) {
 export function SocialIcon({ id, iconSrc, large }: { id: string; iconSrc?: string; large?: boolean }) {
   const iconClass = large ? "h-7 w-7" : "h-5 w-5";
   const custom = iconSrc?.trim();
-  if (custom) {
+  const useCustom = custom && !(id === "tripadvisor" && custom.includes("tripadvisor-icon"));
+  if (useCustom) {
     const src = resolveSocialIconUrl(custom);
     return <img src={src} alt="" className={`${iconClass} object-contain`} />;
   }
@@ -23,7 +24,16 @@ export function SocialIcon({ id, iconSrc, large }: { id: string; iconSrc?: strin
         </svg>
       );
     case "tripadvisor":
-      return <img src="/brand/tripadvisor-icon.svg" alt="" className={iconClass} width={20} height={20} />;
+      return (
+        <svg className={iconClass} viewBox="0 0 24 24" aria-hidden>
+          <circle cx="12" cy="12" r="12" fill="#00AF87" />
+          <circle cx="8.15" cy="11.1" r="4.15" fill="#fff" />
+          <circle cx="15.85" cy="11.1" r="4.15" fill="#fff" />
+          <circle cx="8.15" cy="11.1" r="1.55" fill="#1a1a1a" />
+          <circle cx="15.85" cy="11.1" r="1.55" fill="#1a1a1a" />
+          <path fill="#1a1a1a" d="M12 12.35 10.35 16.2h3.3L12 12.35z" />
+        </svg>
+      );
     case "instagram":
       return (
         <svg className={iconClass} viewBox="0 0 24 24" aria-hidden>

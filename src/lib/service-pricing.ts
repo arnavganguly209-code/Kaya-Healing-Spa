@@ -1,4 +1,4 @@
-import type { Service } from "@/lib/types";
+import type { Service, SpaPackage } from "@/lib/types";
 import { formatNpr } from "@/lib/content";
 
 export type ServiceDurationOption = {
@@ -53,4 +53,45 @@ export function parseServiceDurationOptions(service: Service): ServiceDurationOp
 export function priceLabel(option: ServiceDurationOption) {
   if (option.priceNpr == null || option.priceNpr <= 0) return "Price to be confirmed at reception";
   return formatNpr(option.priceNpr);
+}
+
+export function minutesFromDurationLabel(label: string, fallback = 120) {
+  const hours = Number(label.match(/(\d+)\s*hour/i)?.[1] || 0);
+  const mins = Number(label.match(/(\d+)\s*min/i)?.[1] || 0);
+  const total = hours * 60 + mins;
+  return total > 0 ? total : fallback;
+}
+
+export function parsePackageDurationOptions(pkg: SpaPackage): ServiceDurationOption[] {
+  const durationMinutes = pkg.durationMinutes && pkg.durationMinutes > 0
+    ? pkg.durationMinutes
+    : minutesFromDurationLabel(pkg.durationLabel);
+  const stub: Service = {
+    slug: pkg.slug,
+    name: pkg.name,
+    category: "wellness",
+    summary: pkg.summary,
+    overview: pkg.overview || pkg.description,
+    durationMinutes,
+    durationOptions: pkg.durationOptions?.length ? pkg.durationOptions : [],
+    priceFromNpr: pkg.priceNpr,
+    priceIsPlaceholder: true,
+    benefits: pkg.benefits || [],
+    expect: pkg.expect || [],
+    recommendedFor: [],
+    preparation: [],
+    image: pkg.image,
+    imageAlt: pkg.imageAlt,
+  };
+  const parsed = parseServiceDurationOptions(stub);
+  if (parsed.length === 1 && parsed[0].minutes === 60 && durationMinutes !== 60 && !pkg.durationOptions?.length) {
+    return [
+      {
+        minutes: durationMinutes,
+        label: pkg.durationLabel || `${durationMinutes} minutes`,
+        priceNpr: pkg.priceNpr > 0 ? pkg.priceNpr : null,
+      },
+    ];
+  }
+  return parsed;
 }
