@@ -29,6 +29,8 @@ export async function GET() {
       adminSectionFlags: c.adminSectionFlags,
       homePage: c.homePage,
       gallery: c.gallery,
+      servicesMenuPdf: c.servicesMenuPdf || "",
+      packagesMenuPdf: c.packagesMenuPdf || "",
     },
   });
 }
@@ -72,6 +74,8 @@ export async function PUT(request: Request) {
         }
       : current.homePage,
     gallery: Array.isArray(bodyGallery) ? bodyGallery : current.gallery,
+    servicesMenuPdf: typeof body.servicesMenuPdf === "string" ? body.servicesMenuPdf : current.servicesMenuPdf,
+    packagesMenuPdf: typeof body.packagesMenuPdf === "string" ? body.packagesMenuPdf : current.packagesMenuPdf,
   });
   revalidatePath("/", "layout");
   revalidatePath("/services");

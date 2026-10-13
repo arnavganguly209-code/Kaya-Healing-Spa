@@ -51,6 +51,7 @@ export default async function ServicesPage({
         catalogSubtitle={live.pageCovers.services.catalogSubtitle}
         items={services}
         categories={live.categories}
+        menuPdfHref={live.servicesMenuPdf}
       />
       <TherapistStrip therapists={live.therapists} intro="Book a treatment and pick your therapist on the contact form." />
     </>

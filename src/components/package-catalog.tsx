@@ -1,10 +1,11 @@
 "use client";
 
+import { CatalogPhoto } from "@/components/catalog-photo";
+import { MenuDownloadButton } from "@/components/menu-download-button";
 import { CatalogPageIntro } from "@/components/page-hero";
 import { formatNpr, labelForCategory, packageMenuCategories, packages as fallbackPackages } from "@/lib/content";
 import { NAV_MENU_TYPE } from "@/lib/nav-menu-type";
 import type { SpaPackage } from "@/lib/types";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -15,12 +16,14 @@ export function PackageCatalog({
   catalogSubtitle,
   items = fallbackPackages,
   categories,
+  menuPdfHref,
 }: {
   initialCategory?: string;
   catalogTitle?: string;
   catalogSubtitle?: string;
   items?: SpaPackage[];
   categories?: string[];
+  menuPdfHref?: string;
 }) {
   const [category, setCategory] = useState(initialCategory || "all");
   const router = useRouter();
@@ -66,6 +69,9 @@ export function PackageCatalog({
   return (
     <section className="relative bg-[#fffcf8] pb-20 pt-4 md:pb-24">
       <CatalogPageIntro title={catalogTitle} subtitle={catalogSubtitle} />
+      <div className="mx-auto mt-6 max-w-[1440px] px-5 md:px-8">
+        <MenuDownloadButton href={menuPdfHref} label="Download menu" />
+      </div>
 
       <div className="mx-auto mt-10 max-w-[1440px] px-5 md:px-8">
         <div className="flex flex-wrap justify-center gap-2" role="tablist" aria-label="Package categories">
@@ -89,7 +95,7 @@ export function PackageCatalog({
 
         <article className="mt-12 overflow-hidden rounded-3xl bg-[#141210] text-white shadow-[0_20px_50px_rgba(20,18,16,0.18)] lg:grid lg:grid-cols-2">
           <div className="relative min-h-[320px] lg:min-h-[420px]">
-            <Image src={featured.image} alt={featured.imageAlt} fill className="object-cover" sizes="50vw" />
+            <CatalogPhoto src={featured.image} alt={featured.imageAlt} className="object-cover" sizes="50vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#141210]/80 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-[#141210]/40" />
             <span className="absolute left-5 top-5 rounded-full border border-[#F47B20]/60 bg-[#141210]/60 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-[#F47B20] uppercase backdrop-blur-sm">
               Featured
@@ -120,10 +126,9 @@ export function PackageCatalog({
                 className="group overflow-hidden rounded-2xl border border-[#efe8e0] bg-white shadow-[0_8px_30px_rgba(20,18,16,0.06)] transition hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(20,18,16,0.1)]"
               >
                 <div className="relative h-64 overflow-hidden">
-                  <Image
+                  <CatalogPhoto
                     src={item.image}
                     alt={item.imageAlt}
-                    fill
                     className="object-cover transition duration-500 group-hover:scale-105"
                     sizes="50vw"
                   />

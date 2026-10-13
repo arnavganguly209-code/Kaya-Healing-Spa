@@ -36,7 +36,7 @@ function MediaField({
   onUpload: (file: File) => void;
   onRemove?: () => void;
 }) {
-  const previewSrc = src?.startsWith("/uploads/") ? `/api/orbit/media/file?path=${encodeURIComponent(src)}` : src;
+  const previewSrc = src || "";
   return (
     <div className="mt-4 rounded-xl border border-[#efe8e0] bg-[#fffdfb] p-4">
       <p className="text-sm font-semibold">{label}</p>

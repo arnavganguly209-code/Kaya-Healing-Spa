@@ -4,15 +4,17 @@ import { getUploadDir } from "@/lib/upload-path";
 
 export const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 export const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
+export const PDF_TYPES = ["application/pdf"];
 export const IMAGE_MAX = 25 * 1024 * 1024;
 export const VIDEO_MAX = 120 * 1024 * 1024;
+export const PDF_MAX = 25 * 1024 * 1024;
 
 const uploadDir = getUploadDir();
 
 export type MediaItem = {
   path: string;
   name: string;
-  kind: "image" | "video";
+  kind: "image" | "video" | "pdf";
   size: number;
 };
 
@@ -20,24 +22,29 @@ export function isVideoName(name: string) {
   return /\.(mp4|webm|mov)$/i.test(name);
 }
 
+export function isPdfName(name: string) {
+  return /\.pdf$/i.test(name);
+}
+
 export function describeFile(file: File) {
   const type = (file.type || "").toLowerCase();
   const name = file.name || "";
   const image = IMAGE_TYPES.includes(type) || type.startsWith("image/") || /\.(jpe?g|png|webp|gif)$/i.test(name);
   const video = VIDEO_TYPES.includes(type) || type.startsWith("video/") || isVideoName(name);
-  return { image, video, kind: (video ? "video" : image ? "image" : "") as "image" | "video" | "" };
+  const pdf = PDF_TYPES.includes(type) || isPdfName(name);
+  return { image, video, pdf, kind: (pdf ? "pdf" : video ? "video" : image ? "image" : "") as "image" | "video" | "pdf" | "" };
 }
 
 export function rejectUpload(file: File) {
-  const { image, video } = describeFile(file);
-  if (!image && !video) {
-    return "Use a JPG, PNG, WebP, GIF, MP4, or WebM file.";
+  const { image, video, pdf } = describeFile(file);
+  if (!image && !video && !pdf) {
+    return "Use a JPG, PNG, WebP, GIF, PDF, MP4, or WebM file.";
   }
   if (video && file.size > VIDEO_MAX) {
     return `This video is ${(file.size / 1024 / 1024).toFixed(1)} MB. The limit is 120 MB.`;
   }
-  if (image && file.size > IMAGE_MAX) {
-    return `This image is ${(file.size / 1024 / 1024).toFixed(1)} MB. The limit is 25 MB.`;
+  if ((image || pdf) && file.size > (pdf ? PDF_MAX : IMAGE_MAX)) {
+    return `This file is ${(file.size / 1024 / 1024).toFixed(1)} MB. The limit is 25 MB.`;
   }
   if (file.size <= 0) {
     return "That file is empty.";
@@ -47,6 +54,7 @@ export function rejectUpload(file: File) {
 
 export function extensionFor(file: File) {
   const type = file.type;
+  if (type === "application/pdf" || /\.pdf$/i.test(file.name)) return "pdf";
   if (type === "image/png") return "png";
   if (type === "image/webp") return "webp";
   if (type === "image/gif") return "gif";
@@ -70,7 +78,7 @@ export async function saveUpload(file: File) {
   if (!existsSync(fullPath) || statSync(fullPath).size <= 0) {
     throw new Error("Upload could not be saved on the server. Check folder permissions for public/uploads.");
   }
-  return { path: `/uploads/${name}`, kind: describeFile(file).kind as "image" | "video" };
+  return { path: `/uploads/${name}`, kind: describeFile(file).kind as "image" | "video" | "pdf" };
 }
 
 export function listUploads(): MediaItem[] {
@@ -83,7 +91,7 @@ export function listUploads(): MediaItem[] {
       return {
         path: `/uploads/${name}`,
         name,
-        kind: (isVideoName(name) ? "video" : "image") as MediaItem["kind"],
+        kind: (isPdfName(name) ? "pdf" : isVideoName(name) ? "video" : "image") as MediaItem["kind"],
         size,
       };
     })

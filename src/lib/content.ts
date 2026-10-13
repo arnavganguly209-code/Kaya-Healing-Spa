@@ -14,8 +14,8 @@ export const site = {
   phone: "01-5355882",
   phoneTel: "+97715355882",
   /** WhatsApp chat number (display + wa.me). Editable in Orbit → Footer. */
-  whatsapp: "9860304069",
-  email: "",
+  whatsapp: "9803038823",
+  email: "booking@kayahealingspa.com.np",
   googleRating: 4.8,
   googleReviewCount: 499,
   mapEmbedQuery: "Kaya+Healing+Spa+Hotel+Northfield+Chaksibari+Kathmandu",

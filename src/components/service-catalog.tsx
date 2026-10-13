@@ -1,10 +1,11 @@
 "use client";
 
+import { CatalogPhoto } from "@/components/catalog-photo";
+import { MenuDownloadButton } from "@/components/menu-download-button";
 import { CatalogPageIntro } from "@/components/page-hero";
 import { formatNpr, labelForCategory, serviceMenuCategories, services } from "@/lib/content";
 import { NAV_MENU_TYPE } from "@/lib/nav-menu-type";
 import type { ServiceCategory } from "@/lib/types";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -17,12 +18,14 @@ export function ServiceCatalog({
   catalogSubtitle,
   items = services,
   categories,
+  menuPdfHref,
 }: {
   initialCategory?: string;
   catalogTitle?: string;
   catalogSubtitle?: string;
   items?: typeof services;
   categories?: string[];
+  menuPdfHref?: string;
 }) {
   const [category, setCategory] = useState(initialCategory || "all");
   const [query, setQuery] = useState("");
@@ -60,6 +63,9 @@ export function ServiceCatalog({
   return (
     <section className="relative bg-[#fffcf8] pb-20 pt-4 md:pb-24">
       <CatalogPageIntro title={catalogTitle} subtitle={catalogSubtitle} />
+      <div className="mx-auto mt-6 max-w-[1440px] px-5 md:px-8">
+        <MenuDownloadButton href={menuPdfHref} label="Download menu" />
+      </div>
 
       <div className="mx-auto mt-10 max-w-[1440px] px-5 md:px-8">
         <div className="flex flex-col items-center gap-6">
@@ -106,10 +112,9 @@ export function ServiceCatalog({
                 className="group flex flex-col overflow-hidden rounded-2xl border border-[#efe8e0] bg-white shadow-[0_8px_30px_rgba(20,18,16,0.06)] transition hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(20,18,16,0.1)]"
               >
                 <div className="relative h-56 overflow-hidden">
-                  <Image
+                  <CatalogPhoto
                     src={service.image}
                     alt={service.imageAlt}
-                    fill
                     className="object-cover transition duration-500 group-hover:scale-105"
                     sizes="33vw"
                   />

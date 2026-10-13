@@ -217,6 +217,10 @@ export type OrbitContent = {
   categories: string[];
   packages: SpaPackage[];
   gallery: GalleryImage[];
+  /** Public one-click download on /services */
+  servicesMenuPdf?: string;
+  /** Public one-click download on /packages */
+  packagesMenuPdf?: string;
   /** Bump when the code default services menu changes — resets saved services on deploy. */
   servicesMenuVersion?: number;
 };
@@ -643,6 +647,8 @@ export function defaultOrbitContent(): OrbitContent {
     externalReviewLinks: defaultExternalReviewLinks(),
     socialLinks: defaultSocialLinks(),
     extraSocialLinks: [],
+    servicesMenuPdf: "",
+    packagesMenuPdf: "",
     hero: {
       image: "/hero/kaya-hero-spa-hd.png",
       alt: "A therapist giving a guest a massage in a bright KAYA SPA treatment room",
@@ -951,7 +957,15 @@ function loadOrbitContentFromDisk(): OrbitContent {
       footerBrand: merged.footerBrand || defaults.footerBrand,
       footerBottom: normalizeFooterBottom(merged.footerBottom, defaults.footerBottom),
       externalReviewLinks: normalizeExternalReviewLinks(merged.externalReviewLinks),
-      whatsapp: merged.whatsapp?.trim() || defaults.whatsapp,
+      phone: !merged.phone?.trim() || merged.phone.includes("9800000000") ? defaults.phone : merged.phone,
+      whatsapp:
+        !merged.whatsapp?.trim() || merged.whatsapp.replace(/\D/g, "") === "9860304069"
+          ? defaults.whatsapp
+          : merged.whatsapp.trim(),
+      email:
+        !merged.email?.trim() || merged.email.includes("example.com") ? defaults.email : merged.email.trim(),
+      servicesMenuPdf: typeof merged.servicesMenuPdf === "string" ? merged.servicesMenuPdf : defaults.servicesMenuPdf,
+      packagesMenuPdf: typeof merged.packagesMenuPdf === "string" ? merged.packagesMenuPdf : defaults.packagesMenuPdf,
       socialLinks: normalizeSocialLinks(merged.socialLinks),
       extraSocialLinks: normalizeExtraSocialLinks(merged.extraSocialLinks),
       gallery: normalizeGallery(merged.gallery),

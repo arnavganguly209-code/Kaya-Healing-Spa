@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 
 const sections = ["Hero", "Media", "Therapies", "Why Kaya", "Home page", "Home about", "About page", "Therapists", "Services", "Categories", "Packages", "Gallery", "Page covers", "Admin portal", "Footer"] as const;
 
-type MediaItem = { path: string; name: string; kind: "image" | "video"; size: number };
+type MediaItem = { path: string; name: string; kind: "image" | "video" | "pdf"; size: number };
 
 export function OrbitPanel({ initial }: { initial: OrbitContent }) {
   const [content, setContent] = useState(initial);
@@ -323,14 +323,15 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3">
                 {library.map((item) => {
-                  const thumb =
-                    item.path.startsWith("/uploads/") ?
-                      `/api/orbit/media/file?path=${encodeURIComponent(item.path)}`
-                    : item.path;
+                  const thumb = item.path;
                   return (
                   <article key={item.path} className="overflow-hidden rounded-xl border border-[#efe8e0]">
                     {item.kind === "video" ? (
                       <video src={thumb} className="h-28 w-full object-cover" muted />
+                    ) : item.kind === "pdf" ? (
+                      <div className="flex h-28 items-center justify-center bg-[#faf6f0] text-xs font-semibold tracking-wide text-[#8a8175] uppercase">
+                        PDF
+                      </div>
                     ) : (
                       <img src={thumb} alt="" className="h-28 w-full object-cover" />
                     )}
@@ -1125,7 +1126,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                 value={content.whatsapp}
                 onChange={(value) => setContent({ ...content, whatsapp: value })}
               />
-              <p className="text-xs text-[#6B6B6B]">Used for the floating WhatsApp button and mobile menu. Digits only, e.g. 9860304069.</p>
+              <p className="text-xs text-[#6B6B6B]">Used for the floating WhatsApp button and mobile menu. Digits only, e.g. 9803038823.</p>
               <Field label="Email" value={content.email} onChange={(value) => setContent({ ...content, email: value })} />
               <Area label="Footer description" value={content.footerText} onChange={(value) => setContent({ ...content, footerText: value })} />
               <p className="mt-6 text-sm font-semibold">Social & review icons (footer)</p>
@@ -1359,13 +1360,13 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               <button type="button" onClick={() => setPicker(null)}>Close</button>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3">
-              {library.map((item) => (
+              {library.filter((item) => item.kind !== "pdf").map((item) => (
                 <button
                   key={item.path}
                   type="button"
                   className="overflow-hidden rounded-xl border border-[#efe8e0]"
                   onClick={() => {
-                    picker(item.path, item.kind);
+                    picker(item.path, item.kind === "video" ? "video" : "image");
                     setPicker(null);
                   }}
                 >
@@ -1484,10 +1485,7 @@ function MediaField({
   }, [src]);
   const video = kind === "video" || /\.(mp4|webm|mov)$/i.test(src);
   const previewKey = src ? `${src}-${previewToken}` : "empty";
-  const previewSrc =
-    src && src.startsWith("/uploads/")
-      ? `/api/orbit/media/file?path=${encodeURIComponent(src)}&t=${previewToken}`
-      : src;
+  const previewSrc = src ? `${src}${src.includes("?") ? "&" : "?"}t=${previewToken}` : src;
   return (
     <div className="mt-3 text-sm">
       <p className="font-medium">{label}</p>

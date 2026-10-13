@@ -39,6 +39,8 @@ type AdminData = {
   externalReviewLinks: OrbitContent["externalReviewLinks"];
   adminSectionFlags: OrbitAdminSectionFlags;
   homePage: OrbitContent["homePage"];
+  servicesMenuPdf?: string;
+  packagesMenuPdf?: string;
 };
 
 const allSections = ["Dashboard", "Home page", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Bookings", "Blog", "Inquiries", "Reviews", "Account"] as const;
@@ -76,6 +78,8 @@ function catalogSlice(c: AdminData): CatalogAdminSlice {
     categories: c.categories,
     packageCategories: c.packageCategories,
     gallery: c.gallery,
+    servicesMenuPdf: c.servicesMenuPdf || "",
+    packagesMenuPdf: c.packagesMenuPdf || "",
   };
 }
 
@@ -104,6 +108,12 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
   useEffect(() => {
     if (!navSections(content.adminSectionFlags).includes(section)) setSection("Dashboard");
   }, [content.adminSectionFlags, section]);
+
+  useEffect(() => {
+    void loadBookings();
+    void loadInquiries();
+    void loadPosts();
+  }, []);
 
   useEffect(() => {
     if (section === "Inquiries") void loadInquiries();
@@ -227,6 +237,15 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
   }
 
   const unread = inquiries.filter((i) => !i.read).length;
+  const bookingCounts = {
+    total: bookings.length,
+    pending: bookings.filter((b) => b.status === "pending").length,
+    confirmed: bookings.filter((b) => b.status === "confirmed").length,
+    completed: bookings.filter((b) => b.status === "completed").length,
+    cancelled: bookings.filter((b) => b.status === "cancelled" || b.status === "rejected").length,
+  };
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const todayBookings = bookings.filter((b) => b.appointmentDate === todayKey);
 
   return (
     <div className="min-h-[100svh] bg-gradient-to-b from-[#f8f4ee] to-[#fffdf9] text-[#171717]">
@@ -277,10 +296,27 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
 
           {section === "Dashboard" && (
             <>
-              <h2 className="font-serif text-3xl md:text-4xl">Welcome back</h2>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#6B6B6B]">
-                Edit services, packages, categories, gallery, hero, footer, therapists, blog, reviews, and booking inquiries. Full site design lives in Orbit at /orbit.
-              </p>
+              <div className="overflow-hidden rounded-[28px] bg-[#1a1512] p-6 text-white shadow-[0_24px_60px_rgba(26,21,18,0.28)] md:p-8">
+                <p className="text-[11px] font-semibold tracking-[0.28em] text-[#ffb366] uppercase">Front desk</p>
+                <h2 className="mt-2 font-serif text-3xl md:text-5xl">Welcome back</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/70">
+                  Booking traffic, treatments, and guest messages in one place. Open Bookings to confirm or complete a request.
+                </p>
+                <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                  {[
+                    { label: "All bookings", value: bookingCounts.total },
+                    { label: "Pending", value: bookingCounts.pending },
+                    { label: "Confirmed", value: bookingCounts.confirmed },
+                    { label: "Completed", value: bookingCounts.completed },
+                    { label: "Cancelled", value: bookingCounts.cancelled },
+                  ].map((card) => (
+                    <div key={card.label} className="rounded-2xl bg-white/8 p-4 ring-1 ring-white/10">
+                      <p className="font-serif text-3xl text-[#F47B20]">{card.value}</p>
+                      <p className="mt-1 text-xs font-semibold tracking-wide text-white/65 uppercase">{card.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
               {(!content.email?.trim() ||
                 content.email.includes("example.com") ||
                 content.phone?.includes("9800000000")) && (
@@ -291,7 +327,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                   </p>
                 </div>
               )}
-              <ul className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <ul className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <li className="rounded-2xl bg-gradient-to-br from-[#fff7f0] to-white p-5 ring-1 ring-[#efe8e0]">
                   <p className="text-3xl font-bold text-[#F47B20]">{content.services.length}</p>
                   <p className="text-sm font-medium">Treatments</p>
@@ -305,16 +341,35 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                   <p className="text-sm font-medium">Gallery photos</p>
                 </li>
                 <li className="rounded-2xl bg-gradient-to-br from-[#fff7f0] to-white p-5 ring-1 ring-[#efe8e0]">
-                  <p className="text-3xl font-bold text-[#F47B20]">{posts.length || "—"}</p>
-                  <p className="text-sm font-medium">Blog posts (open Blog to load)</p>
-                </li>
-                <li className="rounded-2xl bg-gradient-to-br from-[#fff7f0] to-white p-5 ring-1 ring-[#efe8e0]">
                   <p className="text-3xl font-bold text-[#F47B20]">{unread || "0"}</p>
                   <p className="text-sm font-medium">Unread inquiries</p>
                 </li>
               </ul>
+              <div className="mt-8 rounded-2xl border border-[#efe8e0] bg-[#fffdfb] p-6">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold tracking-wide text-[#8a8175] uppercase">Today</p>
+                    <h3 className="font-serif text-2xl">Appointments on {todayKey}</h3>
+                  </div>
+                  <button type="button" className="text-sm font-semibold text-[#F47B20] underline" onClick={() => setSection("Bookings")}>
+                    Open bookings
+                  </button>
+                </div>
+                {todayBookings.length === 0 ? (
+                  <p className="mt-4 text-sm text-[#6B6B6B]">No appointments dated today.</p>
+                ) : (
+                  <ul className="mt-4 divide-y divide-[#efe8e0]">
+                    {todayBookings.slice(0, 6).map((b) => (
+                      <li key={b.id} className="flex flex-wrap justify-between gap-2 py-3 text-sm">
+                        <span className="font-medium">{b.appointmentTime} · {b.name}</span>
+                        <span className="text-[#8a8175]">{b.serviceName || b.packageName || "Visit"} · {b.status}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
               <div className="mt-8 rounded-2xl border border-dashed border-[#c4b8a8] bg-[#faf6f0] p-6">
-                <p className="text-xs font-semibold tracking-wide text-[#8a8175] uppercase">Coming soon</p>
+                <p className="text-xs font-semibold tracking-wide text-[#8a8175] uppercase">Bank / payments</p>
                 <p className="mt-2 font-serif text-xl">Global IME Bank — online booking payments</p>
                 <p className="mt-2 text-sm text-[#6B6B6B]">
                   A payment card will appear here for paid bookings once the gateway is connected. Inquiries and manual booking stay available until then.
@@ -737,7 +792,7 @@ function Area({ label, value, onChange, rows = 4 }: { label: string; value: stri
 }
 
 function MediaField({ label, src, onUpload }: { label: string; src: string; onUpload: (file: File) => void }) {
-  const previewSrc = src?.startsWith("/uploads/") ? `/api/orbit/media/file?path=${encodeURIComponent(src)}` : src;
+  const previewSrc = src || "";
   return (
     <div className="mt-3 text-sm">
       <p className="font-medium">{label}</p>

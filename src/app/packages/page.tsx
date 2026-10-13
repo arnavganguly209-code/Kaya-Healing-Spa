@@ -36,6 +36,7 @@ export default async function PackagesPage({
         catalogSubtitle={orbit.pageCovers.packages.catalogSubtitle}
         items={items}
         categories={orbit.packageCategories}
+        menuPdfHref={orbit.packagesMenuPdf}
       />
       <TherapistStrip therapists={orbit.therapists} intro="Prefer someone specific? Book a package and choose your therapist on the contact form." />
     </>

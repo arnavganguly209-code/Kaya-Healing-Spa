@@ -1,3 +1,4 @@
+import { CatalogPhoto } from "@/components/catalog-photo";
 import { JsonLd } from "@/components/json-ld";
 import { PageCoverArt } from "@/components/page-cover-art";
 import { ServiceBookingPanel } from "@/components/service-booking-panel";
@@ -67,6 +68,9 @@ export default async function ServiceDetail({ params }: Props) {
       />
       <div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 md:px-8 lg:grid-cols-[1.4fr_0.8fr]">
         <div>
+          <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-3xl bg-[#f4eee6]">
+            <CatalogPhoto src={service.image} alt={service.imageAlt} className="object-cover" sizes="70vw" />
+          </div>
           <h2 className="font-serif text-3xl">Treatment overview</h2>
           <p className="prose-quiet mt-4">{service.overview}</p>
           {service.benefits.length > 0 ? (

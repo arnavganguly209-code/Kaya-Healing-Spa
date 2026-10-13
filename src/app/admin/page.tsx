@@ -32,6 +32,8 @@ export default async function AdminPage() {
         adminSectionFlags: c.adminSectionFlags,
         homePage: c.homePage,
         gallery: c.gallery,
+        servicesMenuPdf: c.servicesMenuPdf || "",
+        packagesMenuPdf: c.packagesMenuPdf || "",
       }}
     />
   );

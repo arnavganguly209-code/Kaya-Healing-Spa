@@ -1,4 +1,4 @@
-import { isOrbitAuthed } from "@/lib/orbit-auth";
+import { isOrbitOrAdminAuthed } from "@/lib/admin-auth";
 import { contentTypeForUpload, resolveUploadFile } from "@/lib/upload-path";
 import { readFileSync } from "fs";
 import { NextResponse } from "next/server";
@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 /** Orbit preview + fallback when nginx/static miss an upload. */
 export async function GET(request: Request) {
-  if (!(await isOrbitAuthed())) {
+  if (!(await isOrbitOrAdminAuthed())) {
     return NextResponse.json({ message: "Sign in required." }, { status: 401 });
   }
   const url = new URL(request.url);

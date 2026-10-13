@@ -28,6 +28,7 @@ export function contentTypeForUpload(name: string) {
     ".mp4": "video/mp4",
     ".webm": "video/webm",
     ".mov": "video/quicktime",
+    ".pdf": "application/pdf",
   };
   return types[ext] || "application/octet-stream";
 }

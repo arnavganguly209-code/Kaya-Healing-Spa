@@ -1,3 +1,4 @@
+import { CatalogPhoto } from "@/components/catalog-photo";
 import { HeroMedia } from "@/components/hero-media";
 import { HomeReviewsSlider } from "@/components/home-reviews-slider";
 import { HomeVisitSection } from "@/components/home-visit-section";
@@ -142,7 +143,7 @@ export function HomePage() {
           {featuredServices.map((service) => (
             <article key={service.slug} className="group border border-[#e6dfd4] bg-white">
               <Link href={`/services/${service.slug}`} className="img-zoom relative block h-64">
-                <Image src={service.image} alt={service.imageAlt} fill className="object-cover" sizes="(min-width: 1280px) 33vw, 100vw" />
+                <CatalogPhoto src={service.image} alt={service.imageAlt} className="object-cover" sizes="(min-width: 1280px) 33vw, 100vw" />
               </Link>
               <div className="p-6">
                 <p className="text-xs tracking-[0.16em] uppercase text-[#2f8f45]">{service.durationMinutes} min · from {formatNpr(service.priceFromNpr)}</p>
@@ -164,7 +165,7 @@ export function HomePage() {
           {orbit.packages.slice(0, 4).map((item) => (
             <article key={item.slug} className="grid overflow-hidden border border-[#e6dfd4] bg-white md:grid-cols-5">
               <div className="relative min-h-56 md:col-span-2">
-                <Image src={item.image} alt={item.imageAlt} fill className="object-cover" sizes="40vw" />
+                <CatalogPhoto src={item.image} alt={item.imageAlt} className="object-cover" sizes="40vw" />
               </div>
               <div className="p-6 md:col-span-3">
                 <p className="text-xs tracking-[0.16em] uppercase text-[#8a8175]">{item.durationLabel}</p>

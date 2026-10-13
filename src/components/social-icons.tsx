@@ -1,9 +1,6 @@
 export function resolveSocialIconUrl(src: string) {
   const path = src.trim();
   if (!path) return "";
-  if (path.startsWith("/uploads/")) {
-    return `/api/orbit/media/file?path=${encodeURIComponent(path)}`;
-  }
   return path;
 }
 

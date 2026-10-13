@@ -11,7 +11,7 @@ import { useState } from "react";
 
 export type CatalogAdminSlice = Pick<
   OrbitContent,
-  "services" | "packages" | "categories" | "packageCategories" | "gallery"
+  "services" | "packages" | "categories" | "packageCategories" | "gallery" | "servicesMenuPdf" | "packagesMenuPdf"
 >;
 
 function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
@@ -51,7 +51,7 @@ function MediaField({
   src: string;
   onUpload: (file: File) => void;
 }) {
-  const previewSrc = src?.startsWith("/uploads/") ? `/api/orbit/media/file?path=${encodeURIComponent(src)}` : src;
+  const previewSrc = src || "";
   return (
     <div className="mt-3 text-sm">
       <p className="font-medium">{label}</p>
@@ -59,6 +59,52 @@ function MediaField({
       <label className="mt-2 inline-flex cursor-pointer rounded-full bg-[#F47B20] px-4 py-2 text-white">
         Upload
         <input type="file" accept="image/*" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onUpload(f); }} />
+      </label>
+    </div>
+  );
+}
+
+function PdfMenuField({
+  label,
+  src,
+  onUpload,
+}: {
+  label: string;
+  src?: string;
+  onUpload: (file: File) => void;
+}) {
+  const href = src?.trim() || "";
+  const name = href.split("/").pop() || "menu.pdf";
+  return (
+    <div className="rounded-2xl border border-[#efe8e0] bg-white p-5">
+      <p className="font-semibold">{label}</p>
+      <p className="mt-1 text-sm text-[#6B6B6B]">PDF guests download from the public page in one click.</p>
+      {href ? (
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <a
+            href={href}
+            download={name}
+            className="inline-flex rounded-full bg-[#141210] px-4 py-2 text-xs font-bold tracking-wide text-white uppercase"
+          >
+            Download current PDF
+          </a>
+          <span className="break-all text-xs text-[#8a8175]">{name}</span>
+        </div>
+      ) : (
+        <p className="mt-2 text-sm text-[#8a8175]">No menu PDF uploaded yet.</p>
+      )}
+      <label className="mt-3 inline-flex cursor-pointer rounded-full bg-[#F47B20] px-4 py-2 text-sm font-semibold text-white">
+        Upload PDF
+        <input
+          type="file"
+          accept="application/pdf,.pdf"
+          className="sr-only"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            e.target.value = "";
+            if (f) onUpload(f);
+          }}
+        />
       </label>
     </div>
   );
@@ -107,6 +153,13 @@ export function AdminServicesEditor({ slice, setSlice, publish, upload }: Editor
   return (
     <>
       <p className="text-sm text-[#6B6B6B]">Full menu — each treatment has its own page at /services/[slug].</p>
+      <div className="mt-4">
+        <PdfMenuField
+          label="Services menu PDF"
+          src={slice.servicesMenuPdf}
+          onUpload={(file) => upload(file, (servicesMenuPdf) => publish({ ...slice, servicesMenuPdf }))}
+        />
+      </div>
       <button
         type="button"
         className="mt-4 rounded-full bg-[#fff7f0] px-5 py-3 text-sm font-semibold text-[#c45a0a]"
@@ -199,6 +252,13 @@ export function AdminPackagesEditor({ slice, setSlice, publish, upload }: Editor
   return (
     <>
       <p className="text-sm text-[#6B6B6B]">Each package has a detail page at /packages/[slug].</p>
+      <div className="mt-4">
+        <PdfMenuField
+          label="Packages menu PDF"
+          src={slice.packagesMenuPdf}
+          onUpload={(file) => upload(file, (packagesMenuPdf) => publish({ ...slice, packagesMenuPdf }))}
+        />
+      </div>
       <button type="button" className="mt-4 rounded-full bg-[#fff7f0] px-5 py-3 text-sm font-semibold text-[#c45a0a]" onClick={() => publish({ ...slice, packages: [...slice.packages, { ...template, slug: `package-${Date.now()}`, name: "New package" }] })}>Add package</button>
       <div className="mt-6 flex flex-wrap gap-2">
         {slice.packages.map((p, i) => (

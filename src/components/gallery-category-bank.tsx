@@ -13,7 +13,7 @@ type Props = {
 };
 
 function previewSrc(src: string) {
-  return src?.startsWith("/uploads/") ? `/api/orbit/media/file?path=${encodeURIComponent(src)}` : src;
+  return src || "";
 }
 
 export function GalleryCategoryBank({ gallery, setGallery, publishGallery, upload, onPickLibrary }: Props) {

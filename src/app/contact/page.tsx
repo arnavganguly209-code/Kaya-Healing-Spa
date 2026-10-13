@@ -57,8 +57,8 @@ export default async function ContactPage({
         <div className="space-y-8">
           <CompanyContactCard
             phone={orbit.phone || site.phone}
-            email={orbit.email}
-            whatsapp={orbit.whatsapp}
+            email={orbit.email || site.email}
+            whatsapp={orbit.whatsapp || site.whatsapp}
             googleReviewsUrl={orbit.externalReviewLinks.googleReviewsUrl || orbit.socialLinks.find((l) => l.id === "google")?.url}
             tripadvisorUrl={orbit.externalReviewLinks.tripadvisorUrl}
           />

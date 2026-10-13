@@ -1,3 +1,4 @@
+import { CatalogPhoto } from "@/components/catalog-photo";
 import { PageCoverArt } from "@/components/page-cover-art";
 import { TherapistStrip } from "@/components/therapist-strip";
 import { formatNpr, getPackage, packages as fallbackPackages } from "@/lib/content";
@@ -53,6 +54,9 @@ export default async function PackageDetail({ params }: Props) {
         ]}
       />
       <div className="mx-auto max-w-[800px] px-5 py-16">
+        <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-3xl bg-[#f4eee6]">
+          <CatalogPhoto src={item.image} alt={item.imageAlt} className="object-cover" sizes="800px" />
+        </div>
         <p className="prose-quiet text-lg">{item.description}</p>
         <ul className="mt-8 divide-y divide-[#e6dfd4] border-y border-[#e6dfd4]">
           {item.items.map((line) => (

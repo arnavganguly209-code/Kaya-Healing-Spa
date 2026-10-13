@@ -26,7 +26,12 @@ export function CompanyContactCard({
   tripadvisorUrl?: string;
 }) {
   const tel = phone || site.phone;
-  const telHref = tel.startsWith("+") ? tel.replace(/\s/g, "") : site.phoneTel.replace(/\s/g, "");
+  const digits = tel.replace(/\D/g, "");
+  const telHref = tel.startsWith("+")
+    ? tel.replace(/\s/g, "")
+    : digits.startsWith("977")
+      ? `+${digits}`
+      : `+977${digits.replace(/^0+/, "")}`;
   const mail = (email || site.email).trim();
   const wa = (whatsapp || site.whatsapp).trim();
   const reviewsUrl = (googleReviewsUrl || site.social.google).trim();
@@ -42,13 +47,30 @@ export function CompanyContactCard({
       <h2 className="mt-2 font-serif text-3xl">{site.name}</h2>
       <p className="mt-1 text-sm text-[#6B6B6B]">{site.placeType}</p>
       <p className="mt-4 text-sm leading-relaxed">{site.addressLine}</p>
-      <p className="mt-4">
+      <p className="mt-4 text-sm">
+        <span className="text-[#8a8175]">Phone: </span>
         <a href={`tel:${telHref}`} className="text-lg font-semibold text-[#171717] hover:text-[#F47B20]">
           {tel}
         </a>
       </p>
+      <p className="mt-2 text-sm">
+        <span className="text-[#8a8175]">WhatsApp: </span>
+        {waReady ? (
+          <a
+            href={normalizeWhatsAppHref(wa)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#171717] hover:text-[#25D366]"
+          >
+            {wa}
+          </a>
+        ) : (
+          <span>{wa || "—"}</span>
+        )}
+      </p>
       {mailReady ? (
         <p className="mt-2 text-sm">
+          <span className="text-[#8a8175]">Email: </span>
           <a href={`mailto:${mail}`} className="font-medium text-[#171717] underline decoration-[#171717]/30 underline-offset-2 hover:text-[#F47B20]">
             {mail}
           </a>
