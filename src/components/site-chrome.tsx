@@ -32,7 +32,15 @@ export function SiteChrome({
         whatsappDisplay={whatsapp}
         logoSrc={logoSrc}
       />
-      <main className={pathname === "/" ? "" : "pt-[64px] sm:pt-[68px] lg:pt-[108px]"}>{children}</main>
+      <main
+        className={
+          pathname === "/"
+            ? ""
+            : "pt-[calc(64px+env(safe-area-inset-top,0px))] sm:pt-[calc(68px+env(safe-area-inset-top,0px))] lg:pt-[calc(108px+env(safe-area-inset-top,0px))]"
+        }
+      >
+        {children}
+      </main>
       {footer}
       <WhatsAppFloat displayPhone={whatsapp} />
       <BackToTop />

@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import { siteBrand } from "@/lib/site-brand";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
@@ -27,6 +27,13 @@ const serif = Cormorant_Garamond({
   weight: ["500", "600"],
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#c45e0a",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),

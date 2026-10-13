@@ -1,10 +1,10 @@
 "use client";
 
 import { CatalogPhoto } from "@/components/catalog-photo";
+import { FilterChips } from "@/components/filter-chips";
 import { MenuDownloadButton } from "@/components/menu-download-button";
 import { CatalogPageIntro } from "@/components/page-hero";
 import { formatNpr, labelForCategory, packageMenuCategories, packages as fallbackPackages } from "@/lib/content";
-import { NAV_MENU_TYPE } from "@/lib/nav-menu-type";
 import type { SpaPackage } from "@/lib/types";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -74,24 +74,15 @@ export function PackageCatalog({
       </div>
 
       <div className="mx-auto mt-10 max-w-[1440px] px-5 md:px-8">
-        <div className="flex flex-wrap justify-center gap-2" role="tablist" aria-label="Package categories">
-          {filters.map((filter) => (
-            <button
-              key={filter}
-              type="button"
-              role="tab"
-              aria-selected={category === filter}
-              onClick={() => selectCategory(filter)}
-              className={`rounded-full px-5 py-3 ${NAV_MENU_TYPE} transition ${
-                category === filter
-                  ? "bg-[#F47B20] text-white shadow-[0_8px_24px_rgba(244,123,32,0.28)]"
-                  : "border border-[#e6dfd4] bg-white text-[#141210] hover:border-[#F47B20]/40 hover:text-[#F47B20]"
-              }`}
-            >
-              {filter === "all" ? "All" : labelForCategory(filter)}
-            </button>
-          ))}
-        </div>
+        <FilterChips
+          label="Package categories"
+          value={category}
+          onChange={selectCategory}
+          items={filters.map((filter) => ({
+            id: filter,
+            label: filter === "all" ? "All" : labelForCategory(filter),
+          }))}
+        />
 
         <article className="mt-12 overflow-hidden rounded-3xl bg-[#141210] text-white shadow-[0_20px_50px_rgba(20,18,16,0.18)] lg:grid lg:grid-cols-2">
           <div className="relative min-h-[320px] lg:min-h-[420px]">

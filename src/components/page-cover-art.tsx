@@ -18,7 +18,7 @@ export function PageCoverArt({ eyebrow, title, tagline, text, crumbs, children }
       <OrangeLotusBackground idSuffix="cover" intensity={1} />
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
-      <div className="relative z-[2] mx-auto flex min-h-[min(48svh,440px)] max-w-[920px] flex-col items-center justify-center px-5 py-20 text-center md:min-h-[min(52svh,480px)] md:px-8 md:py-24">
+      <div className="relative z-[2] mx-auto flex min-h-[min(36svh,320px)] max-w-[920px] flex-col items-center justify-center px-5 py-14 text-center sm:min-h-[min(42svh,380px)] sm:py-16 md:min-h-[min(52svh,480px)] md:px-8 md:py-24">
         {eyebrow ? (
           <p className="text-[11px] font-bold tracking-[0.32em] text-white uppercase drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)]">{eyebrow}</p>
         ) : null}

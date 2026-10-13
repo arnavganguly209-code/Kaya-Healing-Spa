@@ -23,6 +23,17 @@ body {
   overflow-x: hidden;
 }
 
+html[data-nav-open] {
+  overflow: hidden;
+}
+
+html[data-nav-open] .whatsapp-fab,
+html[data-nav-open] .back-to-top-btn {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
 .call-ring {
   animation: kaya-call-ring 2s ease-out infinite;
 }

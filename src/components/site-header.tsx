@@ -39,9 +39,15 @@ export function SiteHeader({
   const onHero = isHome && !scrolled;
 
   useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
+    document.documentElement.toggleAttribute("data-nav-open", open);
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.removeAttribute("data-nav-open");
     };
   }, [open]);
 
@@ -69,11 +75,14 @@ export function SiteHeader({
     ? "book-cta border border-white/70 bg-transparent text-white hover:bg-white/10"
     : "book-cta-cream border border-[#F47B20]/30 bg-gradient-to-b from-[#fff8f0] to-[#fde5cc] text-[#7a3a12] shadow-[0_10px_28px_rgba(244,123,32,0.2)] hover:from-[#fff3e6] hover:to-[#ffd9b0]";
 
+  const barSolid = glass || open;
+
   return (
+    <>
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300 ${
-        glass
-          ? "border-b border-white/60 bg-white/80 shadow-[0_8px_32px_rgba(23,23,23,0.05)] backdrop-blur-lg"
+      className={`fixed inset-x-0 top-0 z-[110] pt-[env(safe-area-inset-top,0px)] transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300 ${
+        barSolid
+          ? "border-b border-white/60 bg-white/95 shadow-[0_8px_32px_rgba(23,23,23,0.05)] backdrop-blur-lg"
           : "border-b-0 border-transparent bg-gradient-to-b from-black/50 via-black/15 to-transparent shadow-none backdrop-blur-0"
       }`}
     >
@@ -184,7 +193,7 @@ export function SiteHeader({
           <button
             type="button"
             className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition xl:hidden ${
-              onHero ? "text-white hover:bg-white/10" : "text-[#171717] hover:bg-[#f6f1e8]"
+              onHero && !open ? "text-white hover:bg-white/10" : "text-[#171717] hover:bg-[#f6f1e8]"
             }`}
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -195,9 +204,20 @@ export function SiteHeader({
         </div>
       </div>
 
-      {open && (
-        <div className="fixed inset-0 top-[64px] z-40 flex flex-col overflow-y-auto bg-white px-5 py-6 sm:top-[68px] sm:px-6 sm:py-8 xl:hidden">
-          <nav className="flex flex-col gap-1" aria-label="Mobile">
+    </header>
+
+    {open ? (
+        <div
+          className="fixed inset-0 z-[105] flex h-[100dvh] w-full max-w-[100vw] flex-col bg-[#fffcf8] xl:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site menu"
+        >
+          <div
+            className="h-[calc(64px+env(safe-area-inset-top,0px))] shrink-0 sm:h-[calc(68px+env(safe-area-inset-top,0px))]"
+            aria-hidden
+          />
+          <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-2 sm:px-6" aria-label="Mobile">
             {links.map((link) => {
               if (link.href === "/services") {
                 return (
@@ -252,8 +272,7 @@ export function SiteHeader({
                 </Link>
               );
             })}
-          </nav>
-          <div className="mt-8 flex flex-col gap-3">
+          <div className="mt-8 flex flex-col gap-3 pb-4">
             <a
               href={whatsAppUrl(whatsappDisplay)}
               target="_blank"
@@ -266,8 +285,9 @@ export function SiteHeader({
               Book Appointment
             </Link>
           </div>
+          </nav>
         </div>
-      )}
-    </header>
+    ) : null}
+    </>
   );
 }

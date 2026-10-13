@@ -22,7 +22,7 @@ export function WhatsAppFloat({ displayPhone = site.whatsapp }: { displayPhone?:
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="whatsapp-fab group fixed bottom-5 right-5 z-[45] flex max-w-[calc(100vw-2rem)] items-center gap-0 overflow-hidden rounded-full bg-[#25D366] text-white transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98] sm:gap-3 sm:pr-5 sm:pl-3 sm:py-2"
+      className="whatsapp-fab group fixed right-5 bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] z-[40] flex max-w-[calc(100vw-2.5rem)] items-center gap-0 overflow-hidden rounded-full bg-[#25D366] text-white transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98] sm:gap-3 sm:pr-5 sm:pl-3 sm:py-2"
       aria-label={`Chat on WhatsApp — ${displayPhone}`}
     >
       <span className="flex h-14 w-14 shrink-0 items-center justify-center sm:h-11 sm:w-11 sm:rounded-full sm:bg-white/15">
