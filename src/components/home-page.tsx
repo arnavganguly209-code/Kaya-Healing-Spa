@@ -70,13 +70,8 @@ export function HomePage() {
           <h1 className="sr-only">
             {hero.titleOrange} {hero.titleDark} — {site.name}
           </h1>
-          <div className="hero-copy-panel relative z-20 mb-0 max-w-xl text-white md:mb-6">
-            {hero.eyebrow ? <p className="hidden text-[11px] font-semibold tracking-[0.22em] text-white/90 uppercase drop-shadow-[0_1px_8px_rgba(0,0,0,0.65)] md:block">{hero.eyebrow}</p> : null}
-            <p className="display mt-2 hidden text-[1.85rem] leading-[1.15] text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.7)] md:block md:text-5xl">
-              <span className="text-[#F47B20]">{hero.titleOrange}</span> {hero.titleDark}
-            </p>
-            {hero.subtitle ? <p className="mt-2 hidden text-sm leading-relaxed text-white/95 drop-shadow-[0_1px_10px_rgba(0,0,0,0.65)] md:block md:text-base">{hero.subtitle}</p> : null}
-            <div className="flex w-full flex-col gap-2.5 md:mt-4 md:max-w-md md:flex-row">
+          <div className="hero-copy-panel relative z-20 mb-0 w-full max-w-xl md:hidden">
+            <div className="flex w-full flex-col gap-2.5">
               <Link href="/contact" className="btn-primary rounded-full">
                 {hero.book || "Book Appointment"}
               </Link>
