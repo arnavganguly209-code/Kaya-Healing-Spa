@@ -1,6 +1,7 @@
 import { JsonLd } from "@/components/json-ld";
 import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteMaintenance } from "@/components/site-maintenance";
 import { site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import { siteBrand } from "@/lib/site-brand";
@@ -132,6 +133,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           {children}
         </SiteChrome>
+        <SiteMaintenance />
       </body>
     </html>
   );
