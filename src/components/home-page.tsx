@@ -5,7 +5,7 @@ import { HomeVisitSection } from "@/components/home-visit-section";
 import { Reveal } from "@/components/reveal";
 import { TherapiesSection } from "@/components/therapies-section";
 import { WhyKayaSection } from "@/components/why-kaya-section";
-import { formatNpr, site } from "@/lib/content";
+import { formatNpr, phoneToTelHref, site } from "@/lib/content";
 import { mapEmbedUrl } from "@/lib/map-embed";
 import { readOrbitContent } from "@/lib/orbit-store";
 import { Flower2, Leaf, Sparkles } from "lucide-react";
@@ -280,7 +280,7 @@ export function HomePage() {
           <h2 className="display mt-3 text-[1.85rem] sm:text-5xl">{site.name}</h2>
           <p className="mt-4 text-lg leading-relaxed">{orbit.addressLine || site.addressLine}</p>
           <p className="mt-2 text-sm">
-            <a href={`tel:${site.phoneTel}`} className="font-semibold hover:text-[#F47B20]">
+            <a href={`tel:${phoneToTelHref(orbit.phone || site.phone)}`} className="font-semibold hover:text-[#F47B20]">
               {orbit.phone || site.phone}
             </a>
           </p>

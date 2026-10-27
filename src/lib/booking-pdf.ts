@@ -4,6 +4,7 @@ import { displayBookingNumber } from "@/lib/booking-number";
 import { bookingAmountDueNpr, bookingAmountPaidNpr, bookingGrandTotalNpr } from "@/lib/booking-pricing";
 import type { SpaBooking } from "@/lib/booking-types";
 import { smtpFromEmail, SPA_BOOKING_PHONE, SPA_BOOKING_WHATSAPP, spaPublicUrl } from "@/lib/spa-config";
+import { readOrbitContent } from "@/lib/orbit-store";
 import { embedBrandLogo } from "@/lib/pdf-brand";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
@@ -91,6 +92,11 @@ function drawCentered(
 }
 
 export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Array> {
+  const orbit = readOrbitContent();
+  const pdfPhone = orbit.phone || SPA_BOOKING_PHONE;
+  const pdfWhatsapp = orbit.whatsapp || SPA_BOOKING_WHATSAPP;
+  const pdfAddress = orbit.addressLine || site.addressLine;
+  const pdfMail = orbit.email || smtpFromEmail() || "booking@kayahealingspa.com.np";
   const doc = await PDFDocument.create();
   const number = displayBookingNumber(booking);
   doc.setTitle(`Kaya Healing Spa Booking ${number}`);
@@ -138,12 +144,11 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
   y -= 15;
   drawCentered(page, site.tagline, y, 10, timesItalic, GOLD, width);
   y -= 14;
-  drawCentered(page, site.addressLine, y, 8, font, MUTED, width);
+  drawCentered(page, pdfAddress, y, 8, font, MUTED, width);
   y -= 13;
-  drawCentered(page, `Phone: ${SPA_BOOKING_PHONE}    WhatsApp: ${SPA_BOOKING_WHATSAPP}`, y, 9, fontBold, INK, width);
+  drawCentered(page, `Phone: ${pdfPhone}    WhatsApp: ${pdfWhatsapp}`, y, 9, fontBold, INK, width);
   y -= 12;
-  const mail = smtpFromEmail() || "booking@kayahealingspa.com.np";
-  drawCentered(page, `${mail}  |  www.kayahealingspa.com.np`, y, 8, font, MUTED, width);
+  drawCentered(page, `${pdfMail}  |  www.kayahealingspa.com.np`, y, 8, font, MUTED, width);
   y -= 16;
 
   page.drawLine({
@@ -338,15 +343,15 @@ export async function generateBookingPdf(booking: SpaBooking): Promise<Uint8Arra
 
   const footerY = 28;
   page.drawText(pdfText(`Reference ${number}`, 28), { x: margin, y: footerY, size: 7.5, font, color: MUTED });
-  page.drawText(`Phone ${SPA_BOOKING_PHONE}`, {
-    x: centerX(width, `Phone ${SPA_BOOKING_PHONE}`, 7.5, font),
+  page.drawText(`Phone ${pdfPhone}`, {
+    x: centerX(width, `Phone ${pdfPhone}`, 7.5, font),
     y: footerY,
     size: 7.5,
     font,
     color: MUTED,
   });
-  page.drawText(`WhatsApp ${SPA_BOOKING_WHATSAPP}`, {
-    x: width - margin - font.widthOfTextAtSize(`WhatsApp ${SPA_BOOKING_WHATSAPP}`, 7.5),
+  page.drawText(`WhatsApp ${pdfWhatsapp}`, {
+    x: width - margin - font.widthOfTextAtSize(`WhatsApp ${pdfWhatsapp}`, 7.5),
     y: footerY,
     size: 7.5,
     font,

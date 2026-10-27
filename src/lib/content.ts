@@ -266,6 +266,17 @@ export function formatNpr(amount: number) {
   return `NPR ${amount.toLocaleString("en-NP")}`;
 }
 
+/** Build a tel: target from an admin-edited display number. */
+export function phoneToTelHref(phone: string | undefined | null, fallback = site.phoneTel): string {
+  const trimmed = (phone || "").trim();
+  if (!trimmed) return fallback;
+  if (trimmed.startsWith("+")) return trimmed.replace(/\s/g, "");
+  const digits = trimmed.replace(/\D/g, "");
+  if (!digits) return fallback;
+  if (digits.startsWith("977")) return `+${digits}`;
+  return `+977${digits.replace(/^0+/, "")}`;
+}
+
 /** Opens WhatsApp chat (Nepal mobiles → 977 prefix). */
 export function whatsAppUrl(raw = site.whatsapp) {
   let digits = raw.replace(/\D/g, "");

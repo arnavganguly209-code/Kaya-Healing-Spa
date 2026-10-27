@@ -1,7 +1,7 @@
 import { JsonLd } from "@/components/json-ld";
 import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
-import { site } from "@/lib/content";
+import { phoneToTelHref, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import { siteBrand } from "@/lib/site-brand";
 import type { Metadata, Viewport } from "next";
@@ -85,7 +85,7 @@ export const dynamic = "force-dynamic";
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const orbit = readOrbitContent();
   const phoneDisplay = orbit.phone?.trim() || site.phone;
-  const telRaw = phoneDisplay.startsWith("+") ? phoneDisplay.replace(/\s/g, "") : site.phoneTel;
+  const telRaw = phoneToTelHref(phoneDisplay);
   const sameAs = [
     ...orbit.socialLinks.filter((link) => link.enabled && link.url?.trim()).map((link) => link.url.trim()),
     ...(orbit.extraSocialLinks ?? []).filter((link) => link.url?.trim()).map((link) => link.url.trim()),

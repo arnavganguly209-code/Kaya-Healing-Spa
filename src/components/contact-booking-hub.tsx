@@ -17,10 +17,11 @@ type Props = {
   packages: SpaPackage[];
   therapists: OrbitTherapist[];
   allowTherapistBooking?: boolean;
+  confirmPhone?: string;
   initial?: { service?: string; package?: string; therapist?: string; mode?: string };
 };
 
-export function ContactBookingHub({ services, packages, therapists, allowTherapistBooking = true, initial }: Props) {
+export function ContactBookingHub({ services, packages, therapists, allowTherapistBooking = true, confirmPhone, initial }: Props) {
   const canBookTherapist = allowTherapistBooking && therapists.length > 0;
   const defaultMode: BookingMode =
     canBookTherapist && (initial?.mode === "therapist" || initial?.therapist)
@@ -67,6 +68,7 @@ export function ContactBookingHub({ services, packages, therapists, allowTherapi
           services={services}
           packages={packages}
           therapists={canBookTherapist ? therapists : []}
+          confirmPhone={confirmPhone}
           initialService={initial?.service}
         />
       )}
@@ -77,6 +79,7 @@ export function ContactBookingHub({ services, packages, therapists, allowTherapi
           services={services}
           packages={packages}
           therapists={canBookTherapist ? therapists : []}
+          confirmPhone={confirmPhone}
           initialPackage={initial?.package}
         />
       )}
@@ -87,6 +90,7 @@ export function ContactBookingHub({ services, packages, therapists, allowTherapi
           services={services}
           packages={packages}
           therapists={therapists}
+          confirmPhone={confirmPhone}
           initialService={initial?.service}
           initialPackage={initial?.package}
           initialTherapist={initial?.therapist}
@@ -101,6 +105,7 @@ function BookingPanel({
   services,
   packages,
   therapists,
+  confirmPhone,
   initialService,
   initialPackage,
   initialTherapist,
@@ -109,6 +114,7 @@ function BookingPanel({
   services: Service[];
   packages: SpaPackage[];
   therapists: OrbitTherapist[];
+  confirmPhone?: string;
   initialService?: string;
   initialPackage?: string;
   initialTherapist?: string;
@@ -247,7 +253,7 @@ function BookingPanel({
         <p className="prose-quiet mt-2 text-sm">
           {kind === "therapist"
             ? "Select your therapist, choose a treatment or package, then add your visit details."
-            : `Share your details and preferred time. We confirm by phone at ${site.phone}.`}
+            : `Share your details and preferred time. We confirm by phone at ${confirmPhone || site.phone}.`}
         </p>
       </div>
 

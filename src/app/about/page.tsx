@@ -1,7 +1,7 @@
 import { CATALOG_COMING_SOON_IMAGE } from "@/lib/catalog-images";
 import { PageHero } from "@/components/page-hero";
 import { Reveal } from "@/components/reveal";
-import { labelForCategory, site } from "@/lib/content";
+import { labelForCategory, phoneToTelHref, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 
@@ -62,7 +62,7 @@ export default function AboutPage() {
             <div>
               <dt className="text-[#8a8175]">Phone</dt>
               <dd className="mt-1">
-                <a href={`tel:${site.phoneTel}`} className="font-semibold hover:text-[#F47B20]">
+                <a href={`tel:${phoneToTelHref(orbit.phone || site.phone)}`} className="font-semibold hover:text-[#F47B20]">
                   {orbit.phone || site.phone}
                 </a>
               </dd>

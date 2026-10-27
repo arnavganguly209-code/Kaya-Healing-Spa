@@ -1,7 +1,7 @@
 import { FooterSocialLinks } from "@/components/footer-social-links";
 import { Logo } from "@/components/logo";
 import { OrangeLotusBackground } from "@/components/orange-lotus-background";
-import { site } from "@/lib/content";
+import { phoneToTelHref, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import Link from "next/link";
 
@@ -28,7 +28,7 @@ export function SiteFooter() {
   const orbit = readOrbitContent();
   const brand = orbit.footerBrand || site.name;
   const displayPhone = orbit.phone || site.phone;
-  const telHref = displayPhone.startsWith("+") ? displayPhone.replace(/\s/g, "") : site.phoneTel;
+  const telHref = phoneToTelHref(displayPhone);
   return (
     <footer className="relative overflow-hidden bg-[#12100e] text-[#f6f1e8]">
       <OrangeLotusBackground idSuffix="footer" intensity={0.2} showWatermark={false} />

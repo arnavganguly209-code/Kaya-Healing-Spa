@@ -32,7 +32,7 @@ function statusHeadline(booking: SpaBooking): string {
 export function buildBookingConfirmationHtml(booking: SpaBooking): string {
   const orbit = readOrbitContent();
   const phone = orbit.phone || site.phone;
-  const address = site.addressLine;
+  const address = orbit.addressLine || site.addressLine;
   const contactEmail = smtpFromEmail();
   const number = displayBookingNumber(booking);
   const total = bookingGrandTotalNpr(booking);
@@ -41,7 +41,7 @@ export function buildBookingConfirmationHtml(booking: SpaBooking): string {
   const logoUrl = `${spaPublicUrl()}/brand/kaya-logo-hd.png`;
   const pdfLink = booking.pdfAccessToken ? signedBookingPdfUrl(booking) : null;
   const policyUrl = `${spaPublicUrl()}/terms`;
-  const mapUrl = site.social.google;
+  const mapUrl = orbit.externalReviewLinks.googleReviewsUrl || orbit.mapEmbedQuery || site.social.google;
 
   const row = (label: string, value: string) =>
     `<tr><td style="padding:8px 12px;color:#8a8175;font-size:13px;border-bottom:1px solid #efe8e0;width:38%">${escapeHtml(label)}</td><td style="padding:8px 12px;color:#141210;font-size:13px;font-weight:600;border-bottom:1px solid #efe8e0">${escapeHtml(value)}</td></tr>`;

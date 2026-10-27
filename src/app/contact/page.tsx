@@ -51,6 +51,7 @@ export default async function ContactPage({
           packages={orbit.packages}
           therapists={bookableTherapists(orbit)}
           allowTherapistBooking={orbit.therapistBookingEnabled !== false}
+          confirmPhone={orbit.phone || site.phone}
           initial={{
             service: params.service,
             package: params.package,

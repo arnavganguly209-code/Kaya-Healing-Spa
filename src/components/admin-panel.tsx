@@ -713,7 +713,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                   type="checkbox"
                   className="mt-1 h-5 w-5 accent-[#F47B20]"
                   checked={content.therapistBookingEnabled !== false}
-                  onChange={(e) => setContent({ ...content, therapistBookingEnabled: e.target.checked })}
+                  onChange={(e) => publish({ ...content, therapistBookingEnabled: e.target.checked })}
                 />
                 <span>
                   <span className="block text-sm font-semibold">Therapist booking</span>
@@ -763,7 +763,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                           checked={t.enabled !== false}
                           onChange={(e) => {
                             const therapists = content.therapists.map((x, i) => (i === index ? { ...x, enabled: e.target.checked } : x));
-                            setContent({ ...content, therapists });
+                            publish({ ...content, therapists });
                           }}
                         />
                         Show on site
@@ -771,7 +771,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                       <button
                         type="button"
                         className="text-xs text-[#c45e0a]"
-                        onClick={() => setContent({ ...content, therapists: content.therapists.filter((_, i) => i !== index) })}
+                        onClick={() => publish({ ...content, therapists: content.therapists.filter((_, i) => i !== index) })}
                       >
                         Remove
                       </button>

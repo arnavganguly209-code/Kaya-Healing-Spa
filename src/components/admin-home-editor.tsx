@@ -105,6 +105,8 @@ export function AdminHomeEditor({ slice, setSlice, publish, upload }: Props) {
           <Field label="Title (orange)" value={slice.hero.titleOrange} onChange={(v) => patchHero({ titleOrange: v })} />
           <Field label="Title (dark)" value={slice.hero.titleDark} onChange={(v) => patchHero({ titleDark: v })} />
           <Area label="Subtitle" value={slice.hero.subtitle} onChange={(v) => patchHero({ subtitle: v })} />
+          <Field label="Book button label (mobile)" value={slice.hero.book} onChange={(v) => patchHero({ book: v })} />
+          <Field label="Explore button label (mobile)" value={slice.hero.explore} onChange={(v) => patchHero({ explore: v })} />
           {heroSlides.map((slide, index) => (
             <div key={index} className="mt-4 rounded-2xl border border-[#efe8e0] p-4">
               <div className="flex items-center justify-between">
