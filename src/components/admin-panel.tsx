@@ -47,18 +47,20 @@ type AdminData = {
   packagesMenuPdf?: string;
   brandLogo?: string;
   aboutPage: OrbitContent["aboutPage"];
+  therapistBookingEnabled: boolean;
   pageCovers: OrbitContent["pageCovers"];
   addressLine: string;
   mapEmbedQuery: string;
 };
 
-const allSections = ["Dashboard", "Home page", "About", "Contact", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Bookings", "Blog", "Inquiries", "Reviews", "Account"] as const;
+const allSections = ["Dashboard", "Home page", "About", "Contact", "Pages", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Bookings", "Blog", "Inquiries", "Reviews", "Account"] as const;
 
 const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSectionFlags | null> = {
   Dashboard: null,
   "Home page": "home",
   About: "about",
   Contact: "contact",
+  Pages: null,
   Footer: "footer",
   Categories: "categories",
   Services: "services",
@@ -100,6 +102,25 @@ function navSections(flags: OrbitAdminSectionFlags) {
     return key === null || flags[key] !== false;
   });
 }
+
+const navHints: Record<(typeof allSections)[number], string> = {
+  Dashboard: "Bookings overview",
+  "Home page": "Hero, therapies, reviews",
+  About: "Story, photos, values",
+  Contact: "Phone, email, address, map",
+  Pages: "Inner page banners",
+  Footer: "Logo, social, legal",
+  Categories: "Treatment filters",
+  Services: "Menu, prices, photos",
+  Packages: "Package catalog",
+  Gallery: "Photo grid",
+  Therapists: "Team & booking on/off",
+  Bookings: "Confirm guest visits",
+  Blog: "Articles and SEO",
+  Inquiries: "Contact messages",
+  Reviews: "Home review slider",
+  Account: "Admin username",
+};
 
 export function AdminPanel({ initial }: { initial: AdminData }) {
   const [content, setContent] = useState(initial);
@@ -177,7 +198,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
       setError(body.message || "Could not save.");
       return false;
     }
-    setMessage("Live site updated.");
+    setMessage("Live site updated. Refresh the public page — changes appear within a few seconds.");
     return true;
   }
 
@@ -286,8 +307,8 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
         </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-[1600px] flex-1 gap-6 px-4 py-6 lg:grid-cols-[240px_1fr] lg:gap-8 lg:px-8 lg:py-10">
-        <nav className="flex flex-row flex-wrap gap-2 lg:sticky lg:top-28 lg:max-h-[calc(100svh-8rem)] lg:flex-col lg:gap-1 lg:overflow-y-auto lg:pr-1">
+      <div className="mx-auto grid w-full max-w-[1600px] flex-1 gap-6 px-4 py-6 lg:grid-cols-[280px_1fr] lg:gap-8 lg:px-8 lg:py-10">
+        <nav className="flex flex-row flex-wrap gap-2 lg:sticky lg:top-28 lg:max-h-[calc(100svh-8rem)] lg:flex-col lg:gap-2 lg:overflow-y-auto lg:pr-1">
           {navSections(content.adminSectionFlags).map((item) => (
             <button
               key={item}
@@ -297,12 +318,17 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                 setMessage("");
                 setError("");
               }}
-              className={`rounded-full px-4 py-2.5 text-left text-sm font-semibold transition lg:w-full lg:rounded-xl ${
-                section === item ? "bg-[#F47B20] text-white shadow-md" : "bg-white text-[#171717] shadow-sm hover:bg-[#fff7f0]"
+              className={`min-w-[9.5rem] flex-1 rounded-2xl border px-4 py-3 text-left transition lg:w-full lg:flex-none ${
+                section === item
+                  ? "border-[#F47B20] bg-[#fff7f0] shadow-md ring-1 ring-[#F47B20]/30"
+                  : "border-[#efe8e0] bg-white shadow-sm hover:border-[#F47B20]/40 hover:bg-[#fffdfb]"
               }`}
             >
-              {item}
-              {item === "Inquiries" && unread > 0 ? ` (${unread})` : ""}
+              <span className={`block text-sm font-semibold ${section === item ? "text-[#c45e0a]" : "text-[#171717]"}`}>
+                {item}
+                {item === "Inquiries" && unread > 0 ? ` (${unread})` : ""}
+              </span>
+              <span className="mt-0.5 hidden text-xs font-normal text-[#8a8175] lg:block">{navHints[item]}</span>
             </button>
           ))}
         </nav>
@@ -416,6 +442,79 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
               />
               <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
                 {saving ? "Saving…" : "Save about page"}
+              </button>
+            </>
+          )}
+
+          {section === "Pages" && (
+            <>
+              <h2 className="font-serif text-2xl">Page banners</h2>
+              <p className="mt-1 text-sm text-[#6B6B6B]">Titles and taglines at the top of each inner page. About and Contact banners can also be edited in those sections.</p>
+              {(
+                [
+                  ["services", "Services"],
+                  ["packages", "Packages"],
+                  ["about", "About"],
+                  ["contact", "Contact"],
+                  ["gallery", "Gallery"],
+                  ["blog", "Blog"],
+                ] as const
+              ).map(([key, label]) => (
+                <div key={key} className="mt-6 space-y-2 rounded-2xl border border-[#efe8e0] bg-[#fffdfb] p-5">
+                  <p className="text-sm font-semibold">{label}</p>
+                  <Field
+                    label="Eyebrow"
+                    value={content.pageCovers[key].eyebrow}
+                    onChange={(eyebrow) =>
+                      setContent({ ...content, pageCovers: { ...content.pageCovers, [key]: { ...content.pageCovers[key], eyebrow } } })
+                    }
+                  />
+                  <Field
+                    label="Title"
+                    value={content.pageCovers[key].title}
+                    onChange={(title) =>
+                      setContent({ ...content, pageCovers: { ...content.pageCovers, [key]: { ...content.pageCovers[key], title } } })
+                    }
+                  />
+                  <Area
+                    label="Tagline"
+                    value={content.pageCovers[key].tagline}
+                    onChange={(tagline) =>
+                      setContent({ ...content, pageCovers: { ...content.pageCovers, [key]: { ...content.pageCovers[key], tagline } } })
+                    }
+                  />
+                  <Area
+                    label="Supporting line"
+                    value={content.pageCovers[key].text}
+                    onChange={(text) =>
+                      setContent({ ...content, pageCovers: { ...content.pageCovers, [key]: { ...content.pageCovers[key], text } } })
+                    }
+                  />
+                  {(key === "services" || key === "packages") && (
+                    <>
+                      <Field
+                        label="Catalog heading"
+                        value={content.pageCovers[key].catalogTitle}
+                        onChange={(catalogTitle) =>
+                          setContent({ ...content, pageCovers: { ...content.pageCovers, [key]: { ...content.pageCovers[key], catalogTitle } } })
+                        }
+                      />
+                      <Area
+                        label="Catalog subtitle"
+                        value={content.pageCovers[key].catalogSubtitle}
+                        onChange={(catalogSubtitle) =>
+                          setContent({
+                            ...content,
+                            pageCovers: { ...content.pageCovers, [key]: { ...content.pageCovers[key], catalogSubtitle } },
+                          })
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+              ))}
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
+                {saving ? "Saving…" : "Save page banners"}
               </button>
             </>
           )}
@@ -605,32 +704,126 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
 
           {section === "Therapists" && (
             <>
-              <button type="button" className="rounded-full border px-4 py-2 text-sm" onClick={() => publish({
-                ...content,
-                therapists: [...content.therapists, { ...content.therapists[0], slug: `therapist-${Date.now()}`, name: "New therapist" }],
-              })}>
+              <h2 className="font-serif text-2xl">Therapists</h2>
+              <p className="mt-1 text-sm text-[#6B6B6B]">
+                Service and package booking stay on. Turn therapist choice off to hide “Book therapist” on the public site. Hide one person with their own switch.
+              </p>
+              <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-[#efe8e0] bg-[#fff7f0] p-5">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-5 w-5 accent-[#F47B20]"
+                  checked={content.therapistBookingEnabled !== false}
+                  onChange={(e) => setContent({ ...content, therapistBookingEnabled: e.target.checked })}
+                />
+                <span>
+                  <span className="block text-sm font-semibold">Therapist booking</span>
+                  <span className="mt-1 block text-sm text-[#6B6B6B]">
+                    {content.therapistBookingEnabled !== false
+                      ? "Guests can pick a therapist when they book."
+                      : "Guests can still book treatments and packages. Therapist choice is hidden."}
+                  </span>
+                </span>
+              </label>
+              <button
+                type="button"
+                className="mt-4 rounded-full border border-[#efe8e0] bg-white px-4 py-2 text-sm"
+                onClick={() =>
+                  setContent({
+                    ...content,
+                    therapists: [
+                      ...content.therapists,
+                      {
+                        ...(content.therapists[0] || {
+                          title: "Massage therapist",
+                          description: "Describe specialties and style.",
+                          experience: "5 years experience",
+                          priceFromNpr: 4000,
+                          photo: "/brand/kaya-logo-hd.webp",
+                          photoAlt: "Therapist portrait",
+                        }),
+                        slug: `therapist-${Date.now()}`,
+                        name: "New therapist",
+                        enabled: true,
+                      },
+                    ],
+                  })
+                }
+              >
                 Add therapist
               </button>
               {content.therapists.map((t, index) => (
-                <div key={`${t.slug}-${index}`} className="mt-4 space-y-2 rounded-2xl border p-4">
-                  <Field label="Name" value={t.name} onChange={(v) => {
-                    const therapists = content.therapists.map((x, i) => (i === index ? { ...x, name: v } : x));
-                    setContent({ ...content, therapists });
-                  }} />
-                  <Field label="Title" value={t.title} onChange={(v) => {
-                    const therapists = content.therapists.map((x, i) => (i === index ? { ...x, title: v } : x));
-                    setContent({ ...content, therapists });
-                  }} />
-                  <Area label="Bio" value={t.description} onChange={(v) => {
-                    const therapists = content.therapists.map((x, i) => (i === index ? { ...x, description: v } : x));
-                    setContent({ ...content, therapists });
-                  }} />
-                  <MediaField label="Photo" src={t.photo} onUpload={(f) => upload(f, (path) => {
-                    const therapists = content.therapists.map((x, i) => (i === index ? { ...x, photo: path } : x));
-                    publish({ ...content, therapists });
-                  })} />
+                <div key={`${t.slug}-${index}`} className="mt-4 space-y-2 rounded-2xl border border-[#efe8e0] p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-sm font-semibold">{t.name}</p>
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 accent-[#F47B20]"
+                          checked={t.enabled !== false}
+                          onChange={(e) => {
+                            const therapists = content.therapists.map((x, i) => (i === index ? { ...x, enabled: e.target.checked } : x));
+                            setContent({ ...content, therapists });
+                          }}
+                        />
+                        Show on site
+                      </label>
+                      <button
+                        type="button"
+                        className="text-xs text-[#c45e0a]"
+                        onClick={() => setContent({ ...content, therapists: content.therapists.filter((_, i) => i !== index) })}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                  <Field
+                    label="Name"
+                    value={t.name}
+                    onChange={(v) => {
+                      const therapists = content.therapists.map((x, i) => (i === index ? { ...x, name: v } : x));
+                      setContent({ ...content, therapists });
+                    }}
+                  />
+                  <Field
+                    label="Title"
+                    value={t.title}
+                    onChange={(v) => {
+                      const therapists = content.therapists.map((x, i) => (i === index ? { ...x, title: v } : x));
+                      setContent({ ...content, therapists });
+                    }}
+                  />
+                  <Area
+                    label="Bio"
+                    value={t.description}
+                    onChange={(v) => {
+                      const therapists = content.therapists.map((x, i) => (i === index ? { ...x, description: v } : x));
+                      setContent({ ...content, therapists });
+                    }}
+                  />
+                  <Field
+                    label="Experience"
+                    value={t.experience}
+                    onChange={(v) => {
+                      const therapists = content.therapists.map((x, i) => (i === index ? { ...x, experience: v } : x));
+                      setContent({ ...content, therapists });
+                    }}
+                  />
+                  <MediaField
+                    label="Photo"
+                    src={t.photo}
+                    onUpload={(f) =>
+                      upload(f, (path) => {
+                        const therapists = content.therapists.map((x, i) => (i === index ? { ...x, photo: path } : x));
+                        setContent({ ...content, therapists });
+                      })
+                    }
+                  />
                 </div>
               ))}
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
+                {saving ? "Saving…" : "Save therapists"}
+              </button>
             </>
           )}
 

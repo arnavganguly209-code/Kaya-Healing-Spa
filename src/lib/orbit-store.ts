@@ -220,6 +220,8 @@ export type OrbitContent = {
   adminSectionFlags: OrbitAdminSectionFlags;
   pageCovers: OrbitPageCovers;
   aboutPage: OrbitAboutPage;
+  /** When false, guests cannot choose a therapist — service/package booking still works. */
+  therapistBookingEnabled: boolean;
   therapists: OrbitTherapist[];
   packageCategories: string[];
   services: Service[];
@@ -263,6 +265,7 @@ function normalizeTherapists(list: OrbitTherapist[] | undefined, defaults: Orbit
       ...t,
       photo: keepUpload ? photo : therapistPlaceholderPath(t.slug),
       photoAlt: t.photoAlt || `${t.name} — therapist photo`,
+      enabled: t.enabled !== false,
     };
   });
 }
@@ -834,6 +837,7 @@ export function defaultOrbitContent(): OrbitContent {
     packages,
     gallery: [],
     aboutPage: defaultAboutPage(),
+    therapistBookingEnabled: true,
     therapists: defaultTherapists(),
   });
 }
@@ -988,6 +992,7 @@ function loadOrbitContentFromDisk(): OrbitContent {
       adminSectionFlags: normalizeAdminSectionFlags(merged.adminSectionFlags),
       pageCovers: normalizePageCovers(merged.pageCovers),
       aboutPage: normalizeAboutPage(merged.aboutPage),
+      therapistBookingEnabled: merged.therapistBookingEnabled !== false,
       therapists: normalizeTherapists(
         saved.servicesMenuVersion === SERVICES_MENU_VERSION ? merged.therapists : defaults.therapists,
         defaults.therapists,
@@ -1027,7 +1032,8 @@ export function writeOrbitContent(content: OrbitContent) {
     aboutPage: normalizeAboutPage(content.aboutPage),
     homePage: normalizeHomePage(content.homePage),
     adminSectionFlags: normalizeAdminSectionFlags(content.adminSectionFlags),
-    therapists: content.therapists?.length ? content.therapists : defaultTherapists(),
+    therapists: normalizeTherapists(content.therapists, defaultTherapists()),
+    therapistBookingEnabled: content.therapistBookingEnabled !== false,
     servicesMenuVersion: SERVICES_MENU_VERSION,
     socialLinks: normalizeSocialLinks(content.socialLinks),
     extraSocialLinks: normalizeExtraSocialLinks(content.extraSocialLinks),

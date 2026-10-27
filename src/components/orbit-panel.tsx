@@ -762,7 +762,23 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
           )}
           {section === "Therapists" && (
             <>
-              <p className="text-sm text-[#6B6B6B]">Team on services &amp; packages pages and “Book therapist” on contact. Choose a therapist from those pages — not as an optional field on treatment/package forms.</p>
+              <p className="text-sm text-[#6B6B6B]">Team on services &amp; packages pages and “Book therapist” on contact. Service and package booking stay available if therapist choice is off.</p>
+              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[#efe8e0] bg-[#fff7f0] p-5">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-5 w-5 accent-[#F47B20]"
+                  checked={content.therapistBookingEnabled !== false}
+                  onChange={(e) => setContent({ ...content, therapistBookingEnabled: e.target.checked })}
+                />
+                <span>
+                  <span className="block text-sm font-semibold">Therapist booking</span>
+                  <span className="mt-1 block text-sm text-[#6B6B6B]">
+                    {content.therapistBookingEnabled !== false
+                      ? "Guests can pick a therapist when they book."
+                      : "Treatments and packages stay bookable. Therapist choice is hidden."}
+                  </span>
+                </span>
+              </label>
               <button
                 type="button"
                 className="rounded-full border border-[#efe8e0] bg-white px-5 py-3 text-sm"
@@ -780,6 +796,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
                         priceFromNpr: 4000,
                         photo: content.therapists[0]?.photo || "/brand/kaya-logo-hd.webp",
                         photoAlt: "Therapist portrait",
+                        enabled: true,
                       },
                     ],
                   })
@@ -789,11 +806,22 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
               </button>
               {content.therapists.map((therapist, index) => (
                 <div key={therapist.slug} className="space-y-3 rounded-2xl border border-[#efe8e0] bg-white p-5">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="text-sm font-semibold">{therapist.name}</p>
-                    <button type="button" className="text-xs text-[#c45e0a]" onClick={() => publish({ ...content, therapists: content.therapists.filter((_, i) => i !== index) })}>
-                      Remove
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 accent-[#F47B20]"
+                          checked={therapist.enabled !== false}
+                          onChange={(e) => updateTherapist(index, { enabled: e.target.checked })}
+                        />
+                        Show on site
+                      </label>
+                      <button type="button" className="text-xs text-[#c45e0a]" onClick={() => publish({ ...content, therapists: content.therapists.filter((_, i) => i !== index) })}>
+                        Remove
+                      </button>
+                    </div>
                   </div>
                   <Field label="Slug" value={therapist.slug} onChange={(value) => updateTherapist(index, { slug: value })} />
                   <Field label="Name" value={therapist.name} onChange={(value) => updateTherapist(index, { name: value })} />

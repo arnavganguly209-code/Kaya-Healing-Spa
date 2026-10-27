@@ -4,6 +4,8 @@ import { site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Spa Gallery",
   description: `Photographs of treatment rooms, rituals, and quiet details at ${site.name} in Kathmandu.`,

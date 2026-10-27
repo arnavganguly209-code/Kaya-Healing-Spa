@@ -4,6 +4,8 @@ import { Reveal } from "@/components/reveal";
 import { labelForCategory, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 import Image from "next/image";
 import Link from "next/link";
 

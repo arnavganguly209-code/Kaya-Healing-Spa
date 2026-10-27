@@ -6,12 +6,14 @@ export function TherapistStrip({
   therapists,
   title = "Meet our therapists",
   intro = "Use the arrows to browse the team, then book your therapist and choose a treatment or package.",
+  allowBooking = true,
 }: {
   therapists: OrbitTherapist[];
   serviceSlug?: string;
   packageSlug?: string;
   title?: string;
   intro?: string;
+  allowBooking?: boolean;
 }) {
   if (!therapists.length) return null;
 
@@ -22,7 +24,7 @@ export function TherapistStrip({
         <p className="prose-quiet mt-3 max-w-2xl text-sm">{intro}</p>
         <TherapistCarousel ariaLabel="therapists">
           {therapists.map((therapist) => (
-            <TherapistCard key={therapist.slug} therapist={therapist} />
+            <TherapistCard key={therapist.slug} therapist={therapist} allowBooking={allowBooking} />
           ))}
         </TherapistCarousel>
       </div>

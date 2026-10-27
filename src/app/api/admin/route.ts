@@ -33,6 +33,7 @@ export async function GET() {
       packagesMenuPdf: c.packagesMenuPdf || "",
       brandLogo: c.brandLogo || "",
       aboutPage: c.aboutPage,
+      therapistBookingEnabled: c.therapistBookingEnabled !== false,
       pageCovers: c.pageCovers,
       addressLine: c.addressLine || "",
       mapEmbedQuery: c.mapEmbedQuery || "",
@@ -71,6 +72,8 @@ export async function PUT(request: Request) {
     services: (body.services as typeof current.services) || current.services,
     packages: (body.packages as typeof current.packages) || current.packages,
     therapists: (body.therapists as typeof current.therapists) || current.therapists,
+    therapistBookingEnabled:
+      typeof body.therapistBookingEnabled === "boolean" ? body.therapistBookingEnabled : current.therapistBookingEnabled !== false,
     categories: (body.categories as typeof current.categories) || current.categories,
     packageCategories: (body.packageCategories as typeof current.packageCategories) || current.packageCategories,
     homePage: bodyHome
@@ -104,5 +107,7 @@ export async function PUT(request: Request) {
   revalidatePath("/gallery");
   revalidatePath("/contact");
   revalidatePath("/about");
+  revalidatePath("/blog");
+  revalidatePath("/admin");
   return NextResponse.json({ success: true });
 }

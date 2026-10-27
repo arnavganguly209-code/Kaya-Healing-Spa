@@ -8,6 +8,7 @@ export function TherapistCard({
   selected,
   onSelect,
   fullWidth,
+  allowBooking = true,
 }: {
   therapist: OrbitTherapist;
   compact?: boolean;
@@ -15,6 +16,7 @@ export function TherapistCard({
   onSelect?: () => void;
   /** Use in grids (e.g. contact form) instead of horizontal carousel cards */
   fullWidth?: boolean;
+  allowBooking?: boolean;
 }) {
   const inner = (
     <>
@@ -30,7 +32,7 @@ export function TherapistCard({
         <p className={`prose-quiet mt-2 flex-1 text-[#4a4a4a] ${compact ? "text-xs leading-snug line-clamp-3" : "text-sm leading-relaxed"}`}>
           {therapist.description}
         </p>
-        {!compact && !onSelect && (
+        {!compact && !onSelect && allowBooking && (
           <Link
             href={`/contact?therapist=${encodeURIComponent(therapist.slug)}&mode=therapist`}
             className="btn-primary mt-4 w-full text-center sm:mt-5"

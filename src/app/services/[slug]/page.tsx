@@ -5,6 +5,7 @@ import { ServiceBookingPanel } from "@/components/service-booking-panel";
 import { TherapistStrip } from "@/components/therapist-strip";
 import { categoryLabels, getService as fallbackService, services, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
+import { bookableTherapists, publicTherapists } from "@/lib/therapist-booking";
 import type { Service } from "@/lib/types";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -114,9 +115,13 @@ export default async function ServiceDetail({ params }: Props) {
             </>
           ) : null}
         </div>
-        <ServiceBookingPanel service={service} therapists={orbit.therapists} />
+        <ServiceBookingPanel service={service} therapists={bookableTherapists(orbit)} />
       </div>
-      <TherapistStrip therapists={orbit.therapists} serviceSlug={service.slug} />
+      <TherapistStrip
+        therapists={publicTherapists(orbit)}
+        serviceSlug={service.slug}
+        allowBooking={orbit.therapistBookingEnabled !== false}
+      />
     </article>
   );
 }

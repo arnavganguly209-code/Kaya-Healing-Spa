@@ -51,6 +51,8 @@ export async function PUT(request: Request) {
     pageCovers: body.pageCovers ? normalizePageCovers({ ...current.pageCovers, ...body.pageCovers }) : current.pageCovers,
     aboutPage: body.aboutPage ? { ...current.aboutPage, ...body.aboutPage, owner: { ...current.aboutPage.owner, ...body.aboutPage.owner }, logos: body.aboutPage.logos?.length ? body.aboutPage.logos : current.aboutPage.logos } : current.aboutPage,
     therapists: body.therapists?.length ? body.therapists : current.therapists,
+    therapistBookingEnabled:
+      typeof body.therapistBookingEnabled === "boolean" ? body.therapistBookingEnabled : current.therapistBookingEnabled !== false,
     packageCategories: body.packageCategories?.length ? body.packageCategories : current.packageCategories,
     packages: body.packages?.length ? body.packages : current.packages,
     services: body.services,

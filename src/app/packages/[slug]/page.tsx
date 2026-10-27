@@ -4,6 +4,7 @@ import { ServiceBookingPanel } from "@/components/service-booking-panel";
 import { TherapistStrip } from "@/components/therapist-strip";
 import { formatNpr, getPackage, packages as fallbackPackages } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
+import { bookableTherapists, publicTherapists } from "@/lib/therapist-booking";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -99,9 +100,13 @@ export default async function PackageDetail({ params }: Props) {
             <p className="mt-1 text-sm text-[#8a8175] line-through">{formatNpr(item.compareAtNpr)}</p>
           ) : null}
         </div>
-        <ServiceBookingPanel pkg={item} therapists={orbit.therapists} />
+        <ServiceBookingPanel pkg={item} therapists={bookableTherapists(orbit)} />
       </div>
-      <TherapistStrip therapists={orbit.therapists} packageSlug={item.slug} />
+      <TherapistStrip
+        therapists={publicTherapists(orbit)}
+        packageSlug={item.slug}
+        allowBooking={orbit.therapistBookingEnabled !== false}
+      />
     </article>
   );
 }

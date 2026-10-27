@@ -17,6 +17,7 @@ import { readBookingSettings } from "@/lib/booking-settings";
 import { isPastDate, listAvailableSlots, parseDateYmd, timeToMinutes } from "@/lib/booking-scheduler";
 import { parseServiceDurationOptions } from "@/lib/service-pricing";
 import { readOrbitContent } from "@/lib/orbit-store";
+import { assignedTherapist } from "@/lib/therapist-booking";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -116,13 +117,16 @@ export async function POST(request: Request) {
       }
     }
 
+    const therapist = assignedTherapist(orbit, body.therapistSlug);
+    if (body.therapistSlug && !therapist) {
+      return NextResponse.json({ message: "Therapist choice is not available. Book a treatment or package instead." }, { status: 400 });
+    }
+
     const existing = readBookings();
-    const slots = listAvailableSlots(body.preferredDate, durationMinutes, settings, existing, body.therapistSlug || undefined);
+    const slots = listAvailableSlots(body.preferredDate, durationMinutes, settings, existing, therapist?.slug);
     if (!slots.includes(body.preferredTime)) {
       return NextResponse.json({ message: "That time is no longer available. Please choose another slot." }, { status: 409 });
     }
-
-    const therapist = body.therapistSlug ? orbit.therapists.find((t) => t.slug === body.therapistSlug) : undefined;
 
     const { booking, created } = createBooking({
       status: "confirmed",

@@ -6,7 +6,10 @@ import { JsonLd } from "@/components/json-ld";
 import { PageHero } from "@/components/page-hero";
 import { faqs, reviews, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
+import { bookableTherapists } from "@/lib/therapist-booking";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Contact & Booking",
@@ -46,7 +49,8 @@ export default async function ContactPage({
         <ContactBookingHub
           services={orbit.services}
           packages={orbit.packages}
-          therapists={orbit.therapists}
+          therapists={bookableTherapists(orbit)}
+          allowTherapistBooking={orbit.therapistBookingEnabled !== false}
           initial={{
             service: params.service,
             package: params.package,

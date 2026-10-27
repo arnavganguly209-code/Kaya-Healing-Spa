@@ -36,6 +36,7 @@ export default async function AdminPage() {
         packagesMenuPdf: c.packagesMenuPdf || "",
         brandLogo: c.brandLogo || "",
         aboutPage: c.aboutPage,
+        therapistBookingEnabled: c.therapistBookingEnabled !== false,
         pageCovers: c.pageCovers,
         addressLine: c.addressLine || "",
         mapEmbedQuery: c.mapEmbedQuery || "",

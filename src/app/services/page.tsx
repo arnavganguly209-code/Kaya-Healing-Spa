@@ -4,7 +4,10 @@ import { ServiceCatalog } from "@/components/service-catalog";
 import { TherapistStrip } from "@/components/therapist-strip";
 import { services as fallbackServices, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
+import { publicTherapists } from "@/lib/therapist-booking";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Spa Treatments in Kathmandu",
@@ -53,7 +56,15 @@ export default async function ServicesPage({
         categories={live.categories}
         menuPdfHref={live.servicesMenuPdf}
       />
-      <TherapistStrip therapists={live.therapists} intro="Book a treatment and pick your therapist on the contact form." />
+      <TherapistStrip
+        therapists={publicTherapists(live)}
+        allowBooking={live.therapistBookingEnabled !== false}
+        intro={
+          live.therapistBookingEnabled === false
+            ? "Our therapists host every treatment. Book a service or package below — therapist choice is currently closed."
+            : "Book a treatment and pick your therapist on the contact form."
+        }
+      />
     </>
   );
 }

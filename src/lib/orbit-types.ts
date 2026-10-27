@@ -7,6 +7,8 @@ export type OrbitTherapist = {
   priceFromNpr: number;
   photo: string;
   photoAlt: string;
+  /** When false, this therapist is hidden from booking pickers and the public strip. */
+  enabled?: boolean;
 };
 
 export type OrbitAboutLogo = {

@@ -16,12 +16,14 @@ type Props = {
   services: Service[];
   packages: SpaPackage[];
   therapists: OrbitTherapist[];
+  allowTherapistBooking?: boolean;
   initial?: { service?: string; package?: string; therapist?: string; mode?: string };
 };
 
-export function ContactBookingHub({ services, packages, therapists, initial }: Props) {
+export function ContactBookingHub({ services, packages, therapists, allowTherapistBooking = true, initial }: Props) {
+  const canBookTherapist = allowTherapistBooking && therapists.length > 0;
   const defaultMode: BookingMode =
-    initial?.mode === "therapist" || initial?.therapist
+    canBookTherapist && (initial?.mode === "therapist" || initial?.therapist)
       ? "therapist"
       : initial?.mode === "package" || initial?.package
         ? "package"
@@ -29,16 +31,21 @@ export function ContactBookingHub({ services, packages, therapists, initial }: P
 
   const [mode, setMode] = useState<BookingMode>(defaultMode);
 
+  useEffect(() => {
+    if (!canBookTherapist && mode === "therapist") setMode("service");
+  }, [canBookTherapist, mode]);
+  const bookingModes = (
+    [
+      ["service", "Book a treatment"],
+      ["package", "Book a package"],
+      ...(canBookTherapist ? ([["therapist", "Book therapist"]] as const) : []),
+    ] as const
+  );
+
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap" role="tablist" aria-label="Booking type">
-        {(
-          [
-            ["service", "Book a treatment"],
-            ["package", "Book a package"],
-            ["therapist", "Book therapist"],
-          ] as const
-        ).map(([key, label]) => (
+        {bookingModes.map(([key, label]) => (
           <button
             key={key}
             type="button"
@@ -59,7 +66,7 @@ export function ContactBookingHub({ services, packages, therapists, initial }: P
           kind="service"
           services={services}
           packages={packages}
-          therapists={therapists}
+          therapists={canBookTherapist ? therapists : []}
           initialService={initial?.service}
         />
       )}
@@ -69,11 +76,11 @@ export function ContactBookingHub({ services, packages, therapists, initial }: P
           kind="package"
           services={services}
           packages={packages}
-          therapists={therapists}
+          therapists={canBookTherapist ? therapists : []}
           initialPackage={initial?.package}
         />
       )}
-      {mode === "therapist" && (
+      {canBookTherapist && mode === "therapist" && (
         <BookingPanel
           key="therapist"
           kind="therapist"

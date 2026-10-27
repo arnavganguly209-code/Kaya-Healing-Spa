@@ -3,7 +3,10 @@ import { TherapistStrip } from "@/components/therapist-strip";
 import { PageHero } from "@/components/page-hero";
 import { packages as fallbackPackages, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
+import { publicTherapists } from "@/lib/therapist-booking";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Spa Packages in Kathmandu",
@@ -38,7 +41,15 @@ export default async function PackagesPage({
         categories={orbit.packageCategories}
         menuPdfHref={orbit.packagesMenuPdf}
       />
-      <TherapistStrip therapists={orbit.therapists} intro="Prefer someone specific? Book a package and choose your therapist on the contact form." />
+      <TherapistStrip
+        therapists={publicTherapists(orbit)}
+        allowBooking={orbit.therapistBookingEnabled !== false}
+        intro={
+          orbit.therapistBookingEnabled === false
+            ? "Our therapists host every package. Book a package below — therapist choice is currently closed."
+            : "Prefer someone specific? Book a package and choose your therapist on the contact form."
+        }
+      />
     </>
   );
 }
