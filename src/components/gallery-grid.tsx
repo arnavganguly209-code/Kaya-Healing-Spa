@@ -10,17 +10,30 @@ function unoptimizedSrc(src: string) {
   return src.startsWith("/uploads/") || src.startsWith("/hero/");
 }
 
-export function GalleryGrid({ items }: { items: GalleryImage[] }) {
+export function GalleryGrid({
+  items,
+  branches,
+}: {
+  items: GalleryImage[];
+  branches: { id: string; place: string }[];
+}) {
+  const houses = branches.length ? branches : [{ id: "kathmandu", place: "Kathmandu" }];
+  const [branchId, setBranchId] = useState(houses[0]?.id || "kathmandu");
+  const activeBranch = houses.some((house) => house.id === branchId) ? branchId : houses[0].id;
+  const houseItems = useMemo(
+    () => items.filter((image) => (image.branchId || "kathmandu") === activeBranch),
+    [items, activeBranch],
+  );
   const categories = useMemo(() => {
-    const set = new Set(items.map((image) => image.category));
+    const set = new Set(houseItems.map((image) => image.category));
     return ["all", ...Array.from(set)] as const;
-  }, [items]);
+  }, [houseItems]);
 
   const [filter, setFilter] = useState<string>("all");
   const [active, setActive] = useState<number | null>(null);
   const images = useMemo(
-    () => items.filter((image) => filter === "all" || image.category === filter),
-    [filter, items],
+    () => houseItems.filter((image) => filter === "all" || image.category === filter),
+    [filter, houseItems],
   );
 
   useEffect(() => {
@@ -36,7 +49,28 @@ export function GalleryGrid({ items }: { items: GalleryImage[] }) {
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-14 pb-28 md:px-8">
-      <div className="flex flex-wrap gap-2">
+      <p className="text-[11px] font-semibold tracking-[0.22em] text-[#F47B20] uppercase">Houses</p>
+      <div className="mt-3 flex flex-wrap gap-2" role="tablist" aria-label="Gallery house">
+        {houses.map((house) => (
+          <button
+            key={house.id}
+            type="button"
+            role="tab"
+            aria-selected={house.id === activeBranch}
+            onClick={() => {
+              setBranchId(house.id);
+              setFilter("all");
+              setActive(null);
+            }}
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold ${
+              house.id === activeBranch ? "bg-[#171717] text-white" : "border border-[#e6dfd4] bg-white"
+            }`}
+          >
+            {house.place}
+          </button>
+        ))}
+      </div>
+      <div className="mt-6 flex flex-wrap gap-2">
         {categories.map((item) => (
           <button
             key={item}
@@ -52,7 +86,9 @@ export function GalleryGrid({ items }: { items: GalleryImage[] }) {
       </div>
       {images.length === 0 ? (
         <p className="mt-12 max-w-xl text-sm leading-7 text-[#6B6B6B]">
-          Gallery photos will appear here after fresh uploads from Orbit. Until then, this page stays empty on purpose.
+          {activeBranch === "kathmandu"
+            ? "Kathmandu photos appear here after they are uploaded in Admin → Gallery."
+            : "This house does not have photos yet. Upload them in Admin → Gallery, under this branch."}
         </p>
       ) : (
         <div className="mt-8 columns-1 gap-4 sm:columns-2 lg:columns-3">

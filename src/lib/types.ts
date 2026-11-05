@@ -55,6 +55,8 @@ export type GalleryImage = {
   category: "spa" | "treatments" | "interiors" | "wellness" | "details";
   width: number;
   height: number;
+  /** House this photo belongs to. Missing values stay on the Kathmandu gallery. */
+  branchId?: string;
 };
 
 export type Review = {

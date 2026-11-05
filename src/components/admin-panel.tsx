@@ -455,11 +455,24 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
               <AboutPageFields
                 about={content.aboutPage}
                 cover={content.pageCovers.about}
-                onAbout={(aboutPage) => setContent({ ...content, aboutPage })}
-                onCover={(about) => setContent({ ...content, pageCovers: { ...content.pageCovers, about } })}
-                onUpload={upload}
+                onAbout={(aboutPage) => {
+                  const next = { ...contentRef.current, aboutPage };
+                  contentRef.current = next;
+                  setContent(next);
+                }}
+                onCover={(about) => {
+                  const next = { ...contentRef.current, pageCovers: { ...contentRef.current.pageCovers, about } };
+                  contentRef.current = next;
+                  setContent(next);
+                }}
+                onUpload={(file, apply) =>
+                  upload(file, (path) => {
+                    apply(path);
+                    void persist(contentRef.current);
+                  })
+                }
               />
-              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(contentRef.current)}>
                 {saving ? "Saving…" : "Save about page"}
               </button>
             </>
@@ -677,7 +690,7 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
               <MediaField
                 label="Current logo"
                 src={content.brandLogo || ""}
-                onUpload={(file) => upload(file, (brandLogo) => publish({ ...content, brandLogo }))}
+                onUpload={(file) => upload(file, (brandLogo) => publish({ ...contentRef.current, brandLogo }))}
               />
               <Field label="Brand name" value={content.footerBrand} onChange={(v) => setContent({ ...content, footerBrand: v })} />
               <Area label="Footer description" value={content.footerText} onChange={(v) => setContent({ ...content, footerText: v })} />
@@ -701,8 +714,8 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                     setContent({ ...content, socialLinks });
                   }} />
                   <MediaField label="Custom icon" src={link.iconSrc || ""} onUpload={(f) => upload(f, (path) => {
-                    const socialLinks = content.socialLinks.map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
-                    publish({ ...content, socialLinks });
+                    const socialLinks = contentRef.current.socialLinks.map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
+                    publish({ ...contentRef.current, socialLinks });
                   })} />
                   <label className="mt-2 flex items-center gap-2 text-sm">
                     <input type="checkbox" checked={link.enabled} onChange={(e) => {
@@ -730,8 +743,8 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                     setContent({ ...content, extraSocialLinks });
                   }} />
                   <MediaField label="Icon" src={link.iconSrc} onUpload={(f) => upload(f, (path) => {
-                    const extraSocialLinks = content.extraSocialLinks.map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
-                    publish({ ...content, extraSocialLinks });
+                    const extraSocialLinks = contentRef.current.extraSocialLinks.map((item, i) => (i === index ? { ...item, iconSrc: path } : item));
+                    publish({ ...contentRef.current, extraSocialLinks });
                   })} />
                   <button type="button" className="mt-2 text-xs text-[#c45e0a] underline" onClick={() => setContent({
                     ...content,
@@ -789,21 +802,37 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
           {section === "Services" && (
             <>
               <h2 className="font-serif text-2xl">Services menu</h2>
-              <AdminServicesEditor slice={catalog} setSlice={setCatalog} publish={publishCatalog} upload={upload} />
+              <AdminServicesEditor
+                slice={catalog}
+                setSlice={(next) => setCatalog({ ...catalogSlice(contentRef.current), services: next.services, servicesMenuPdf: next.servicesMenuPdf })}
+                publish={(next) => publishCatalog({ ...catalogSlice(contentRef.current), services: next.services, servicesMenuPdf: next.servicesMenuPdf })}
+                upload={upload}
+              />
             </>
           )}
 
           {section === "Packages" && (
             <>
               <h2 className="font-serif text-2xl">Packages</h2>
-              <AdminPackagesEditor slice={catalog} setSlice={setCatalog} publish={publishCatalog} upload={upload} />
+              <AdminPackagesEditor
+                slice={catalog}
+                setSlice={(next) => setCatalog({ ...catalogSlice(contentRef.current), packages: next.packages, packagesMenuPdf: next.packagesMenuPdf })}
+                publish={(next) => publishCatalog({ ...catalogSlice(contentRef.current), packages: next.packages, packagesMenuPdf: next.packagesMenuPdf })}
+                upload={upload}
+              />
             </>
           )}
 
           {section === "Gallery" && (
             <>
               <h2 className="font-serif text-2xl">Gallery</h2>
-              <AdminGalleryEditor slice={catalog} setSlice={setCatalog} publish={publishCatalog} upload={upload} />
+              <AdminGalleryEditor
+                slice={catalog}
+                setSlice={(next) => setCatalog({ ...catalogSlice(contentRef.current), gallery: next.gallery })}
+                publish={(next) => publishCatalog({ ...catalogSlice(contentRef.current), gallery: next.gallery })}
+                upload={upload}
+                branches={content.branches.map((branch) => ({ id: branch.id, place: branch.place }))}
+              />
               <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publishCatalog(catalogSlice(contentRef.current))}>
                 {saving ? "Saving…" : "Save gallery to live site"}
               </button>
@@ -922,14 +951,14 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                     src={t.photo}
                     onUpload={(f) =>
                       upload(f, (path) => {
-                        const therapists = content.therapists.map((x, i) => (i === index ? { ...x, photo: path } : x));
-                        setContent({ ...content, therapists });
+                        const therapists = contentRef.current.therapists.map((x, i) => (i === index ? { ...x, photo: path } : x));
+                        publish({ ...contentRef.current, therapists });
                       })
                     }
                   />
                 </div>
               ))}
-              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(contentRef.current)}>
                 {saving ? "Saving…" : "Save therapists"}
               </button>
             </>

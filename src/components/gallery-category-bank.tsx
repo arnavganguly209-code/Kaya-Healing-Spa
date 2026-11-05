@@ -2,7 +2,9 @@
 
 import { GALLERY_CATEGORIES, galleryCategoryLabel, newGalleryImage } from "@/lib/gallery-categories";
 import type { GalleryImage } from "@/lib/types";
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
+
+type GalleryBranch = { id: string; place: string };
 
 type Props = {
   gallery: GalleryImage[];
@@ -10,50 +12,81 @@ type Props = {
   publishGallery: (next: GalleryImage[]) => void;
   upload: (file: File, apply: (path: string) => void) => void;
   onPickLibrary?: (apply: (src: string) => void) => void;
+  branches?: GalleryBranch[];
 };
 
 function previewSrc(src: string) {
   return src || "";
 }
 
-export function GalleryCategoryBank({ gallery, setGallery, publishGallery, upload, onPickLibrary }: Props) {
+export function GalleryCategoryBank({ gallery, setGallery, publishGallery, upload, onPickLibrary, branches = [] }: Props) {
+  const houses = branches.length ? branches : [{ id: "kathmandu", place: "Kathmandu" }];
+  const [branchId, setBranchId] = useState(houses[0]?.id || "kathmandu");
+  const activeBranch = houses.some((house) => house.id === branchId) ? branchId : houses[0].id;
+  const galleryRef = useRef(gallery);
+  galleryRef.current = gallery;
+  const houseGallery = useMemo(
+    () => gallery.filter((image) => (image.branchId || "kathmandu") === activeBranch),
+    [gallery, activeBranch],
+  );
+
   const byCategory = useMemo(() => {
     const map = new Map<GalleryImage["category"], GalleryImage[]>();
     for (const cat of GALLERY_CATEGORIES) map.set(cat.id, []);
-    for (const image of gallery) {
+    for (const image of houseGallery) {
       const list = map.get(image.category) ?? [];
       list.push(image);
       map.set(image.category, list);
     }
     return map;
-  }, [gallery]);
+  }, [houseGallery]);
+
+  function remember(next: GalleryImage[], publish: boolean) {
+    galleryRef.current = next;
+    if (publish) publishGallery(next);
+    else setGallery(next);
+  }
 
   function patchImage(id: string, patch: Partial<GalleryImage>) {
-    const next = gallery.map((item) => (item.id === id ? { ...item, ...patch } : item));
-    setGallery(next);
-    if (patch.src?.startsWith("/uploads/")) publishGallery(next);
+    const next = galleryRef.current.map((item) => (item.id === id ? { ...item, ...patch } : item));
+    remember(next, Boolean(patch.src?.startsWith("/uploads/")));
   }
 
   function removeImage(id: string) {
-    publishGallery(gallery.filter((item) => item.id !== id));
+    remember(galleryRef.current.filter((item) => item.id !== id), true);
   }
 
   function uploadToCategory(category: GalleryImage["category"], file: File) {
     upload(file, (src) => {
-      publishGallery([...gallery, newGalleryImage(category, src)]);
+      remember([...galleryRef.current, newGalleryImage(category, src, activeBranch)], true);
     });
   }
 
   function addEmptySlot(category: GalleryImage["category"]) {
-    setGallery([...gallery, newGalleryImage(category)]);
+    remember([...galleryRef.current, newGalleryImage(category, "", activeBranch)], false);
   }
 
   return (
     <div className="space-y-10">
       <p className="text-sm leading-relaxed text-[#6B6B6B]">
-        Upload photos by category — the same filters shown on{" "}
-        <span className="font-semibold text-[#141210]">/gallery</span>. Each category has its own upload button.
+        Choose a house, then upload. Kathmandu keeps the photos already on the site. Lumbini starts empty until you add its own pictures. Uploads publish straight to /gallery.
       </p>
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Gallery house">
+        {houses.map((house) => (
+          <button
+            key={house.id}
+            type="button"
+            role="tab"
+            aria-selected={house.id === activeBranch}
+            onClick={() => setBranchId(house.id)}
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold ${
+              house.id === activeBranch ? "bg-[#171717] text-white" : "border border-[#efe8e0] bg-white text-[#171717]"
+            }`}
+          >
+            {house.place}
+          </button>
+        ))}
+      </div>
 
       {GALLERY_CATEGORIES.map(({ id, label }) => {
         const items = byCategory.get(id) ?? [];

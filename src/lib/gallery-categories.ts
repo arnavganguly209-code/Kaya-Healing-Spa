@@ -12,7 +12,7 @@ export function galleryCategoryLabel(id: string) {
   return GALLERY_CATEGORIES.find((c) => c.id === id)?.label ?? id.replace(/-/g, " ");
 }
 
-export function newGalleryImage(category: GalleryImage["category"], src = ""): GalleryImage {
+export function newGalleryImage(category: GalleryImage["category"], src = "", branchId = "kathmandu"): GalleryImage {
   return {
     id: `g-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     src,
@@ -20,5 +20,6 @@ export function newGalleryImage(category: GalleryImage["category"], src = ""): G
     category,
     width: 1200,
     height: 1600,
+    branchId,
   };
 }

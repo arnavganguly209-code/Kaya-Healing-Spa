@@ -26,7 +26,7 @@ export default function GalleryPage() {
         text={cover.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Gallery" }]}
       />
-      <GalleryGrid items={images} />
+      <GalleryGrid items={images} branches={orbit.branches.map((branch) => ({ id: branch.id, place: branch.place }))} />
     </>
   );
 }

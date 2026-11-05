@@ -130,10 +130,17 @@ export function AdminCategoriesEditor({ slice, setSlice, publish }: EditorProps)
   );
 }
 
-export function AdminGalleryEditor({ slice, setSlice, publish, upload }: EditorProps) {
+export function AdminGalleryEditor({
+  slice,
+  setSlice,
+  publish,
+  upload,
+  branches,
+}: EditorProps & { branches?: { id: string; place: string }[] }) {
   return (
     <GalleryCategoryBank
       gallery={slice.gallery}
+      branches={branches}
       setGallery={(gallery) => setSlice({ ...slice, gallery })}
       publishGallery={(gallery) => publish({ ...slice, gallery })}
       upload={upload}

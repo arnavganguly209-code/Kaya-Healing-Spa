@@ -902,7 +902,9 @@ function normalizeHero(hero: OrbitHero): OrbitHero {
 
 function normalizeGallery(raw: GalleryImage[] | undefined): GalleryImage[] {
   if (!Array.isArray(raw)) return [];
-  return raw.filter((item) => typeof item.src === "string" && item.src.startsWith("/uploads/"));
+  return raw
+    .filter((item) => typeof item.src === "string" && item.src.startsWith("/uploads/"))
+    .map((item) => ({ ...item, branchId: item.branchId?.trim() || "kathmandu" }));
 }
 
 /** Persisted gallery: Orbit uploads only (drops stock/demo URLs). */
@@ -912,7 +914,7 @@ function sanitizeGalleryForStorage(raw: GalleryImage[] | undefined): GalleryImag
     const src = item.src?.trim() ?? "";
     if (!src) return false;
     return src.startsWith("/uploads/");
-  });
+  }).map((item) => ({ ...item, branchId: item.branchId?.trim() || "kathmandu" }));
 }
 
 function normalizeTherapies(therapies: OrbitContent["therapies"]): OrbitContent["therapies"] {

@@ -44,7 +44,7 @@ export function HomePage() {
   const whyKaya = orbit.whyKaya;
   const homeAbout = orbit.homeAbout;
   const featuredServices = services.slice(0, 6);
-  const preview = gallery.slice(0, 6);
+  const preview = gallery.filter((image) => (image.branchId || "kathmandu") === "kathmandu").slice(0, 6);
 
   return (
     <>

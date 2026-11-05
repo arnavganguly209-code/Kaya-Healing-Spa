@@ -1017,6 +1017,7 @@ export function OrbitPanel({ initial }: { initial: OrbitContent }) {
             <>
               <GalleryCategoryBank
                 gallery={content.gallery}
+                branches={content.branches.map((branch) => ({ id: branch.id, place: branch.place }))}
                 setGallery={(gallery) => setContent({ ...content, gallery })}
                 publishGallery={(gallery) => publish({ ...contentRef.current, gallery })}
                 upload={upload}
