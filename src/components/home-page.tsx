@@ -5,8 +5,8 @@ import { HomeVisitSection } from "@/components/home-visit-section";
 import { Reveal } from "@/components/reveal";
 import { TherapiesSection } from "@/components/therapies-section";
 import { WhyKayaSection } from "@/components/why-kaya-section";
-import { formatNpr, phoneToTelHref, site } from "@/lib/content";
-import { mapEmbedUrl } from "@/lib/map-embed";
+import { BranchShowcase } from "@/components/branch-showcase";
+import { formatNpr, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import { Flower2, Leaf, Sparkles } from "lucide-react";
 import Image from "next/image";
@@ -274,35 +274,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-[1440px] gap-8 px-4 py-14 md:px-8 md:gap-10 md:py-24 lg:grid-cols-2">
-        <div className="min-w-0">
-          <p className="eyebrow">Visit</p>
-          <h2 className="display mt-3 text-[1.85rem] sm:text-5xl">{site.name}</h2>
-          <p className="mt-4 text-lg leading-relaxed">{orbit.addressLine || site.addressLine}</p>
-          <p className="mt-2 text-sm">
-            <a href={`tel:${phoneToTelHref(orbit.phone || site.phone)}`} className="font-semibold hover:text-[#F47B20]">
-              {orbit.phone || site.phone}
-            </a>
-          </p>
-          <p className="prose-quiet mt-2 text-sm">{site.placeType} · {orbit.aboutPage.googleRating || site.googleRating}★ on Google</p>
-          <ul className="mt-6 space-y-2 text-sm">
-            {site.hours.map((row) => (
-              <li key={row.day}>{row.day}: {row.hours}</li>
-            ))}
-          </ul>
-          <p className="mt-3 text-xs text-[#8a8175]">{site.hoursNote}</p>
-          <Link href="/contact" className="btn-primary mt-8">Request a time</Link>
-        </div>
-        <div className="min-h-[240px] overflow-hidden rounded-2xl bg-[#f6f1e8] sm:min-h-[320px]">
-          <iframe
-            title={`Map — ${site.name}`}
-            className="h-full min-h-[240px] w-full grayscale sm:min-h-[320px]"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            src={mapEmbedUrl(orbit.mapEmbedQuery || site.mapEmbedQuery)}
-          />
-        </div>
-      </section>
+      <BranchShowcase branches={orbit.branches} />
     </>
   );
 }

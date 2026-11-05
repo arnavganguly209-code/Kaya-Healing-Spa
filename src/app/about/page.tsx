@@ -1,7 +1,8 @@
+import { BranchShowcase } from "@/components/branch-showcase";
 import { CATALOG_COMING_SOON_IMAGE } from "@/lib/catalog-images";
 import { PageHero } from "@/components/page-hero";
 import { Reveal } from "@/components/reveal";
-import { labelForCategory, phoneToTelHref, site } from "@/lib/content";
+import { labelForCategory, site } from "@/lib/content";
 import { readOrbitContent } from "@/lib/orbit-store";
 import type { Metadata } from "next";
 
@@ -28,7 +29,6 @@ export default function AboutPage() {
   const storyImage = pageImage(about.storyImage || orbit.homeAbout.image);
   const storyAlt = about.storyImageAlt || orbit.homeAbout.imageAlt;
   const ownerPhoto = pageImage(about.owner.photo);
-  const address = orbit.addressLine || site.addressLine;
   const values = about.values?.length
     ? about.values
     : [{ title: "Care", text: "Guests are greeted as people with a day behind them, not as a timetable." }];
@@ -55,16 +55,10 @@ export default function AboutPage() {
           <h2 className="mt-2 font-serif text-3xl">{site.name}</h2>
           <p className="mt-1 text-sm text-[#6B6B6B]">{about.companyTagline || site.placeType}</p>
           <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-[#8a8175]">Address</dt>
-              <dd className="mt-1 leading-relaxed">{address}</dd>
-            </div>
-            <div>
-              <dt className="text-[#8a8175]">Phone</dt>
-              <dd className="mt-1">
-                <a href={`tel:${phoneToTelHref(orbit.phone || site.phone)}`} className="font-semibold hover:text-[#F47B20]">
-                  {orbit.phone || site.phone}
-                </a>
+            <div className="sm:col-span-2">
+              <dt className="text-[#8a8175]">Houses</dt>
+              <dd className="mt-1 leading-relaxed">
+                {orbit.branches.map((branch) => `${branch.place} · ${branch.addressLine}`).join("  ·  ")}
               </dd>
             </div>
             <div>
@@ -80,6 +74,13 @@ export default function AboutPage() {
           </dl>
         </div>
       </section>
+
+      <BranchShowcase
+        branches={orbit.branches}
+        eyebrow="Where to find us"
+        title="Kathmandu and Lumbini"
+        intro="The Kathmandu house confirms every online treatment and package. Call the Lumbini house to arrange a visit at Buddha Maya Gardens."
+      />
 
       <section className="mx-auto grid max-w-[1440px] gap-8 px-4 py-8 md:px-8 lg:grid-cols-2 lg:gap-12 lg:py-16">
         <Reveal>

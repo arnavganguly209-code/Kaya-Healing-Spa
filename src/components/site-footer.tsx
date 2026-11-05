@@ -27,8 +27,6 @@ const treatments = [
 export function SiteFooter() {
   const orbit = readOrbitContent();
   const brand = orbit.footerBrand || site.name;
-  const displayPhone = orbit.phone || site.phone;
-  const telHref = phoneToTelHref(displayPhone);
   return (
     <footer className="relative overflow-hidden bg-[#12100e] text-[#f6f1e8]">
       <OrangeLotusBackground idSuffix="footer" intensity={0.2} showWatermark={false} />
@@ -39,7 +37,11 @@ export function SiteFooter() {
           <p className="mt-5 font-serif text-2xl text-white">{brand}</p>
           <p className="mt-2 text-xs tracking-[0.22em] uppercase text-[#F47B20]">{site.tagline}</p>
           <p className="mt-5 max-w-xs text-sm leading-7 text-white/65">{orbit.footerText}</p>
-          <p className="mt-4 max-w-xs text-sm text-white/55">{orbit.addressLine || site.addressLine}</p>
+          {orbit.branches.map((branch) => (
+            <p key={branch.id} className="mt-4 max-w-xs text-sm text-white/55">
+              <span className="font-semibold text-[#F47B20]">{branch.place}.</span> {branch.addressLine}
+            </p>
+          ))}
         </div>
         <div>
           <p className="text-[11px] font-semibold tracking-[0.24em] text-[#F47B20] uppercase">Explore</p>
@@ -68,12 +70,13 @@ export function SiteFooter() {
         <div>
           <p className="text-[11px] font-semibold tracking-[0.24em] text-[#F47B20] uppercase">Contact</p>
           <ul className="mt-5 space-y-3 text-sm text-white/78">
-            <li>{site.city}</li>
-            <li>
-              <a href={`tel:${telHref}`} className="hover:text-white">
-                {displayPhone}
-              </a>
-            </li>
+            {orbit.branches.map((branch) => (
+              <li key={branch.id}>
+                <a href={`tel:${phoneToTelHref(branch.phone)}`} className="hover:text-white">
+                  {branch.place}: {branch.phone}
+                </a>
+              </li>
+            ))}
             {orbit.email ? <li>{orbit.email}</li> : null}
             {site.hours.map((row) => (
               <li key={row.day}>

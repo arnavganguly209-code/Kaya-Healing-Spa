@@ -37,6 +37,7 @@ export async function GET() {
       pageCovers: c.pageCovers,
       addressLine: c.addressLine || "",
       mapEmbedQuery: c.mapEmbedQuery || "",
+      branches: c.branches,
     },
   });
 }
@@ -100,6 +101,7 @@ export async function PUT(request: Request) {
     pageCovers: bodyCovers ? normalizePageCovers({ ...current.pageCovers, ...bodyCovers }) : current.pageCovers,
     addressLine: typeof body.addressLine === "string" && body.addressLine.trim() ? body.addressLine.trim() : current.addressLine,
     mapEmbedQuery: typeof body.mapEmbedQuery === "string" && body.mapEmbedQuery.trim() ? body.mapEmbedQuery.trim() : current.mapEmbedQuery,
+    branches: Array.isArray(body.branches) ? (body.branches as typeof current.branches) : current.branches,
   });
   revalidatePath("/", "layout");
   revalidatePath("/services");

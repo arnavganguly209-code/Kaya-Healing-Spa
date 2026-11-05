@@ -40,6 +40,7 @@ export default async function AdminPage() {
         pageCovers: c.pageCovers,
         addressLine: c.addressLine || "",
         mapEmbedQuery: c.mapEmbedQuery || "",
+        branches: c.branches,
       }}
     />
   );

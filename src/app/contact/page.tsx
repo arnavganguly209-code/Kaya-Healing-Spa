@@ -1,3 +1,4 @@
+import { BranchShowcase } from "@/components/branch-showcase";
 import { ContactBookingHub } from "@/components/contact-booking-hub";
 import { ContactInquiryForm } from "@/components/contact-inquiry-form";
 import { CompanyContactCard } from "@/components/company-contact-card";
@@ -44,6 +45,12 @@ export default async function ContactPage({
         tagline={orbit.pageCovers.contact.tagline}
         text={orbit.pageCovers.contact.text}
         crumbs={[{ label: "Home", href: "/" }, { label: "Contact" }]}
+      />
+      <BranchShowcase
+        branches={orbit.branches}
+        eyebrow="Visit"
+        title="Choose a house"
+        intro="Book a treatment or package for Kathmandu below. For Lumbini, call the branch — online booking stays at the Kathmandu house."
       />
       <section className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 pb-28 md:px-8 md:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
         <ContactBookingHub

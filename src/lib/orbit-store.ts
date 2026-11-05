@@ -12,6 +12,7 @@ import { therapistPlaceholderPath } from "@/lib/catalog-images";
 import type { OrbitAboutPage, OrbitExtraSocialLink, OrbitSocialLink, OrbitTherapist } from "@/lib/orbit-types";
 import type { GalleryImage, Service, SpaPackage } from "@/lib/types";
 import { fileMtimeMs, writeJsonFileAtomic } from "@/lib/json-file";
+import { defaultSpaBranches, reconcileBranches, type SpaBranch } from "@/lib/spa-branches";
 import { existsSync, readFileSync } from "fs";
 import path from "path";
 
@@ -196,6 +197,8 @@ export type OrbitContent = {
   email: string;
   addressLine: string;
   mapEmbedQuery: string;
+  /** Kathmandu confirms online booking. Further houses are visit-by-phone. */
+  branches: SpaBranch[];
   footerText: string;
   footerBrand: string;
   footerBottom: OrbitFooterBottom;
@@ -681,6 +684,7 @@ export function defaultOrbitContent(): OrbitContent {
     email: site.email,
     addressLine: site.addressLine,
     mapEmbedQuery: site.mapEmbedQuery,
+    branches: defaultSpaBranches(),
     footerText:
       "A Kathmandu spa for guests who want time, quiet rooms, and treatments arranged around how they actually feel.",
     footerBrand: "Kaya Healing Spa",
@@ -1017,15 +1021,16 @@ function loadOrbitContentFromDisk(): OrbitContent {
       extraSocialLinks: normalizeExtraSocialLinks(merged.extraSocialLinks),
       gallery: normalizeGallery(merged.gallery),
     };
-    return applyMenuCatalogImages(built);
+    return applyMenuCatalogImages(reconcileBranches(built));
   } catch {
     return applyMenuCatalogImages(defaults);
   }
 }
 
 export function writeOrbitContent(content: OrbitContent) {
+  const synced = reconcileBranches(content);
   const payload = {
-    ...content,
+    ...synced,
     hero: normalizeHero(content.hero),
     therapies: normalizeTherapies(content.therapies),
     whyKaya: normalizeWhyKaya(content.whyKaya),

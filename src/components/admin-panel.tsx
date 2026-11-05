@@ -16,6 +16,7 @@ import { AdminDeveloperCredit } from "@/components/admin-developer-credit";
 import { AboutPageFields } from "@/components/about-page-fields";
 import { AdminHomeEditor, type AdminHomeSlice } from "@/components/admin-home-editor";
 import { ContactPageFields } from "@/components/contact-page-fields";
+import type { SpaBranch } from "@/lib/spa-branches";
 import { Logo } from "@/components/logo";
 import { SocialIcon, socialPlatformLabels } from "@/components/social-icons";
 import Link from "next/link";
@@ -51,15 +52,17 @@ type AdminData = {
   pageCovers: OrbitContent["pageCovers"];
   addressLine: string;
   mapEmbedQuery: string;
+  branches: SpaBranch[];
 };
 
-const allSections = ["Dashboard", "Home page", "About", "Contact", "Pages", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Bookings", "Blog", "Inquiries", "Reviews", "Account"] as const;
+const allSections = ["Dashboard", "Home page", "About", "Contact", "Branches", "Pages", "Footer", "Categories", "Services", "Packages", "Gallery", "Therapists", "Bookings", "Blog", "Inquiries", "Reviews", "Account"] as const;
 
 const sectionFlagKey: Record<(typeof allSections)[number], keyof OrbitAdminSectionFlags | null> = {
   Dashboard: null,
   "Home page": "home",
   About: "about",
   Contact: "contact",
+  Branches: null,
   Pages: null,
   Footer: "footer",
   Categories: "categories",
@@ -96,6 +99,21 @@ function catalogSlice(c: AdminData): CatalogAdminSlice {
   };
 }
 
+function withBookingHouse(
+  content: AdminData,
+  patch: Partial<Pick<SpaBranch, "addressLine" | "phone" | "mapEmbedQuery">>,
+): AdminData {
+  const branches = (content.branches || []).map((branch) => (branch.bookingLocation ? { ...branch, ...patch } : branch));
+  const booking = branches.find((branch) => branch.bookingLocation) ?? branches[0];
+  return {
+    ...content,
+    branches,
+    addressLine: booking?.addressLine ?? content.addressLine,
+    phone: booking?.phone ?? content.phone,
+    mapEmbedQuery: booking?.mapEmbedQuery ?? content.mapEmbedQuery,
+  };
+}
+
 function navSections(flags: OrbitAdminSectionFlags) {
   return allSections.filter((name) => {
     const key = sectionFlagKey[name];
@@ -108,6 +126,7 @@ const navHints: Record<(typeof allSections)[number], string> = {
   "Home page": "Hero, therapies, reviews",
   About: "Story, photos, values",
   Contact: "Phone, email, address, map",
+  Branches: "Kathmandu and Lumbini",
   Pages: "Inner page banners",
   Footer: "Logo, social, legal",
   Categories: "Treatment filters",
@@ -537,12 +556,13 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
                 onCover={(contact) => setContent({ ...content, pageCovers: { ...content.pageCovers, contact } })}
                 onLocation={(location) =>
                   setContent({
-                    ...content,
-                    phone: location.phone,
+                    ...withBookingHouse(content, {
+                      phone: location.phone,
+                      addressLine: location.addressLine,
+                      mapEmbedQuery: location.mapEmbedQuery,
+                    }),
                     whatsapp: location.whatsapp,
                     email: location.email,
-                    addressLine: location.addressLine,
-                    mapEmbedQuery: location.mapEmbedQuery,
                     externalReviewLinks: {
                       ...content.externalReviewLinks,
                       googleReviewsUrl: location.googleReviewsUrl,
@@ -562,6 +582,94 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
             </>
           )}
 
+          {section === "Branches" && (
+            <>
+              <h2 className="font-serif text-2xl">Branches</h2>
+              <p className="mt-1 text-sm text-[#6B6B6B]">
+                Kathmandu stays the online booking house for treatments and packages. Lumbini is shown on the home, about, and contact pages and is arranged by phone.
+              </p>
+              {content.branches.map((branch, index) => (
+                <div key={branch.id} className="mt-6 space-y-2 rounded-2xl border border-[#efe8e0] bg-[#fffdfb] p-5">
+                  <p className="text-sm font-semibold">
+                    {branch.place || "Branch"}
+                    {branch.bookingLocation ? " · online booking" : " · phone visits"}
+                  </p>
+                  <Field
+                    label="City"
+                    value={branch.place}
+                    onChange={(place) => {
+                      const branches = content.branches.map((item, i) => (i === index ? { ...item, place } : item));
+                      setContent({ ...content, branches });
+                    }}
+                  />
+                  <Field
+                    label="Spa name"
+                    value={branch.name}
+                    onChange={(name) => {
+                      const branches = content.branches.map((item, i) => (i === index ? { ...item, name } : item));
+                      setContent({ ...content, branches });
+                    }}
+                  />
+                  <Area
+                    label="Address"
+                    value={branch.addressLine}
+                    onChange={(addressLine) => {
+                      const branches = content.branches.map((item, i) => (i === index ? { ...item, addressLine } : item));
+                      const next = { ...content, branches };
+                      setContent(branch.bookingLocation ? withBookingHouse(next, { addressLine }) : next);
+                    }}
+                  />
+                  <Field
+                    label="Phone"
+                    value={branch.phone}
+                    onChange={(phone) => {
+                      const branches = content.branches.map((item, i) => (i === index ? { ...item, phone } : item));
+                      const next = { ...content, branches };
+                      setContent(branch.bookingLocation ? withBookingHouse(next, { phone }) : next);
+                    }}
+                  />
+                  <Area
+                    label="Map search (used in the embedded map)"
+                    value={branch.mapEmbedQuery}
+                    onChange={(mapEmbedQuery) => {
+                      const branches = content.branches.map((item, i) => (i === index ? { ...item, mapEmbedQuery } : item));
+                      const next = { ...content, branches };
+                      setContent(branch.bookingLocation ? withBookingHouse(next, { mapEmbedQuery }) : next);
+                    }}
+                  />
+                  <Field
+                    label="Google Maps link"
+                    value={branch.mapsLink}
+                    onChange={(mapsLink) => {
+                      const branches = content.branches.map((item, i) => (i === index ? { ...item, mapsLink } : item));
+                      setContent({ ...content, branches });
+                    }}
+                  />
+                  <Field
+                    label="Quote"
+                    value={branch.quote}
+                    onChange={(quote) => {
+                      const branches = content.branches.map((item, i) => (i === index ? { ...item, quote } : item));
+                      setContent({ ...content, branches });
+                    }}
+                  />
+                  <Area
+                    label="Description"
+                    value={branch.description}
+                    onChange={(description) => {
+                      const branches = content.branches.map((item, i) => (i === index ? { ...item, description } : item));
+                      setContent({ ...content, branches });
+                    }}
+                    rows={8}
+                  />
+                </div>
+              ))}
+              <button type="button" className="mt-8 rounded-full bg-[#F47B20] px-5 py-2.5 text-sm font-semibold text-white" disabled={saving} onClick={() => publish(content)}>
+                {saving ? "Saving…" : "Save branches"}
+              </button>
+            </>
+          )}
+
           {section === "Footer" && (
             <>
               <h2 className="font-serif text-2xl">Brand logo</h2>
@@ -573,11 +681,11 @@ export function AdminPanel({ initial }: { initial: AdminData }) {
               />
               <Field label="Brand name" value={content.footerBrand} onChange={(v) => setContent({ ...content, footerBrand: v })} />
               <Area label="Footer description" value={content.footerText} onChange={(v) => setContent({ ...content, footerText: v })} />
-              <Field label="Phone" value={content.phone} onChange={(v) => setContent({ ...content, phone: v })} />
+              <Field label="Phone" value={content.phone} onChange={(v) => setContent(withBookingHouse(content, { phone: v }))} />
               <Field label="WhatsApp" value={content.whatsapp} onChange={(v) => setContent({ ...content, whatsapp: v })} />
               <Field label="Email" value={content.email} onChange={(v) => setContent({ ...content, email: v })} />
-              <Area label="Address" value={content.addressLine} onChange={(v) => setContent({ ...content, addressLine: v })} />
-              <Area label="Map location (Google Maps URL or place name)" value={content.mapEmbedQuery} onChange={(v) => setContent({ ...content, mapEmbedQuery: v })} />
+              <Area label="Address" value={content.addressLine} onChange={(v) => setContent(withBookingHouse(content, { addressLine: v }))} />
+              <Area label="Map location (Google Maps URL or place name)" value={content.mapEmbedQuery} onChange={(v) => setContent(withBookingHouse(content, { mapEmbedQuery: v }))} />
               <p className="mt-6 font-semibold">Social & review icons</p>
               <p className="text-sm text-[#6B6B6B]">
                 Paste full https links. <strong>Google</strong> URL also powers the contact page “Google reviews” line. Upload a clear PNG/SVG (square) if built-in icons look soft.
